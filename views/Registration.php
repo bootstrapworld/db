@@ -14,26 +14,10 @@
 	
 	<!--- AJAX calls --->
 	<script type="text/javascript">
-		function updateRq(e){
-			formObject = validateSubmission(e);
-			if(!formObject) return false;
-			console.log('validated!', formObject);
-			const data = JSON.stringify(formObject);
-			var request = new XMLHttpRequest();
-			// if the request is successful, execute the callback
-			request.onreadystatechange = function() {
-        if (request.readyState == 4 && request.status == 200) {
-          updateRp(request.responseText);
-        }
-    	}; 
-			request.open('POST', '../actions/PersonActions.php?method=update&data='+data);
-			request.send();
-		}
-
-		function updateRp( personId ){
-			if ( personId ){
+		function updateRegistrationRp( registration_id ){
+			if ( registration_id ){
 				alert( "Update successful." );
-				const urlValue = baseURL + `/views/Registration.php?registration_id=${personId}`;
+				const urlValue = baseURL + `/views/Registration.php?registration_id=${registration_id}`;
 				window.location = urlValue;
 			}
 		}
@@ -48,8 +32,8 @@
 	          deleteRp(request.responseText);
 	        }
 	    	}; 
-				const data = JSON.stringify({person_id:id});
-				request.open('POST', "../actions/PersonActions.php?method=delete&data="+data);
+				const data = JSON.stringify({registration_id:id});
+				request.open('POST', "../actions/RegistrationActions.php?method=delete&data="+data);
 				request.send();
 			}
 		}
@@ -65,14 +49,8 @@
     include 'common.php';
 
 		if(isset($_GET["registration_id"])) {
-			$mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
+			$mysqli = openDB_Connection();
 			
-			// Check connection
-			if ($mysqli -> connect_errno) {
-			  echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
-			  exit();
-			}
-	
       $sql = "SELECT * FROM Registrations AS R, People AS P, Events AS E 
       				WHERE R.registration_id = 0 AND R.person_id = P.person_id AND R.event_id = E.event_id;";
       $result = $mysqli->query($sql);
@@ -83,9 +61,8 @@
 </head>
 <body>
 	<div id="content">
-	<center>
 		<h1>Register for a Bootstrap Workshop!</h1>
-		<form id="RegistrationForm">
+		<form id="new_registration" novalidate action="../actions/RegistrationActions.php">
 		    <?php 
 		        if($_GET["registration_id"] && !$data) {
 		            echo "NOTE: no records matched <tt>person_id=".$_REQUEST["registration_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>registration_id</tt>.";
@@ -99,17 +76,16 @@
 			/>
 
 			<!-- Person fieldset -->
-			<?php include '../fragments/person-fragment.php' ?>
+			<?php include 'fragments/person-fragment.php' ?>
 
 			<input type="submit" value="Submit">
 			<?php if(isset($data)) { ?>
 				<input type="button" value="Delete Entry" onclick="deleteRq()">
 			<?php } ?>
 		</form>
-	</center>
 	</div>
 	<script>
-		document.getElementById('RegistrationForm').onsubmit = updateRq;
+	document.getElementById('new_registration').onsubmit = (e) => updateRequest(e, updateRegistrationRp);
 	</script>
 
 </body>

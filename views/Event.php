@@ -14,23 +14,7 @@
 	
 	<!--- AJAX calls --->
 	<script type="text/javascript">
-		function updateRq(e){
-			formObject = validateSubmission(e);
-			if(!formObject) return false;
-			console.log('validated!', formObject);
-			const data = JSON.stringify(formObject);
-			var request = new XMLHttpRequest();
-			// if the request is successful, execute the callback
-			request.onreadystatechange = function() {
-        if (request.readyState == 4 && request.status == 200) {
-          updateRp(request.responseText);
-        }
-    	}; 
-			request.open('POST', '../actions/EventActions.php?method=update&data='+data);
-			request.send();
-		}
-
-		function updateRp( eventId ){
+		function updateEventRp( eventId ){
 			if ( eventId ){
 				alert( "Update successful." );
 				const urlValue = baseURL + `/views/Event.php?event_id=${eventId}`;
@@ -64,26 +48,23 @@
     include 'common.php';
 
 		if(isset($_GET["event_id"])) {
-			$mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
-			
-			// Check connection
-			if ($mysqli -> connect_errno) {
-			  echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
-			  exit();
-			}
+			$mysqli = openDB_Connection();
 	
-      $sql = "SELECT * FROM Events WHERE event_id=".$_REQUEST["event_id"];
+      $sql = "SELECT * FROM Events As E, Organizations AS O WHERE E.org_id = O.org_id AND event_id=".$_REQUEST["event_id"];
       $result = $mysqli->query($sql);
       $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
+
+    	$sql = "SELECT * FROM `Registrations` AS R, `People` AS P WHERE R.person_id = P.person_id AND event_id = ".$_REQUEST["event_id"];
+      $registrations = $mysqli->query($sql);
+
       $mysqli->close();
 		}
 	?>
 </head>
 <body>
 	<div id="content">
-	<center>
 		<h1>Add or Edit a Event</h1>
-		<form id="EventForm">
+		<form id="new_event" novalidate action="../actions/EventActions.php">
 		    <?php 
 		        if($_GET["event_id"] && !$data) {
 		            echo "NOTE: no records matched <tt>event_id=".$_REQUEST["event_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>event_id</tt>.";
@@ -119,9 +100,23 @@
 					<input  id="location" name="location"  validator="alphanumbsym"
 						placeholder="123 Lolly Lane or https://zoom.us/..."
 						value="<?php echo $data["location"] ?>" 
-						type="text" size="70" maxlength="100"/>
+						type="text" size="70" maxlength="100" required="yes"/>
 					</span>
 					<label for="location">Address or URL of the event</label>
+				<br/>
+
+				<input type="hidden" id="org_id"	name="org_id"
+			   		value="<?php echo $data["org_id"] ?>" 
+				/>
+
+				<span class="formInput">
+					<input id="org_name" name="org_name"
+						placeholder="CSforAll" validator="alpha"
+						class="dropdown" datatype="organization" autocomplete="nope" target="org_id"
+						value="<?php echo $data["name"] ?>" 
+						type="text" size="70" maxlength="70" ignore="yes" />
+					<label for="employer_name">Partner Organization</label>
+				</span>
 				<br/>
 
 				<span class="formInput">
@@ -178,24 +173,26 @@
 				<input type="button" value="Delete Entry" onclick="deleteRq()">
 			<?php } ?>
 		</form>
-	</center>
+
+    <h2>Registrations</h2>
+    <ul>
+          <?php
+			if(mysqli_num_rows($registrations)) {
+			    while($row = mysqli_fetch_assoc($registrations)) {
+			?>
+		        <li><a href="Registration.php?registration_id=<?php echo $row['registration_id']; ?>">
+		  		    <?php echo $row['name_first']; ?> (<?php echo $row['name_last']; ?>)
+		  	    </a></li>
+		<?php
+			    }
+			} else {
+		    echo "No registrations were found for this event";
+			}
+		?>
+    </ul>
 	</div>
 	<script>
-		document.getElementById('EventForm').onsubmit = updateRq;
-
-		function setEventID(id) {
-				const urlValue = baseURL + `/views/Event.php?event_id=${id}`;
-				window.location = urlValue;
-		}
-		
-		var lName = document.getElementById('name_last');
-		var options = { 
-			script:	"../actions/EventActions.php?method=searchForNames&", 
-			varname: "name_last", json: true, minchars: 3,
-			callback:	function (id, obj) { setEventID(obj.id); } 
-		}
-		//lName.setAttribute('script', options.script);			
-		//var suggestObj = new AutoSuggest(lName.id, options);
+	document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);
 	</script>
 
 </body>

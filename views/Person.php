@@ -61,7 +61,6 @@
 </head>
 <body>
 	<div id="content">
-	<center>
 		<h1>Add or Edit a Person</h1>
 		    <?php 
 		        if($_GET["person_id"] && !$data) {
@@ -75,7 +74,6 @@
 			<!-- Organization modal -->
 			<?php include 'fragments/organization-fragment.php' ?>
 		</div>
-	</center>
 	</div>
 </body>
 </html>
