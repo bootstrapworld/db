@@ -1,0 +1,210 @@
+body {
+	font-family:		arial, helvetica, serif;
+	font-size:			12px;
+	padding:			0px;
+	margin:				0px;
+}
+
+
+/* Basic links and spacing of the Content DIV */
+#content{padding: 35px 15px;}
+#content a, a img{ text-decoration: none; border:	0px;}
+#content a:hover{text-decoration: underline; color: blue;}
+#content a:visited, #content a:link, #content a:active{color:	blue;}
+
+/* Define our elements */
+br{	clear: left;}
+h1{	font-size:	30px; margin:	10px 0px 0px 0px;}
+h2{	text-decoration: underline; margin: 10px 0px 0px 0px;}
+h3{	font-style:	italic; padding: 0px; margin:	10px 10px 0px 10px;}
+
+table{
+	width:				90%; 
+	border-collapse:	collapse;
+	margin:				5px;
+	text-align:			left;
+	white-space:		nowrap;
+}
+td{	border:solid 1px black;	white-space: nowrap;}
+thead{background: black; color: white; font-weight:	bold;}
+tfoot{background: #88a; color: black; font-weight:	bold;}
+table.compact{width: 550px;}
+table.smart span{display: block;}
+
+td.controls{width:	20px;}
+
+iframe{display:	none; border:0px none;}
+/* *********** Modal Window *********** */
+div#modalBackground{
+    position:			fixed;
+    left:				0;
+    top:				0;
+    width:				100%;
+    height:				100%;
+	z-index:			999;
+	background-color:	#333333;
+	display:			none;
+	opacity:			0.40;
+	filter:				alpha(opacity=40)
+}
+div#modalWindow{
+    position:			fixed;
+    left:				0;
+    top:				0;
+	z-index:			1000;
+	display:			none;
+	width:				auto;
+	height:				auto;
+}
+div#modalWindow fieldset{background: black; width: 600px; padding: 10px;}
+div.edit{width: 600px;}
+div.edit img{border: solid 1px black;}
+form.modal{display:none;}
+/* *********** FORM STYLES *********** */
+form div{
+	position:			relative; 
+	float:				left; 
+	margin-right:		10px;
+}
+div.header input{
+	position:			relative; 
+	float:				left;
+	font-size:			30px; 
+	font-weight:		bold; 
+	margin:				10px 0px 0px 0px;
+	font-family:		arial, helvetica, serif;
+}
+div.header span{
+	font-size:			30px; 
+	font-weight:		bold;
+	font-family:		sans-serif; 
+	margin-bottom:		10px;
+	clear: none;
+}
+td span{margin: 3px; padding:0px;}
+fieldset{
+	text-align: 		left;
+	width:				98%; 
+	margin:				10px 0px; 
+}
+fieldset span.formInput { display: inline-block; margin: 2px; }
+legend { font-weight: bold; }
+input, select {
+	padding: 2px; 
+	font-family: arial, helvetica, 
+	serif; 
+	font-size:12px;
+}
+input[required=yes]+label::after {content: '*'; color: red; }
+label {
+	font-size:			11px;
+	display:			block;
+	color:				black;
+	margin:				0px 0px 5px 2px;
+	clear:				left;
+	z-index:			0;
+	-moz-user-select:	none;
+    -khtml-user-select: none;
+    user-select:		none;
+}
+#Err{
+	position:			absolute;
+	top:				0px;
+	left:				0px;
+	background:			url(../images/popup.gif) top left no-repeat;
+	padding:			20px 10px 10px 10px;
+	z-index:			10000;
+	width:				230px;
+	display:			none;
+	font:				arial, helvetica, serif;
+	color:				black;
+}
+
+form.modal label{color: white;}
+form.modal legend{background: white;}
+input.dropdown {font-size: 11px;}
+/* *********** CALENDAR STYLES *********** */
+/* the table (within the div) that holds the date picker calendar */
+.dpTable {
+	font-family:		Tahoma, Arial, Helvetica, sans-serif;
+	font-size:			10px;
+	text-align:			center;
+	color:				#505050;
+	background-color:	#ece9d8;
+	width:				120px;
+	border-collapse:	collapse;
+	border:				2px solid black;
+	z-index:			1;
+	margin:				0px;
+	}
+
+/* date */
+.dpTD {border: 1px solid #ece9d8;}
+
+/* highlighted date */
+.dpDayHighlightTD { background-color:	#CCCCCC; border: 1px solid #AAAAAA;}
+
+/* mouseover date */
+.dpTDHover { background-color:	#aca998; border: 1px solid #888888;color: red; cursor: pointer;}
+
+/* Heading cell (Mo, Tu, We, etc.) */
+.dpDayTD {background-color: #CCCCCC; border: 1px solid #AAAAAA; color: black;}
+
+.dpTD a, .dpTable a{color: black;}
+
+
+/* *********** Draggable Lists *********** */
+ul.draggable {margin: 5px; padding: 10px 5px; list-style-type: none; border: solid 1px black;}
+li.draggable {
+	list-style-type:	none;
+	list-style-position:inside;
+	display:			block;
+	padding:			0px;
+	margin:				0px;
+	width:				375px;
+	font-size:			11px;
+	font-family:		Arial, sans-serif;
+	position:			relative;
+	cursor:				move;
+	z-index:			5;
+	background-color:	#eee;
+	white-space:		nowrap;
+}
+li.draggable input{
+	-moz-user-select:	none;
+    -khtml-user-select: none;
+    user-select:		none;}
+
+table.draggable{width: 375px; margin: 0px; padding: 0px; white-space: nowrap;}
+table.draggable td{width: 125px; margin: 0px; padding: 0px; white-space: nowrap;}
+
+/* ajax processing box example */
+div#JSMX_loading{
+	position:			fixed;
+	top:				20px;
+	right:				150px;
+	margin:				0px;
+	padding:			0px;
+	width:				112px;
+	height:				30px;
+	background-image:	url(processing.gif);
+	background-repeat:	no-repeat;
+	background-position:center center;
+	z-index:			200;
+}
+
+@media print {
+	body					{background: white; width: 650px}
+	div span, td span		{display: block; margin: 1px; padding: 0px;}
+	form label				{border-top: 1px solid gray; display: block;}
+	div.header label		{display: none;} 
+	fieldset				{clear: both; margin: 10px;}
+	td.controls				{display: none;}
+	div#filter label, div#filter select, div#filter input, div#filter textarea, div#filter .datepicker
+							{display: block; float:	left;}
+	form select, form input, form textarea, form .datepicker, i, p, br
+							{display: none;}
+	img						{display: none;}
+	td,tr					{margin: 0px; padding: 0px;}
+	table{display: inline-block;}
+}

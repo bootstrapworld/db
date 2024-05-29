@@ -1,0 +1,81 @@
+ul.toolbar{                         /* menu list container */
+	position:			fixed;
+	list-style-type:	none;
+	margin:				0px;
+	padding:			0px;
+	color:				white;
+	background:			black;
+	min-width:			600px;
+	width:				100%;
+	height:				29px;
+	z-index:			99;
+    }
+
+ul.toolbar li{                      /* top-level menu element */
+	list-style-type:	none;
+	float:				left;
+	width:				120px;
+}
+
+ul.toolbar ul {                     /* third-level (or greater) menu element list elements */
+	position:			absolute; 
+	list-style-type:	none;
+	display:			none;
+}
+
+ul.toolbar li a{                    /* top-level menu element links */
+	font-size:			24px;
+	font-weight:		bold;
+	text-align:			left;
+	text-decoration:	none;
+}
+
+ul.toolbar li:hover>a {					/* second-level hovering properties */
+	display:			block;
+	background:			white;
+	color:				black;
+    }
+
+ul.toolbar ul a, ul.toolbar ul li{      /* all the other level menu link elements */
+	display:			block;
+	font-size:			12px;
+	font-weight:		normal;
+    }
+	
+
+ul.toolbar li:hover ul, ul.toolbar li:hover ul a, li.over ul{           /* top-level hovering properties */
+	display:			block;
+	background:			black;
+	color:				white;
+	left:				auto;
+	padding:			0px 1px 1px 3px;
+	margin:				0px;
+	width:				114px;
+    }
+    
+ul.toolbar li ul a:hover{
+	text-decoration:	underline;
+}
+
+@media print {
+    ul.toolbar {display: none; }
+}
+
+a {color: white;}
+a, a:visited,a:link, a:active{color:	inherit;}
+
+
+div#filter{
+	position:			fixed;
+	left:				0px;
+	bottom:				0px;
+	height:				20px; 
+	width:				100%;
+	background:			black;
+	color:				white;
+	padding:			5px;
+	z-index:			99;
+}
+div#filter div#search{float: right; margin-right: 20px;}
+div#filter input, div#filter select, div#filter span {float: left;}
+div#filter span,div#filter a {margin-top: 3px;}
