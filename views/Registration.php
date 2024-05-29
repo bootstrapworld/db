@@ -8,7 +8,6 @@
 	<link rel="stylesheet" href="../css/autosuggest_inquisitor.css" type="text/css" media="screen" charset="utf-8" />
 
 	<script type="text/javascript" src="../js/scripts.js"></script>	
-	<script type="text/javascript" src="../js/datepicker.js"></script>		
 	<script type="text/javascript" src="../js/validate.js"></script>			
 	<script type="text/javascript" src="../js/autosuggest.js"></script>	
 	<script type="text/javascript" src="../js/modal.js"></script>
