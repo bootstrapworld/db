@@ -2,7 +2,7 @@
 
 	include 'common.php';
 
-	function updateEvent($data) {
+	function update($data) {
 		$mysqli = openDB_Connection();
 
     // create comma-delimited strings for columns, values, and col=val pairs
@@ -29,7 +29,7 @@
 		$mysqli -> close();
 	}
 
-	function deleteEvent($event_id) {
+	function delete($event_id) {
 		$mysqli = openDB_Connection();
 
     $values = implode(", ", array_map('quoteOrNull', array_values($event_id)));

@@ -1,38 +1,29 @@
 if (typeof(Modal) == "undefined") Modal = {}
 
-/* Initialize a Modal Object */
-Modal = function(button, id, callback){
+/* Initialize a Modal Object 
+Modal contain:
+- a "show button" which opens the modal
+- the id of the DOM element that it contains
+	-> this DOM element *must* have a button called id+"Submit"
+	-> this DOM element *must* have a button called id+"Cancel"
+- a callback function, to return some result when the modal is closed
+*/
+Modal = function(showButton, id, callback){
 	pointer				= this;
-	this.button			= button;
+	this.showButton		= showButton;
 	this.id				= id;
 	this.callback		= callback;
 	this.contents		= document.getElementById(id);
-	this.button.onclick = function (){ pointer.showModal(); return false;}	
+	showButton.onclick = function (){ pointer.showModal(); return false;}	
 }
 
-Modal.prototype.hideModal = function(){
-	document.getElementById('modalWindow').style.display = 'none';
-	document.getElementById('modalBackground').style.display = 'none';
-	// hide the error dialog, if it's open (could point to a modal field)
-	if(document.getElementById('Err')) document.getElementById('Err').style.display='none';
-	// make the modal form invisible again
-	this.contents.style.display = 'none';
-	// remove resize handlers
-	if (window.detachEvent) window.detachEvent('onresize', OnWindowResize);
-	else if (window.removeEventListener) window.removeEventListener('resize', OnWindowResize, false);
-	else window.onresize = null;
-	return;
-}
-
-Modal.prototype.showModal = function(contents){
+// ensure that all DOM elements are in place
+function ensureModalDOM() {
 	// create iframe and modal container and modal BG if they're not already created
 	if(!document.getElementById('modalBackground')){
 		modalBG			= document.createElement('div');
 		modalBG.setAttribute('id','modalBackground');
 		document.getElementsByTagName("body")[0].appendChild(modalBG);
-	}
-	if(!document.getElementById('modalIframe')){
-		document.getElementById('modalBackground').appendChild(document.createElement('iframe'));
 	}
 	if(!document.getElementById('modalWindow')){
 		modal			= document.createElement('div');
@@ -40,6 +31,19 @@ Modal.prototype.showModal = function(contents){
 		modal.setAttribute('class','modal');
 		document.getElementsByTagName("body")[0].appendChild(modal);
 	}
+}
+
+/* 
+When showing a modal:
+- populate it with the DOM contents
+- center everything, and attach a resize event they *stay* centered
+- put the focus on the first visible, editable field on the form
+- assign "hide modal" to the cancel button
+- assign callback to the submit button
+*/
+Modal.prototype.showModal = function(){
+	ensureModalDOM();
+
 	// populate the modalWindow
 	modal = document.getElementById('modalWindow');
 	modal.appendChild(this.contents);
@@ -55,24 +59,36 @@ Modal.prototype.showModal = function(contents){
 	if (document.all) document.documentElement.onscroll = OnWindowResize;
 	
 	// set focus on first non-hidden, non-disabled field in the modal form
-	var elts = this.contents.elements;
-	for(i=0; i < elts.length; i++) {
-		if (elts[i].type	== "hidden")	continue;
-		if (elts[i].disabled== true)		continue;
-		elts[i].focus();
-		break;
+	[...this.contents.querySelectorAll('input, select, textarea')]
+	  .find(elt => (elt.type !== "hidden") && (!elt.disabled))
+	  .focus();
+	
+	// set callback functions for "cancel" and "submit" buttons
+	var cancel = document.getElementById(this.id + "Cancel");
+	var submit = document.getElementById(this.id + "Submit");
+	cancel.onclick = () => pointer.hideModal();
+	/*
+	submit.onclick = () => {
+		result = submit.onclick(); // execute existing handler
+		console.log('got result', result, 'in outer submit handler');
+		if(result) this.pointer.hideModal();
+		this.pointer.callback(result); // pass the result to the callback
 	}
-	//set callback functions for "cancel" and "submit"
-	var pointer = this;
-	var id = this.id;
-	var cancel = document.getElementById(id + "Cancel");
-	cancel.onclick = function() { pointer.hideModal();}
-	var submit = document.getElementById(id + "Submit");
-	submit.onclick = function() {
-						result = eval(pointer.callback + "('"+id+"')");
-						if(result) pointer.hideModal();
-						return false;
-					}
+	*/
+}
+
+Modal.prototype.hideModal = function(){
+	document.getElementById('modalWindow').style.display = 'none';
+	document.getElementById('modalBackground').style.display = 'none';
+	// hide the error dialog, if it's open (could point to a modal field)
+	if(document.getElementById('Err')) document.getElementById('Err').style.display='none';
+	// make the modal form invisible again
+	this.contents.style.display = 'none';
+	// remove resize handlers
+	if (window.detachEvent) window.detachEvent('onresize', OnWindowResize);
+	else if (window.removeEventListener) window.removeEventListener('resize', OnWindowResize, false);
+	else window.onresize = null;
+	return;
 }
 
 //  we only need to move the dialog based on scroll position if

@@ -26,14 +26,14 @@
           updateRp(request.responseText);
         }
     	}; 
-			request.open('POST', '../actions/EventActions.php?method=updateEvent&data='+data);
+			request.open('POST', '../actions/EventActions.php?method=update&data='+data);
 			request.send();
 		}
 
 		function updateRp( eventId ){
 			if ( eventId ){
 				alert( "Update successful." );
-				const urlValue = baseURL + `/forms/Event.php?event_id=${eventId}`;
+				const urlValue = baseURL + `/views/Event.php?event_id=${eventId}`;
 				window.location = urlValue;
 			}
 		}
@@ -49,17 +49,19 @@
 	        }
 	    	}; 
 				const data = JSON.stringify({event_id:id});
-				request.open('POST', "../actions/EventActions.php?method=deleteEvent&data="+data);
+				request.open('POST', "../actions/EventActions.php?method=delete&data="+data);
 				request.send();
 			}
 		}
 		function deleteRp( rsp ){
 			alert("Deleted ID#: " + rsp );
-			const urlValue = baseURL + `/forms/Event.php`;
+			const urlValue = baseURL + `/views/Event.php`;
 			window.location = urlValue;
 		}
 	</script>
     <?php
+
+    include 'common.php';
 
 		if(isset($_GET["event_id"])) {
 			$mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
@@ -95,53 +97,79 @@
 				<legend>Event Information</legend>
 				<i style="clear: both;">You must enter at least a title, type, start & end time, and price.</i><p/>
 				
-				<input  id="title" name="title"
-					placeholder="Event Title" class="alphanum" 
-					value="<?php echo $data["title"] ?>" 
-					type="text" size="40" maxlength="50" required="yes"/>
+				<span class="formInput">
+					<input  id="title" name="title"
+						placeholder="Webinar about stuff..." validator="alphanum" 
+						value="<?php echo $data["title"] ?>" 
+						type="text" size="40" maxlength="50" required="yes"/>
+					<label for="title">Event Title</label>
+				</span>
 
-				<select  id="type" name="type" required="yes">
-						<option value="">--</option>
-						<option value="Webinar">Webinar</option>
-						<option value="Professional Development">Professional Development</option>
-				</select>
+				<span class="formInput">
+					<select  id="type" name="type" required="yes">
+							<option value="">--</option>
+							<option value="Webinar">Webinar</option>
+							<option value="Professional Development">Professional Development</option>
+					</select>
+					<label for="type">Type of Event</label>
+				</span>
 				<br/>
 
-				<input  id="location" name="location" 
-					placeholder="Event Location or Webinar Link"
-					value="<?php echo $data["location"] ?>" 
-					type="text" size="70" maxlength="100"/>
+				<span class="formInput">
+					<input  id="location" name="location"  validator="alphanumbsym"
+						placeholder="123 Lolly Lane or https://zoom.us/..."
+						value="<?php echo $data["location"] ?>" 
+						type="text" size="70" maxlength="100"/>
+					</span>
+					<label for="location">Address or URL of the event</label>
 				<br/>
 
-				Start: <input  id="start" name="start" 
-					placeholder="Start Date" class="numsym" 
+				<span class="formInput">
+					<input  id="start" name="start" 
+					placeholder="Start Date" validator="numsym" 
 					value="<?php echo $data["start"] ?>" 
 					type="date" size="30" maxlength="30" required="yes" />
+					<label for="start">Start Date</label>
+				</span>
 				
-				End: <input  id="end" name="end" 
-					placeholder="End Date" class="numsym" 
+				<span class="formInput">
+					<input  id="end" name="end" 
+					placeholder="End Date" validator="numsym" 
 					value="<?php echo $data["end"] ?>" 
 					type="date" size="30" maxlength="30"  required="yes" />
+					<label for="end">End Date</label>
+				</span>
+
+				<span class="formInput">
+					<input  id="price" name="price" 
+						placeholder="Price ($USD)" validator="numsym" 
+						value="<?php echo $data["price"] || '$0.00' ?>" 
+						type="text" size="10" maxlength="15" required="yes" />
+						<label for="price">Ticket cost</label>
+				</span>
+
+				<span class="formInput">
+					<?php echo generateDropDown("curriculum", "curriculum", $currOpts, $data["curriculum"], true); ?>
+					<label for="curriculum">Curriculum</label>
+				</span>
 				<br/>
 
-				<input  id="webpage_url" name="webpage_url" 
-					placeholder="Event URL" class="url" 
-					value="<?php echo $data["webpage_url"] ?>" 
-					type="text" size="70" maxlength="100"/>
+				<span class="formInput">
+					<input  id="webpage_url" name="webpage_url" 
+						placeholder="www.BootstrapWorld.org/workshops/..." validator="url" 
+						value="<?php echo $data["webpage_url"] ?>" 
+						type="text" size="70" maxlength="100"/>
+					<label for="webpage_url">Web page for the event</label>
+				</span>
 				<br/>
 				
-				<input  id="calendar_url" name="calendar_url" 
-					placeholder="Calendar URL" class="url" 
-					value="<?php echo $data["calendar_url"] ?>" 
-					type="text" size="70" maxlength="100"/>
-				<br/>
-
-				<input  id="price" name="price" 
-					placeholder="Price ($USD)" class="numsym" 
-					value="<?php echo $data["price"] ?>" 
-					type="text" size="10" maxlength="10" required="yes" />
-
-				<?php echo generateDropDown("event_content", $currOpts, $data["event_content"]); ?>
+				<span class="formInput">
+					<input  id="calendar_url" name="calendar_url" 
+						placeholder="Calendar URL" validator="url" 
+						value="<?php echo $data["calendar_url"] ?>" 
+						type="text" size="70" maxlength="100"/>
+					<label for="calendar_url">Calendar URL for the event</label>
+				</span>
 
 			</fieldset>
 
@@ -156,7 +184,7 @@
 		document.getElementById('EventForm').onsubmit = updateRq;
 
 		function setEventID(id) {
-				const urlValue = baseURL + `/forms/Event.php?event_id=${id}`;
+				const urlValue = baseURL + `/views/Event.php?event_id=${id}`;
 				window.location = urlValue;
 		}
 		

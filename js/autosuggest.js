@@ -131,7 +131,7 @@ AutoSuggest.prototype.setSuggestions = function (req){
 /* Build the HTML for the dropdown list */
 AutoSuggest.prototype.createList = function(arr){
 	var pointer = this;
-	if(!arr || !arr.length) return;
+	//if(!arr || !arr.length) return;
 	// get rid of old list and clear the list removal timeout
 	DOM.removeElement(this.idAs);
 	this.killTimeout();
@@ -142,10 +142,17 @@ AutoSuggest.prototype.createList = function(arr){
 	// create and populate ul, adding a link to create a new entry of <datatype>.
 	var datatype = this.fld.getAttribute('datatype')
 	var ul = DOM.createElement("ul", {id:"as_ul"});
-	//var a  = DOM.createElement("a", { href:"#" }, "Add a new " + datatype, true);
+	var a  = DOM.createElement("a", { href:"#" }, "Add a new " + datatype, true);
 	// **** see modal.js to understand this line
-	//var modalObj = new Modal(a, 'new'+datatype, 'add'+datatype);
-	var li = DOM.createElement(  "li", {}, "Possible duplicates found:", true);
+	let callback = function (id) {document.getElementById(this.fld.target).value = id;}
+	if(document.getElementById('modalWindow') && document.getElementById('modalWindow').contains(this.fld)) {
+	    console.log('add new is being called from INSIDE a modal');
+	} else {
+	    console.log('add new is being called from OUTSIDE a modal');
+	}
+	
+	var modalObj = new Modal(a, 'new_'+datatype, callback);
+	var li = DOM.createElement(  "li", {}, a, true);
 	ul.appendChild(li);
 
 	// if no results - don't do anything

@@ -25,7 +25,9 @@ function attachValidators () {
 		var selects	= forms[f].getElementsByTagName('select');
 		for (var i = 0; i < selects.length; i++) {
 			if(selects[i].getAttribute('required') == "yes") {
-				selects[i].onblur = function (){ validate(this, this.className, this.value); }
+				selects[i].onblur = function (){ 
+					validate(this, this.getAttribute('validate') || '', this.value); 
+				}
 			}
 		}	
 		for (var i = 0; i < inputs.length; i++) {
@@ -34,16 +36,17 @@ function attachValidators () {
 				continue;
 			}
 			if(inputs[i].classList.contains("dropdown")){
-				var datatype = inputs[i].getAttribute('datatype');
+				const datatype = inputs[i].getAttribute('datatype');
+				const target = inputs[i].getAttribute('target');
 				switch(datatype){
 					case "person":
 						var options = { script:	"../actions/PersonActions.php?method=searchForNames&", varname: "search", json: true,
-										callback: (id, obj) => setInfoFromDropDown(id, obj, "person")
+										callback: (id, obj) => setInfoFromDropDown(id, obj, target, "person")
 									  }
 						break;
-					case "org":
+					case "organization":
 						var options = { script:	"../actions/OrganizationActions.php?method=searchForNames&", varname: "search", json: true,
-										callback: (id, obj) => setInfoFromDropDown(id, obj, "org")
+										callback: (id, obj) => setInfoFromDropDown(id, obj, target, "org")
 									  }
 						break;
 					default: alert('no AutoSuggest options object could be created for the given datatype: ' + datatype);
@@ -53,19 +56,20 @@ function attachValidators () {
 				// set up autosuggest object (see autosuggest.js)
 				inputs[i].setAttribute('script', options.script);
 				var suggestObj = new AutoSuggest(inputs[i].id, options);
-				inputs[i].onblur = function () { validate(this, this.className, this.value); }
+				inputs[i].onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
 
 				continue;
 			} 
 			if(inputs[i].type == "text"){
-				inputs[i].onblur = function () { validate(this, this.className, this.value); }
+				inputs[i].onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
 			} else continue;
 		}
 	}
 };
 
 // populate all the fields, and automatically validate
-function setInfoFromDropDown(fieldID, obj, datatype) {
+function setInfoFromDropDown(fieldID, obj, target, datatype) {
+	if(target) { document.getElementById(target).value = obj.id; }
 	var searchParams = new URLSearchParams(window.location.search);
 	searchParams.set(datatype+"_id", obj.id);
 	window.location.search = searchParams.toString();

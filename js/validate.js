@@ -15,7 +15,7 @@ function validate_url(value) {
 	value = unescape(value);
   var objRegExp  = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
   test = objRegExp.test(value) || (value == "");
-  return [test, (test)? value : "This URL is not valid"];
+  return [test, (test)? value : "This URL is not valid (did you forget the https://?"];
 }
 
 function validate_email(value) {
@@ -125,7 +125,7 @@ function validate(elt, type, value){
 
 const numb	= '0123456789.';
 const date	= numb+'/.-';
-const numbsym = numb+'#\'\"\,\!\?/';
+const numbsym = numb+'#\'\"\,\!\?\$/';
 const lwr		= 'abcdefghijklmnopqrstuvwxyz.- ';
 const upr		= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- ';
 const alpha	= lwr+upr+'.\'&';
@@ -152,26 +152,26 @@ function validate_dropdown(value){
 
 function validate_num(value) {
 	value = unescape(value);
-	return isValid(value,numb)? [true, value] : [false, "All values must use only numbers"];
+	return isValid(value,numb)? [true, value] : [false, "Please use only numbers"];
 }
 function validate_numsym(value) {
 	value = unescape(value);
-	return isValid(value,numbsym)? [true, value] : [false, "All values must use only numbers or symbols"];
+	return isValid(value,numbsym)? [true, value] : [false, "Please use only numbers and symbols"];
 }
 function validate_lower(value) {
-	return isValid(value,lwr)? [true, value] : [false, "All values must use only lowercase letters"];
+	return isValid(value,lwr)? [true, value] : [false, "Please use only lowercase letters"];
 }
 function validate_upper(value) {
 	value = unescape(value);
-	return isValid(value,upr)? [true, value] : [false, "All values must use only uppercase letters"];
+	return isValid(value,upr)? [true, value] : [false, "Please use only uppercase letters"];
 }
 function validate_alpha(value) {
 	value = unescape(value);
-	return isValid(value,alphasym)? [true, value] : [false, "All values must use only letters"];
+	return isValid(value,alphasym)? [true, value] : [false, "Please use only letters, dashes, spaces, and periods"];
 }
 function validate_alphanum(value) {
 	value = unescape(value);
-	return isValid(value,alphasym+numbsym)? [true, value] : [false, "All values must use only letter and numbers"];
+	return isValid(value,alphasym+numbsym)? [true, value] : [false, "Please use only letter, dashes, spaces, periods, and numbers"];
 }
 function validate_alphanumbsym(value) {
 	value = unescape(value);
@@ -194,11 +194,11 @@ function validateSubmission(submitEvent){
 	elts = [...submitEvent.target.elements].filter(elt => 
 		(elt.nodeName == "SELECT") || (elt.type == "hidden") || 
 		((elt.type == "text") && (elt.classname !== "modal")));
-	
+
 	// validate every one of them
 	// we have to map first, to force the validator to check EVERYTHING
 	// instead of short-circuiting
-	valid = elts.map( elt => validate(elt, elt.className, elt.value)).every(v=>v);
+	valid = elts.map( elt => validate(elt, elt.getAttribute('validator') || '', elt.value)).every(v=>v);
 
 	// warn if there are errors and return
 	if (!valid){

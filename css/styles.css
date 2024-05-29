@@ -59,7 +59,10 @@ div#modalWindow{
 div#modalWindow fieldset{background: black; width: 600px; padding: 10px;}
 div.edit{width: 600px;}
 div.edit img{border: solid 1px black;}
-form.modal{display:none;}
+div.modal{display:none;}
+/* only display the cancel button when it's inside a modal! */
+.modalCancel { display: none; }
+div.modal .modalCancel { display: inline-block; }
 /* *********** FORM STYLES *********** */
 form div{
 	position:			relative; 
@@ -120,8 +123,8 @@ label {
 	color:				black;
 }
 
-form.modal label{color: white;}
-form.modal legend{background: white;}
+div.modal label{color: white;}
+div.modal legend{background: white;}
 input.dropdown {font-size: 11px;}
 /* *********** CALENDAR STYLES *********** */
 /* the table (within the div) that holds the date picker calendar */

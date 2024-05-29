@@ -26,14 +26,14 @@
           updateRp(request.responseText);
         }
     	}; 
-			request.open('POST', '../actions/PersonActions.php?method=addRegistration&data='+data);
+			request.open('POST', '../actions/PersonActions.php?method=update&data='+data);
 			request.send();
 		}
 
 		function updateRp( personId ){
 			if ( personId ){
 				alert( "Update successful." );
-				const urlValue = baseURL + `/forms/Registration.php?registration_id=${personId}`;
+				const urlValue = baseURL + `/views/Registration.php?registration_id=${personId}`;
 				window.location = urlValue;
 			}
 		}
@@ -49,13 +49,13 @@
 	        }
 	    	}; 
 				const data = JSON.stringify({person_id:id});
-				request.open('POST', "../actions/PersonActions.php?method=deleteRegistration&data="+data);
+				request.open('POST', "../actions/PersonActions.php?method=delete&data="+data);
 				request.send();
 			}
 		}
 		function deleteRp( rsp ){
 			alert("Deleted ID#: " + rsp );
-			const urlValue = baseURL + `/forms/Registration.php`;
+			const urlValue = baseURL + `/views/Registration.php`;
 			window.location = urlValue;
 		}
 		

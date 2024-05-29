@@ -14,30 +14,6 @@
 	
 	<!--- AJAX calls --->
 	<script type="text/javascript">
-		function updateRq(e){
-			formObject = validateSubmission(e);
-			if(!formObject) return false;
-			console.log('validated!', formObject);
-			const data = JSON.stringify(formObject);
-			var request = new XMLHttpRequest();
-			// if the request is successful, execute the callback
-			request.onreadystatechange = function() {
-        if (request.readyState == 4 && request.status == 200) {
-          updateRp(request.responseText);
-        }
-    	}; 
-			request.open('POST', '../actions/OrganizationActions.php?method=updateOrganization&data='+data);
-			request.send();
-		}
-
-		function updateRp( orgId ){
-			if ( orgId ){
-				alert( "Update successful." );
-				const urlValue = baseURL + `/forms/OrganizationActions.php?org_id=${orgId}`;
-				window.location = urlValue;
-			}
-		}
-
 		function deleteRq(){
 			const id = document.getElementById('org_id').value;
 			if(confirm("Are you sure you want to remove Organization ID# " + id + " permanently?")){
@@ -49,13 +25,13 @@
 	        }
 	    	}; 
 				const data = JSON.stringify({person_id:id});
-				request.open('POST', "../actions/OrganizationActions.php?method=deleteOrg&data="+data);
+				request.open('POST', "../actions/OrganizationActions.php?method=delete&data="+data);
 				request.send();
 			}
 		}
 		function deleteRp( rsp ){
 			alert("Deleted ID#: " + rsp );
-			const urlValue = baseURL + `/forms/Organization.php`;
+			const urlValue = baseURL + `/views/Organization.php`;
 			window.location = urlValue;
 		}
 
@@ -73,7 +49,16 @@
 			  exit();
 			}
 	
-      $sql = "SELECT * FROM Organizations WHERE org_id=".$_REQUEST["org_id"];
+      $sql = "SELECT 
+      					org_id,
+      					name,
+      					website,
+      					address,
+      					city AS org_city,
+      					state AS org_state,
+      					zip AS org_zip,
+      					parent_id
+  						FROM Organizations WHERE org_id=".$_REQUEST["org_id"];
       $result = $mysqli->query($sql);
       $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
       $mysqli->close();
@@ -84,25 +69,15 @@
 	<div id="content">
 	<center>
 		<h1>Add or Edit an Organization</h1>
-		<form id="OrganizationForm" novalidate>
 		    <?php 
 		        if($_GET["org_id"] && !$data) {
 		            echo "NOTE: no records matched <tt>org_id=".$_REQUEST["org_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>org_id</tt>.";
 		        }
 		    ?>
-			<!-- Person fieldset -->
-			<?php include '../fragments/organization-fragment.php' ?>
+			<!-- Organization Form -->
+			<?php include 'fragments/organization-fragment.php' ?>
 
-			<input type="submit" value="Submit">
-			<?php if(isset($data)) { ?>
-				<input type="button" value="Delete Entry" onclick="deleteRq()">
-			<?php } ?>
-		</form>
 	</center>
 	</div>
-	<script>
-		document.getElementById('OrganizationForm').onsubmit = updateRq;
-	</script>
-
 </body>
 </html>

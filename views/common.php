@@ -107,8 +107,8 @@ $stateOpts = [
   ["WI", "Wisconsin"],
   ["WY", "Wyoming"]];            
 
-function generateDropDown($id, $options, $actualValue, $required) {
-	$select_html = '<select id="'.$id.'" name="'.$id.'"';
+function generateDropDown($id, $name, $options, $actualValue, $required) {
+	$select_html = '<select id="'.$id.'" name="'.$name.'"';
   $select_html .= $required? 'required="yes">' : ">";
 	$select_html .='<option value="" hidden>Select one</option>';
   $optionMaker = function($value) use ($actualValue) {
