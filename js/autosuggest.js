@@ -112,17 +112,6 @@ AutoSuggest.prototype.setSuggestions = function (req){
 		for(var k in jsondata){
 			this.aSuggestions.push(jsondata[k]);
 		}
-	} else {
-		var xml = req.responseXML;
-		var results = xml.getElementsByTagName('results')[0].childNodes;
-		for (var i=0;i<results.length;i++) {
-			if (results[i].hasChildNodes())
-				this.aSuggestions.push({
-					'id'	:results[i].getAttribute('id'), 
-					'value'	:results[i].childNodes[0].nodeValue,
-					'info'	:results[i].getAttribute('info') 
-				});
-		}
 	}
 	this.idAs = "as_"+this.fld.id;
 	this.createList(this.aSuggestions);
@@ -144,11 +133,12 @@ AutoSuggest.prototype.createList = function(arr){
 	var ul = DOM.createElement("ul", {id:"as_ul"});
 	var a  = DOM.createElement("a", { href:"#" }, "Add a new " + datatype, true);
 	// **** see modal.js to understand this line
-	let callback = function (id) {document.getElementById(this.fld.target).value = id;}
+	const target = this.fld.getAttribute('target');
+	let callback = function (id) {document.getElementById(target).value = id;}
 	if(document.getElementById('modalWindow') && document.getElementById('modalWindow').contains(this.fld)) {
-	    console.log('add new is being called from INSIDE a modal');
+	    console.log('building Autosuggest INSIDE a modal');
 	} else {
-	    console.log('add new is being called from OUTSIDE a modal');
+	    console.log('building Autosuggest OUTSIDE a modal');
 	}
 	
 	var modalObj = new Modal(a, 'new_'+datatype, callback);

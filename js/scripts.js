@@ -67,12 +67,41 @@ function attachValidators () {
 	}
 };
 
-// populate all the fields, and automatically validate
+// Given a form submission event, validate the form and
+// send the validated JSON to the form's "action", using
+// the form's "method". Then pass the response to the callback
+function updateRequest(e, callback) {
+	console.log('processing updateRequest', e)
+	// validate the form and convert to JSON
+	formObject = validateSubmission(e);
+	if(!formObject) return false;
+	console.log('validated!', formObject);
+	const data = JSON.stringify(formObject);
+
+	// append method and JSON-formatted string to post address
+	const target = event.currentTarget;
+	target.action += '?method=update&data='+data; 
+
+	return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+      resolve(this.responseText);
+    };
+    xhr.onerror = reject;
+    xhr.open(target.method, target.action);
+    xhr.send();
+  }).then(callback);
+}
+
+// If there's a target
 function setInfoFromDropDown(fieldID, obj, target, datatype) {
-	if(target) { document.getElementById(target).value = obj.id; }
-	var searchParams = new URLSearchParams(window.location.search);
-	searchParams.set(datatype+"_id", obj.id);
-	window.location.search = searchParams.toString();
+	if(target) { 
+		document.getElementById(target).value = obj.id; 
+	} else {
+		var searchParams = new URLSearchParams(window.location.search);
+		searchParams.set(datatype+"_id", obj.id);
+		window.location.search = searchParams.toString();		
+	}
 }
 
 // add a new row, with a dropdown of types, hidden ID field, dropdown input and phone/address cells

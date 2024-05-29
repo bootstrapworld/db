@@ -67,14 +67,14 @@ Modal.prototype.showModal = function(){
 	var cancel = document.getElementById(this.id + "Cancel");
 	var submit = document.getElementById(this.id + "Submit");
 	cancel.onclick = () => pointer.hideModal();
-	/*
-	submit.onclick = () => {
-		result = submit.onclick(); // execute existing handler
-		console.log('got result', result, 'in outer submit handler');
-		if(result) this.pointer.hideModal();
-		this.pointer.callback(result); // pass the result to the callback
+	const oldOnSubmit = this.contents.onsubmit;
+	this.contents.onsubmit = (e) => {
+		result = oldOnSubmit(e).then(id => {
+			console.log('got result', id, 'in outer submit handler')
+			if(id) this.hideModal();
+			this.callback(id); // pass the result to the callback
+		});
 	}
-	*/
 }
 
 Modal.prototype.hideModal = function(){

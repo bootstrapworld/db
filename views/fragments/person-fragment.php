@@ -1,4 +1,4 @@
-<form id="new_person" novalidate>
+<form id="new_person" novalidate action="../actions/PersonActions.php">
 <fieldset>
 	<legend>Personal Information</legend>
 	<i style="clear: both;">You must enter at least a first and last name, email address, city and state.</i><p/>
@@ -163,37 +163,52 @@
 
 	<input type="submit" id="new_personSubmit" value="Submit">
 	<?php if(isset($data)) { ?>
-		<input type="button" value="Delete Entry" onclick="deleteRq()">
+		<input type="button" value="Delete Entry" onclick="deleteRq()" form="delete_person">
 	<?php } ?>
 	<input type="button" id="new_personCancel" class="modalCancel" value="Cancel" />
 </fieldset>
 </form>
 <script>
-function updatePersonRq(e){
-	formObject = validateSubmission(e);
-	if(!formObject) return false;
-	console.log('validated!', formObject);
-	const data = JSON.stringify(formObject);
-	var request = new XMLHttpRequest();
-	// if the request is successful, execute the callback
-	request.onreadystatechange = function() {
-	if (request.readyState == 4 && request.status == 200) {
-	  updatePersonRp(request.responseText);
-	}
-}; 
-	request.open('POST', '../actions/PersonActions.php?method=update&data='+data);
-	request.send();
-}
 
+// Once we know the DB update was successful:
+// - if we're inside a modal
+// - if we're not, rewrite the URL to switch to edit the record
 function updatePersonRp( personId ){
 	if ( personId ){
-		alert( "Update successful." );
-		const urlValue = baseURL + `/views/Person.php?person_id=${personId}`;
-		window.location = urlValue;
+		const wrapper = document.getElementById('new_person').parentNode;
+		if(wrapper.classList.contains("modal")) {
+				console.log('returning', personId,'from updatePersonRp');
+				return personId; 
+		} else {
+			const urlValue = baseURL + `/views/Person.php?person_id=${personId}`;
+			window.location = urlValue;
+		}
+	}
+}	
+
+function deleteRq(){
+	const id = document.getElementById('person_id').value;
+	if(confirm("Are you sure you want to remove Person ID# " + id + " permanently?")){
+		var request = new XMLHttpRequest();
+		// if the request is successful, execute the callback
+		request.onreadystatechange = function() {
+      if (request.readyState == 4 && request.status == 200) {
+        deleteRp(request.responseText);
+      }
+  	}; 
+		const data = JSON.stringify({person_id:id});
+		request.open('POST', "../actions/PersonActions.php?method=delete&data="+data);
+		request.send();
 	}
 }
+function deleteRp( rsp ){
+	alert("Deleted ID#: " + rsp );
+	const urlValue = baseURL + `/views/Person.php`;
+	window.location = urlValue;
+}
 
-document.getElementById('new_personSubmit').onsubmit = updatePersonRq;
+
+document.getElementById('new_person').onsubmit = (e) => updateRequest(e, updatePersonRp);
 
 // turn off autocomplete if we're already looking at an established person
 if(document.getElementById('person_id').value != "") {

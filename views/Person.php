@@ -11,31 +11,7 @@
 	<script type="text/javascript" src="../js/validate.js"></script>			
 	<script type="text/javascript" src="../js/autosuggest.js"></script>	
 	<script type="text/javascript" src="../js/modal.js"></script>
-	
-	<!--- AJAX calls --->
-	<script type="text/javascript">
-		function deleteRq(){
-			const id = document.getElementById('person_id').value;
-			if(confirm("Are you sure you want to remove Person ID# " + id + " permanently?")){
-				var request = new XMLHttpRequest();
-				// if the request is successful, execute the callback
-				request.onreadystatechange = function() {
-	        if (request.readyState == 4 && request.status == 200) {
-	          deleteRp(request.responseText);
-	        }
-	    	}; 
-				const data = JSON.stringify({person_id:id});
-				request.open('POST', "../actions/PersonActions.php?method=delete&data="+data);
-				request.send();
-			}
-		}
-		function deleteRp( rsp ){
-			alert("Deleted ID#: " + rsp );
-			const urlValue = baseURL + `/views/Person.php`;
-			window.location = urlValue;
-		}
-	</script>
-    <?php
+   <?php
 
     include 'common.php';
 
@@ -48,35 +24,35 @@
 			  exit();
 			}
 	
-      $sql = "SELECT
-      					person_id,
-      					name_first,
-      					name_last,
-      					email_preferred,
-      					email_professional,
-      					email_google,
-      					role,
-      					employer_id,
-      					home_phone,
-      					work_phone,
-      					cell_phone,
-      					home_address,
-      					P.city AS person_city,
-      					P.state AS person_state,
-      					P.zip AS person_zip,
-      					grades_taught,
-      					primary_subject,
-      					prior_years_coding,
-      					race,
-      					other_credentials,
-      					O.name AS employer_name,
-      					O.city AS org_city,
-      					O.state AS org_state,
-      					O.zip AS org_zip
-      				FROM People AS P
-      				LEFT JOIN Organizations AS O
-      				ON P.employer_id=O.org_id
-      				WHERE person_id=".$_REQUEST["person_id"];
+    $sql = "SELECT
+							person_id,
+							name_first,
+							name_last,
+							email_preferred,
+							email_professional,
+							email_google,
+							role,
+							employer_id,
+							home_phone,
+							work_phone,
+							cell_phone,
+							home_address,
+							P.city AS person_city,
+							P.state AS person_state,
+							P.zip AS person_zip,
+							grades_taught,
+							primary_subject,
+							prior_years_coding,
+							race,
+							other_credentials,
+							O.name AS employer_name,
+							O.city AS org_city,
+							O.state AS org_state,
+							O.zip AS org_zip
+						FROM People AS P
+						LEFT JOIN Organizations AS O
+						ON P.employer_id=O.org_id
+						WHERE person_id=".$_REQUEST["person_id"];
       $result = $mysqli->query($sql);
       $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
       $mysqli->close();

@@ -1,4 +1,4 @@
-<form id="new_organization" novalidate>
+<form id="new_organization" novalidate action="../actions/OrganizationActions.php">
 	<fieldset>
 		<legend>Organization Information</legend>
 		<i style="clear: both;">You must enter at least a last name, city and state.</i><p/>
@@ -78,23 +78,6 @@
 </form>
 
 <script>
-	function updateOrgRq(e) {
-		formObject = validateSubmission(e);
-		if(!formObject) return false;
-		console.log('validated!', formObject);
-		const data = JSON.stringify(formObject);
-		var request = new XMLHttpRequest();
-		// if the request is successful, execute the callback
-		request.onreadystatechange = function() {
-			if (request.readyState == 4 && request.status == 200) {
-				console.log('response received! calling updateOrgRp, will return result with', request.responseText);
-			  return updateOrgRp(request.responseText);
-			}
-			request.open('POST', '../actions/OrganizationActions.php?method=update&data='+data);
-			request.send();
-		}
-	}
-
 	// Once we know the DB update was successful:
 	// - if we're inside a modal
 	// - if we're not, rewrite the URL to switch to edit the record
@@ -110,7 +93,7 @@
 			}
 		}
 	}	
-document.getElementById('new_organizationSubmit').onsubmit = updateOrgRq;
+document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
 
 // turn off autocomplete if we're already looking at an established organization
 if(document.getElementById('org_id').value != "") {
