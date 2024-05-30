@@ -6,23 +6,23 @@ $data = json_decode($_REQUEST["data"], true);
 if($method == "update") { update($data); }
 if($method == "deleteEvent") { delete($data); }
 if($method == "searchForNames") { searchForNames($data); }
-  
+	
 function quoteOrNull($value) {
-  if (trim($value) === '') return 'NULL';
-  else return "'".$value."'";
+	if (trim($value) === '') return 'NULL';
+	else return "'".$value."'";
 }
 
 function openDB_Connection() {
-  // servername, username, password, database name
-    $mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
+	// servername, username, password, database name
+		$mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
 
-    // Check connection
-    if ($mysqli -> connect_errno) {
-      echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
-      exit();
-    }
-    
-    return $mysqli;
+		// Check connection
+		if ($mysqli -> connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
+			exit();
+		}
+		
+		return $mysqli;
 }
 
 ?>

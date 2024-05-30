@@ -13,7 +13,7 @@ window.onload = function () {
 	}	
 };
 function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+		return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 /* Attach validation calls and dropdowns to INPUT fields */
@@ -42,12 +42,12 @@ function attachValidators () {
 					case "person":
 						var options = { script:	"../actions/PersonActions.php?method=searchForNames&", varname: "search", json: true,
 										callback: (id, obj) => setInfoFromDropDown(id, obj, target, "person")
-									  }
+										}
 						break;
 					case "organization":
 						var options = { script:	"../actions/OrganizationActions.php?method=searchForNames&", varname: "search", json: true,
 										callback: (id, obj) => setInfoFromDropDown(id, obj, target, "org")
-									  }
+										}
 						break;
 					default: alert('no AutoSuggest options object could be created for the given datatype: ' + datatype);
 						break;		
@@ -83,14 +83,14 @@ function updateRequest(e, callback) {
 	target.action += '?method=update&data='+data; 
 
 	return new Promise(function(resolve, reject) {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-      resolve(this.responseText);
-    };
-    xhr.onerror = reject;
-    xhr.open(target.method, target.action);
-    xhr.send();
-  }).then(callback);
+		var xhr = new XMLHttpRequest();
+		xhr.onload = function() {
+			resolve(this.responseText);
+		};
+		xhr.onerror = reject;
+		xhr.open(target.method, target.action);
+		xhr.send();
+	}).then(callback);
 }
 
 // If there's a target

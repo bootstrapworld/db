@@ -110,9 +110,9 @@ function GetWindowWidth(){
 }
 
 function GetWindowHeight(){
-    var height =document.documentElement && document.documentElement.clientHeight ||
+	var height =document.documentElement && document.documentElement.clientHeight ||
 				document.body && document.body.clientHeight ||
 				document.body && document.body.parentNode && document.body.parentNode.clientHeight ||
 				0;
-  	return height;
+	return height;
 }

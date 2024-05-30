@@ -1,28 +1,28 @@
 <?php
 
 function openDB_Connection() {
-  // servername, username, password, database name
-    $mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
+	// servername, username, password, database name
+		$mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
 
-    // Check connection
-    if ($mysqli -> connect_errno) {
-      echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
-      exit();
-    }
-    
-    return $mysqli;
+		// Check connection
+		if ($mysqli -> connect_errno) {
+			echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
+			exit();
+		}
+		
+		return $mysqli;
 }
 
 // Taken from https://idealdeisurvey.stanford.edu/frequently-asked-questions/survey-definitions
 $raceOpts = ["American Indian or Alaska Native", 
-            "Asian or Asian American",
-            "Black or African American",
-            "Hispanic or Latino/a",
-            "Middle Eastern or North African",
-            "Native Hawai`ian or Pacific Islander",
-            "White or European",
-            "More than one race",
-            "Prefer not to say"];
+						"Asian or Asian American",
+						"Black or African American",
+						"Hispanic or Latino/a",
+						"Middle Eastern or North African",
+						"Native Hawai`ian or Pacific Islander",
+						"White or European",
+						"More than one race",
+						"Prefer not to say"];
 
 $gradeOpts = ["Pre-K",
 						"Elementary",
@@ -68,65 +68,65 @@ $currOpts = ["Algebra",
 						 "History/SS"];
 
 $stateOpts = [
-  ["AL", "Alabama"],
-  ["AK", "Alaska"],
-  ["AZ", "Arizona"],
-  ["AR", "Arkansas"],
-  ["CA", "California"],
-  ["CO", "Colorado"],
-  ["CT", "Connecticut"],
-  ["DE", "Delaware"],
-  ["DC", "District of Columbia"],
-  ["FL", "Florida"],
-  ["GA", "Georgia"],
-  ["HI", "Hawaii"],
-  ["ID", "Idaho"],
-  ["IL", "Illinois"],
-  ["IN", "Indiana"],
-  ["IA", "Iowa"],
-  ["KS", "Kansas"],
-  ["KY", "Kentucky"],
-  ["LA", "Louisiana"],
-  ["ME", "Maine"],
-  ["MD", "Maryland"],
-  ["MA", "Massachusetts"],
-  ["MI", "Michigan"],
-  ["MN", "Minnesota"],
-  ["MS", "Mississippi"],
-  ["MO", "Missouri"],
-  ["MT", "Montana"],
-  ["NB", "Nebraska"],
-  ["NV", "Nevada"],
-  ["NH", "New Hampshire"],
-  ["NJ", "New Jersey"],
-  ["NM", "New Mexico"],
-  ["NY", "New York"],
-  ["NC", "North Carolina"],
-  ["ND", "North Dakota"],
-  ["OH", "Ohio"],
-  ["OK", "Oklahoma"],
-  ["OR", "Oregon"],
-  ["PA", "Pennsylvania"],
-  ["RI", "Rhode Island"],
-  ["SC", "South Carolina"],
-  ["SD", "South Dakota"],
-  ["TN", "Tennessee"],
-  ["TX", "Texas"],
-  ["UT", "Utah"],
-  ["VT", "Vermont"],
-  ["VA", "Virginia"],
-  ["WA", "Washington"],
-  ["WV", "West Virginia"],
-  ["WI", "Wisconsin"],
-  ["WY", "Wyoming"]];            
+	["AL", "Alabama"],
+	["AK", "Alaska"],
+	["AZ", "Arizona"],
+	["AR", "Arkansas"],
+	["CA", "California"],
+	["CO", "Colorado"],
+	["CT", "Connecticut"],
+	["DE", "Delaware"],
+	["DC", "District of Columbia"],
+	["FL", "Florida"],
+	["GA", "Georgia"],
+	["HI", "Hawaii"],
+	["ID", "Idaho"],
+	["IL", "Illinois"],
+	["IN", "Indiana"],
+	["IA", "Iowa"],
+	["KS", "Kansas"],
+	["KY", "Kentucky"],
+	["LA", "Louisiana"],
+	["ME", "Maine"],
+	["MD", "Maryland"],
+	["MA", "Massachusetts"],
+	["MI", "Michigan"],
+	["MN", "Minnesota"],
+	["MS", "Mississippi"],
+	["MO", "Missouri"],
+	["MT", "Montana"],
+	["NB", "Nebraska"],
+	["NV", "Nevada"],
+	["NH", "New Hampshire"],
+	["NJ", "New Jersey"],
+	["NM", "New Mexico"],
+	["NY", "New York"],
+	["NC", "North Carolina"],
+	["ND", "North Dakota"],
+	["OH", "Ohio"],
+	["OK", "Oklahoma"],
+	["OR", "Oregon"],
+	["PA", "Pennsylvania"],
+	["RI", "Rhode Island"],
+	["SC", "South Carolina"],
+	["SD", "South Dakota"],
+	["TN", "Tennessee"],
+	["TX", "Texas"],
+	["UT", "Utah"],
+	["VT", "Vermont"],
+	["VA", "Virginia"],
+	["WA", "Washington"],
+	["WV", "West Virginia"],
+	["WI", "Wisconsin"],
+	["WY", "Wyoming"]];            
 
 function generateDropDown($id, $name, $options, $actualValue, $required) {
 	$select_html = '<select id="'.$id.'" name="'.$name.'"';
-  $select_html .= $required? 'required="yes">' : ">";
+	$select_html .= $required? 'required="yes">' : ">";
 	$select_html .='<option value="" hidden>Select one</option>';
-  $optionMaker = function($value) use ($actualValue) {
-  	// convert non k/v-pairs into k/k pairs,
-    if (!is_array($value)) { $value = [$value, $value]; }
+	$optionMaker = function($value) use ($actualValue) {
+		// convert non k/v-pairs into k/k pairs,
+		if (!is_array($value)) { $value = [$value, $value]; }
 		return '<option value="'.$value[0].'"'.
 			($actualValue==$value[0]? "selected" : "").'>'.
 			$value[1].'</option>';

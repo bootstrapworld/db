@@ -65,7 +65,7 @@
 				class="dropdown" datatype="organization" autocomplete="nope" target="parent_id"
 				value="<?php echo $data["parent_name"] ?>" 
 				type="text" size="70" maxlength="70" ignore="yes" />
-			<label for="parent_org_name">Parent Organization Name</label>
+			<label for="parent_org_name">Parent Organization (e.g. district)</label>
 		</span>
 		<br/>
 

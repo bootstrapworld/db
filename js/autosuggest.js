@@ -136,9 +136,9 @@ AutoSuggest.prototype.createList = function(arr){
 	const target = this.fld.getAttribute('target');
 	let callback = function (id) {document.getElementById(target).value = id;}
 	if(document.getElementById('modalWindow') && document.getElementById('modalWindow').contains(this.fld)) {
-	    console.log('building Autosuggest INSIDE a modal');
+		console.log('building Autosuggest INSIDE a modal');
 	} else {
-	    console.log('building Autosuggest OUTSIDE a modal');
+		console.log('building Autosuggest OUTSIDE a modal');
 	}
 	
 	var modalObj = new Modal(a, 'new_'+datatype, callback);

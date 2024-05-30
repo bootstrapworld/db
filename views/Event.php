@@ -28,10 +28,10 @@
 				var request = new XMLHttpRequest();
 				// if the request is successful, execute the callback
 				request.onreadystatechange = function() {
-	        if (request.readyState == 4 && request.status == 200) {
-	          deleteRp(request.responseText);
-	        }
-	    	}; 
+					if (request.readyState == 4 && request.status == 200) {
+						deleteRp(request.responseText);
+					}
+				}; 
 				const data = JSON.stringify({event_id:id});
 				request.open('POST', "../actions/EventActions.php?method=delete&data="+data);
 				request.send();
@@ -43,21 +43,21 @@
 			window.location = urlValue;
 		}
 	</script>
-    <?php
+		<?php
 
-    include 'common.php';
+		include 'common.php';
 
 		if(isset($_GET["event_id"])) {
 			$mysqli = openDB_Connection();
 	
-      $sql = "SELECT * FROM Events As E, Organizations AS O WHERE E.org_id = O.org_id AND event_id=".$_REQUEST["event_id"];
-      $result = $mysqli->query($sql);
-      $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
+			$sql = "SELECT * FROM Events As E, Organizations AS O WHERE E.org_id = O.org_id AND event_id=".$_REQUEST["event_id"];
+			$result = $mysqli->query($sql);
+			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 
-    	$sql = "SELECT * FROM `Registrations` AS R, `People` AS P WHERE R.person_id = P.person_id AND event_id = ".$_REQUEST["event_id"];
-      $registrations = $mysqli->query($sql);
+			$sql = "SELECT * FROM `Registrations` AS R, `People` AS P WHERE R.person_id = P.person_id AND event_id = ".$_REQUEST["event_id"];
+			$registrations = $mysqli->query($sql);
 
-      $mysqli->close();
+			$mysqli->close();
 		}
 	?>
 </head>
@@ -65,13 +65,13 @@
 	<div id="content">
 		<h1>Add or Edit a Event</h1>
 		<form id="new_event" novalidate action="../actions/EventActions.php">
-		    <?php 
-		        if($_GET["event_id"] && !$data) {
-		            echo "NOTE: no records matched <tt>event_id=".$_REQUEST["event_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>event_id</tt>.";
-		        }
-		    ?>
+				<?php 
+						if($_GET["event_id"] && !$data) {
+								echo "NOTE: no records matched <tt>event_id=".$_REQUEST["event_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>event_id</tt>.";
+						}
+				?>
 			<input type="hidden" id="event_id"	name="event_id"
-				   value="<?php echo $data["event_id"] ?>" 
+					 value="<?php echo $data["event_id"] ?>" 
 			/>
 
 			<fieldset>
@@ -106,7 +106,7 @@
 				<br/>
 
 				<input type="hidden" id="org_id"	name="org_id"
-			   		value="<?php echo $data["org_id"] ?>" 
+						value="<?php echo $data["org_id"] ?>" 
 				/>
 
 				<span class="formInput">
@@ -174,22 +174,22 @@
 			<?php } ?>
 		</form>
 
-    <h2>Registrations</h2>
-    <ul>
-          <?php
+		<h2>Registrations</h2>
+		<ul>
+					<?php
 			if(mysqli_num_rows($registrations)) {
-			    while($row = mysqli_fetch_assoc($registrations)) {
+					while($row = mysqli_fetch_assoc($registrations)) {
 			?>
-		        <li><a href="Registration.php?registration_id=<?php echo $row['registration_id']; ?>">
-		  		    <?php echo $row['name_first']; ?> (<?php echo $row['name_last']; ?>)
-		  	    </a></li>
+						<li><a href="Registration.php?registration_id=<?php echo $row['registration_id']; ?>">
+							<?php echo $row['name_first']; ?> (<?php echo $row['name_last']; ?>)
+						</a></li>
 		<?php
-			    }
+					}
 			} else {
-		    echo "No registrations were found for this event";
+				echo "No registrations were found for this event";
 			}
 		?>
-    </ul>
+		</ul>
 	</div>
 	<script>
 	document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);

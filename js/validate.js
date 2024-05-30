@@ -8,14 +8,14 @@ function validate_phone(value){
 	}
 	var objRegExp  =  /^(\d{10})((x|ext)\d{1,5}){0,1}$/;
 	if(!objRegExp.test(FmtStr)) return [false, "Phone numbers must have 10 digits. Extensions are specified with an \"x\" before the number."]
-    else return [true, "(" + FmtStr.substring(0,3) + ") " + FmtStr.substring(3,6) + "-" + FmtStr.substring(6,10)+FmtStr.substring(10,FmtStr.length)];
-  }
+		else return [true, "(" + FmtStr.substring(0,3) + ") " + FmtStr.substring(3,6) + "-" + FmtStr.substring(6,10)+FmtStr.substring(10,FmtStr.length)];
+	}
 
 function validate_url(value) {
 	value = unescape(value);
-  var objRegExp  = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
-  test = objRegExp.test(value) || (value == "");
-  return [test, (test)? value : "This URL is not valid (did you forget the https://?"];
+	var objRegExp  = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
+	test = objRegExp.test(value) || (value == "");
+	return [test, (test)? value : "This URL is not valid (did you forget the https://?"];
 }
 
 function validate_email(value) {
@@ -208,22 +208,22 @@ Please correct all the boxes marked in red, and then resubmit.`);
 	}
 	const formData = new FormData(submitEvent.target);
 	var formObject = {};
-  formData.forEach((value, key) => {
-    // Reflect.has in favor of: object.hasOwnProperty(key)
-    if(!Reflect.has(formObject, key)){
-      formObject[key] = value;
-      return;
-    }
-    if(!Array.isArray(formObject[key])){
-      formObject[key] = [formObject[key]];    
-    }
-    formObject[key].push(value);
-  });
+	formData.forEach((value, key) => {
+		// Reflect.has in favor of: object.hasOwnProperty(key)
+		if(!Reflect.has(formObject, key)){
+			formObject[key] = value;
+			return;
+		}
+		if(!Array.isArray(formObject[key])){
+			formObject[key] = [formObject[key]];    
+		}
+		formObject[key].push(value);
+	});
 
-  // remove any elements that should be ignored
-  const eltsToIgnore = [...document.querySelectorAll('*[ignore]')];
-  eltsToIgnore.forEach(elt => delete formObject[elt.name]);
+	// remove any elements that should be ignored
+	const eltsToIgnore = [...document.querySelectorAll('*[ignore]')];
+	eltsToIgnore.forEach(elt => delete formObject[elt.name]);
 
-  return formObject;
+	return formObject;
 }
 

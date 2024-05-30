@@ -130,7 +130,7 @@
 			class="dropdown" datatype="organization" autocomplete="nope" target="employer_id"
 			value="<?php echo $data["employer_name"] ?>" 
 			type="text" size="70" maxlength="70" ignore="yes" />
-		<label for="employer_name">Employer/School Name</label>
+		<label for="employer_name">School or Employer Name</label>
 	</span>
 	<br/>
 

@@ -28,10 +28,10 @@
 				var request = new XMLHttpRequest();
 				// if the request is successful, execute the callback
 				request.onreadystatechange = function() {
-	        if (request.readyState == 4 && request.status == 200) {
-	          deleteRp(request.responseText);
-	        }
-	    	}; 
+					if (request.readyState == 4 && request.status == 200) {
+						deleteRp(request.responseText);
+					}
+				}; 
 				const data = JSON.stringify({registration_id:id});
 				request.open('POST', "../actions/RegistrationActions.php?method=delete&data="+data);
 				request.send();
@@ -44,18 +44,24 @@
 		}
 		
 	</script>
-    <?php
+		<?php
 
-    include 'common.php';
+		include 'common.php';
 
 		if(isset($_GET["registration_id"])) {
 			$mysqli = openDB_Connection();
 			
-      $sql = "SELECT * FROM Registrations AS R, People AS P, Events AS E 
-      				WHERE R.registration_id = 0 AND R.person_id = P.person_id AND R.event_id = E.event_id;";
-      $result = $mysqli->query($sql);
-      $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
-      $mysqli->close();
+			$sql = "SELECT * FROM Registrations AS R, People AS P, Events AS E 
+							WHERE R.registration_id = 0 AND R.person_id = P.person_id AND R.event_id = E.event_id;";
+			$result = $mysqli->query($sql);
+			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
+
+			$sql =   "SELECT * FROM Events AS E
+                LEFT JOIN Organizations AS O
+                ON O.org_id = E.org_id
+                WHERE E.start > CURRENT_DATE"
+      $events = $mysqli->query($sql);
+			$mysqli->close();
 		}
 	?>
 </head>
@@ -63,16 +69,16 @@
 	<div id="content">
 		<h1>Register for a Bootstrap Workshop!</h1>
 		<form id="new_registration" novalidate action="../actions/RegistrationActions.php">
-		    <?php 
-		        if($_GET["registration_id"] && !$data) {
-		            echo "NOTE: no records matched <tt>person_id=".$_REQUEST["registration_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>registration_id</tt>.";
-		        }
-		    ?>
+				<?php 
+						if($_GET["registration_id"] && !$data) {
+								echo "NOTE: no records matched <tt>person_id=".$_REQUEST["registration_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>registration_id</tt>.";
+						}
+				?>
 			<input type="hidden" id="registration_id"	name="registration_id"
-				   value="<?php echo $data["registration_id"] ?>" 
+					 value="<?php echo $data["registration_id"] ?>" 
 			/>
 			<input type="hidden" id="event_id"	name="event_id"
-				   value="<?php echo $_GET["event_id"] ?>" 
+					 value="<?php echo $_GET["event_id"] ?>" 
 			/>
 
 			<!-- Person fieldset -->

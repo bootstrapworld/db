@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="../js/modal.js"></script>
    <?php
 
-    include 'common.php';
+	include 'common.php';
 
 		if(isset($_GET["person_id"])) {
 			$mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
@@ -24,7 +24,7 @@
 			  exit();
 			}
 	
-    $sql = "SELECT
+	$sql = "SELECT
 							person_id,
 							name_first,
 							name_last,
@@ -53,20 +53,28 @@
 						LEFT JOIN Organizations AS O
 						ON P.employer_id=O.org_id
 						WHERE person_id=".$_REQUEST["person_id"];
-      $result = $mysqli->query($sql);
-      $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
-      $mysqli->close();
+	  $result = $mysqli->query($sql);
+	  $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
+
+	  $sql =   "SELECT * FROM Registrations AS R, Events AS E
+				LEFT JOIN Organizations AS O
+				ON O.org_id = E.org_id
+				WHERE R.event_id = E.event_id
+				AND R.person_id = ".$_REQUEST["person_id"];
+	  $events = $mysqli->query($sql);
+
+	  $mysqli->close();
 		}
 	?>
 </head>
 <body>
 	<div id="content">
 		<h1>Add or Edit a Person</h1>
-		    <?php 
-		        if($_GET["person_id"] && !$data) {
-		            echo "NOTE: no records matched <tt>person_id=".$_REQUEST["person_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>person_id</tt>.";
-		        }
-		    ?>
+			<?php 
+				if($_GET["person_id"] && !$data) {
+					echo "NOTE: no records matched <tt>person_id=".$_REQUEST["person_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>person_id</tt>.";
+				}
+			?>
 			<!-- Person form -->
 			<?php include 'fragments/person-fragment.php' ?>
 
@@ -74,6 +82,30 @@
 			<!-- Organization modal -->
 			<?php include 'fragments/organization-fragment.php' ?>
 		</div>
+
+		<h2>Events</h2>
+		<ul>
+			<?php
+				if(mysqli_num_rows($events)) {
+					while($row = mysqli_fetch_assoc($events)) {
+						$start = date_create($row['start']);
+						$end   = date_create($row['end']);
+				?>
+					<li><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['title'] ?></a>
+						<?php
+							if(isset($row['org_id'])) {
+								echo 'with <a href="Organization.php?org_id="'.$row["org_id"].'">'.$row["name"].'</a>';
+							}
+						?>
+						<?php if($row['end'] == $row['start']) echo date_format($start,"M jS, Y"); else echo date_format($start,"M jS")." - ".date_format($end,"M jS, Y"); ?>
+					</li>
+			<?php
+					}
+				} else {
+				echo "No events were found that are associated with this organization";
+				}
+			?>
+		</ul>
 	</div>
 </body>
 </html>
