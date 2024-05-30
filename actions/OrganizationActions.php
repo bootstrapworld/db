@@ -5,15 +5,15 @@
 	function update($data) {
 		$mysqli = openDB_Connection();
 
-	// create comma-delimited strings for columns, values, and col=val pairs
-	$columns = implode(", ", array_keys($data));
-	$values = implode(", ", array_map('quoteOrNull', array_values($data)));
-	$updateFields = implode(", ", array_map(
-		function($column,$value) { return $column."=".$value; }, 
-		array_keys($data), array_map('quoteOrNull', array_values($data))
-	));
+		// create comma-delimited strings for columns, values, and col=val pairs
+		$columns = implode(", ", array_keys($data));
+		$values = implode(", ", array_map('quoteOrNull', array_values($data)));
+		$updateFields = implode(", ", array_map(
+			function($column,$value) { return $column."=".$value; }, 
+			array_keys($data), array_map('quoteOrNull', array_values($data))
+		));
 
-	// insert these strings into a query
+		// insert these strings into a query
 		$sql = "INSERT INTO Organizations ($columns)
 						VALUES ($values) 
 						ON DUPLICATE KEY UPDATE 
@@ -30,11 +30,11 @@
 	}
 
 	function delete($org_id) {
-	$mysqli = openDB_Connection();
+		$mysqli = openDB_Connection();
 
-	$values = implode(", ", array_map('quoteOrNull', array_values($org_id)));
+		$values = implode(", ", array_map('quoteOrNull', array_values($org_id)));
 
-	// insert these strings into a query
+		// insert these strings into a query
 		$sql = "DELETE FROM Organizations WHERE org_id=$values;";
 		$result = $mysqli->query($sql);
 		if($result){
@@ -46,11 +46,11 @@
 	}
 
 	function searchForNames() {
-	$mysqli = openDB_Connection();
+		$mysqli = openDB_Connection();
 
-	$pattern = "'".$_REQUEST['search']."%'";
+		$pattern = "'".$_REQUEST['search']."%'";
 
-	// Search for org names that match 
+		// Search for org names that match 
 		$sql = "SELECT 
 			org_id AS id, 
 			name AS value,
