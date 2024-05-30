@@ -54,8 +54,12 @@
 			$result = $mysqli->query($sql);
 			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 
-			$sql = "SELECT * FROM `Registrations` AS R, `People` AS P WHERE R.person_id = P.person_id AND event_id = ".$_REQUEST["event_id"];
+            $sql = "SELECT * FROM `Registrations` AS R, `People` AS P WHERE R.person_id = P.person_id AND event_id = ".$_REQUEST["event_id"];
 			$registrations = $mysqli->query($sql);
+
+			$sql = "SELECT SUM(price) AS total FROM `Registrations` AS R, `Events` AS E 
+							WHERE R.event_id = E.event_id AND E.event_id=".$_REQUEST["event_id"];
+			$sales = $mysqli->query($sql);
 
 			$mysqli->close();
 		}
@@ -102,7 +106,7 @@
 						value="<?php echo $data["location"] ?>" 
 						type="text" size="70" maxlength="100" required="yes"/>
 					</span>
-					<label for="location">Address or URL of the event</label>
+					<label for="location">Address or videoconference link</label>
 				<br/>
 
 				<input type="hidden" id="org_id"	name="org_id"
@@ -137,10 +141,10 @@
 
 				<span class="formInput">
 					<input  id="price" name="price" 
-						placeholder="Price ($USD)" validator="numsym" 
-						value="<?php echo $data["price"] || '$0.00' ?>" 
+						placeholder="Price ($USD)" validator="num" 
+						value="<?php echo $data["price"] || '0.00' ?>" 
 						type="text" size="10" maxlength="15" required="yes" />
-						<label for="price">Ticket cost</label>
+						<label for="price">Ticket cost (in $US)</label>
 				</span>
 
 				<span class="formInput">
@@ -174,25 +178,33 @@
 			<?php } ?>
 		</form>
 
-		<h2>Registrations</h2>
-		<ul>
-					<?php
-			if(mysqli_num_rows($registrations)) {
+		<?php 
+			if(isset($_REQUEST["event_id"])) { 
+			    echo '<h2>Sales</h2>';
+			    echo 'Total: $'.mysqli_fetch_assoc($sales)['total'];
+				echo '<h2>Registrations</h2>';
+				echo '<ul>';
+				if(mysqli_num_rows($registrations)) {
 					while($row = mysqli_fetch_assoc($registrations)) {
-			?>
-						<li><a href="Registration.php?registration_id=<?php echo $row['registration_id']; ?>">
-							<?php echo $row['name_first']; ?> (<?php echo $row['name_last']; ?>)
-						</a></li>
-		<?php
+						echo '<li><a href="Registration.php?registration_id='.$row['registration_id'].'">';
+						echo $row['name_first'].' ('.$row['name_last'].')';
+						echo '</a></li>';
 					}
-			} else {
-				echo "No registrations were found for this event";
-			}
+				} else {
+					echo "No registrations were found for this event";
+				}
+			echo '</ul>';
+			} 
 		?>
-		</ul>
+		
 	</div>
 	<script>
 	document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);
+
+/***************************************************************************** 
+	Populate placeholders with fun sample values 
+*/
+document.getElementById('location').placeholder = randomFormInfo.address + " " + randomFormInfo.city + ", " + randomFormInfo.state
 	</script>
 
 </body>

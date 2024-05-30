@@ -1,6 +1,9 @@
 var debug = 0;
 if(debug > 0){ alert('debugging enabled');} 
 
+// the base url
+var baseURL = 'https://bootstrapworld.org/data/'
+
 // generate DOM from JSON, fix IE6, attach validators to fields, make draggable items draggable
 window.onload = function () {
 	attachValidators();
@@ -192,5 +195,68 @@ function expandTable(tableid, datatype, relationships){
 	unique++;
 }
 
-// the base url
-var baseURL = 'https://bootstrapworld.org/data/'
+
+const pioneers = [
+	// on web these display 3 to a row. in workbook they display 5 to a row.
+	"guillermo-camarena",
+	"vicki-hanson",
+	"mark-dean",
+	"farida-bedwei",
+	"ajay-bhatt",
+
+	// row break in workbook
+	"thomas-david-petite",
+	"timnit-gebru",
+	"ellen-ochoa",
+	"alan-turing",
+	"ruchi-sanghvi",
+
+	// row break in workbook
+	"joy-buolamwini",
+	"audrey-tang",
+	"robert-moses",
+	"chieko-asakawa",
+	"lisa-gelobter",
+
+	// row break in workbook
+	"taher-elgamal",
+	"evelyn-granville",
+	"katherine-johnson",
+	"margaret-hamilton",
+	"grace-hopper",
+
+	// row break in workbook
+	"jerry-lawson",
+	"lynn-conway",
+	"clarence-ellis",
+	"shaffi-goldwasser",
+	"luis-von-ahn",
+
+	// row break in workbook
+	"mary-golda-ross",
+	"jon-maddog-hall",
+	"tim-cook",
+	"al-khwarizmi",
+	"ada-lovelace"
+	//"cristina-amon",
+	//"kimberly-bryant",
+	//"laura-gomez",
+].map(name => {
+	const nameArray = name.split('-').map(capitalizeFirstLetter);
+	return {first: nameArray.shift(), last: nameArray.join(' ')};
+});
+
+const addresses = ["221B Baker Street", "42 Wallaby Way", "742 Evergreen Terrace", "4 Privet Drive", "12 Grimmauld Place", "177A Bleecker Street", "124 Conch St.", "344 Clinton St., Apt. 3B", "Apt. 56B, Whitehaven Mansions", "1640 Riverside Drive", "9764 Jeopardy Lane", "Apt 5A, 129 West 81st St.","2630 Hegal Place, Apt. 42","3170 W. 53 Rd. #35", "420, Paper St","2311N (4th floor) Los Robles Avenue"]
+const cities = ["Sydney", "London", "Metropolis", "Hill Valley", "Chicago", "New York", "301 Cobblestone Way", "Alexandria","Annapolis","Wilmington","Pasadena", "Bedrock"]
+const states = ["CA", "RI", "MA", "IL", "VA", "MD", "DE","LA"]
+const zipcodes = ["94086", "02907", "02130","19886","70777"]
+
+const randomPioneer = pioneers[Math.floor(Math.random()*pioneers.length)];
+const randomFormInfo = {
+	first: 	randomPioneer.first,
+	last: 	randomPioneer.last,
+	address:addresses[Math.floor(Math.random()*addresses.length)],
+	city: 	cities[Math.floor(Math.random()*cities.length)],
+	state: states[Math.floor(Math.random()*states.length)],
+	zip: 	zipcodes[Math.floor(Math.random()*zipcodes.length)]
+}

@@ -215,74 +215,14 @@ if(document.getElementById('person_id').value != "") {
 	document.getElementById('name_last').className = "alpha"
 }
 
+/***************************************************************************** 
+	Populate placeholders with fun sample values 
+*/
 
-
-var pioneers = [
-	// on web these display 3 to a row. in workbook they display 5 to a row.
-	"guillermo-camarena",
-	"vicki-hanson",
-	"mark-dean",
-	"farida-bedwei",
-	"ajay-bhatt",
-
-	// row break in workbook
-	"thomas-david-petite",
-	"timnit-gebru",
-	"ellen-ochoa",
-	"alan-turing",
-	"ruchi-sanghvi",
-
-	// row break in workbook
-	"joy-buolamwini",
-	"audrey-tang",
-	"robert-moses",
-	"chieko-asakawa",
-	"lisa-gelobter",
-
-	// row break in workbook
-	"taher-elgamal",
-	"evelyn-granville",
-	"katherine-johnson",
-	"margaret-hamilton",
-	"grace-hopper",
-
-	// row break in workbook
-	"jerry-lawson",
-	"lynn-conway",
-	"clarence-ellis",
-	"shaffi-goldwasser",
-	"luis-von-ahn",
-
-	// row break in workbook
-	"mary-golda-ross",
-	"jon-maddog-hall",
-	"tim-cook",
-	"al-khwarizmi",
-	"ada-lovelace"
-	//"cristina-amon",
-	//"kimberly-bryant",
-	//"laura-gomez",
-];
-
-const addresses = ["221B Baker Street", "42 Wallaby Way", "742 Evergreen Terrace", "4 Privet Drive", "12 Grimmauld Place", "177A Bleecker Street", "124 Conch St.", "344 Clinton St., Apt. 3B", "Apt. 56B, Whitehaven Mansions", "1640 Riverside Drive", "9764 Jeopardy Lane", "Apt 5A, 129 West 81st St.","2630 Hegal Place, Apt. 42","3170 W. 53 Rd. #35", "420, Paper St","2311N (4th floor) Los Robles Avenue"]
-const cities = ["Sydney", "London", "Metropolis", "Hill Valley", "Chicago", "New York", "301 Cobblestone Way", "Alexandria","Annapolis","Wilmington","Pasadena", "Bedrock"]
-const states = ["CA", "RI", "MA", "IL", "VA", "MD", "DE","LA"]
-const zipcodes = ["94086", "02907", "02130","19886","70777"]
-
-const first = document.getElementById('name_first');
-const last = document.getElementById('name_last');
-const address = document.getElementById('home_address');
-const city = document.getElementById('person_city');
-const state = document.getElementById('person_state');
-const zip = document.getElementById('person_zip');
-
-const randomPioneer = pioneers[Math.floor(Math.random()*pioneers.length)]
-	.split('-')
-	.map(capitalizeFirstLetter);
-first.placeholder = randomPioneer.shift();
-last.placeholder = randomPioneer.join(' ');
-address.placeholder = addresses[Math.floor(Math.random()*addresses.length)];
-city.placeholder = cities[Math.floor(Math.random()*cities.length)];
-state.placeholder = states[Math.floor(Math.random()*states.length)];
-zip.placeholder = zipcodes[Math.floor(Math.random()*zipcodes.length)];
+document.getElementById('name_first').placeholder 	= randomFormInfo.first;
+document.getElementById('name_last').placeholder 		= randomFormInfo.last;
+document.getElementById('home_address').placeholder = randomFormInfo.address;
+document.getElementById('person_city').placeholder 	= randomFormInfo.city;
+document.getElementById('person_state').placeholder = randomFormInfo.state;
+document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
 </script>

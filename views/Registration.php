@@ -59,7 +59,7 @@
 			$sql =   "SELECT * FROM Events AS E
                 LEFT JOIN Organizations AS O
                 ON O.org_id = E.org_id
-                WHERE E.start > CURRENT_DATE"
+                WHERE E.start > CURRENT_DATE";
       $events = $mysqli->query($sql);
 			$mysqli->close();
 		}
