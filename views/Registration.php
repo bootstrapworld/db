@@ -76,7 +76,6 @@
 			    $_GET["registration_id"] = null;
 			} else {
 			    $registration = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
-			    echo $registration."!";
 			    $data = array_merge($data, $registration);
             }
 		}
@@ -183,6 +182,19 @@
 				<input type="button" value="Delete Registration" onclick="deleteRegRq()">
 			<?php } ?>
 		</form>
+
+		<!-- Organization modal -->
+		<div id="neworganization" class="modal">
+			<form id="new_organization" novalidate action="../actions/OrganizationActions.php">
+				<?php include 'fragments/organization-fragment.php' ?>
+				<input type="submit" id="new_organizationSubmit" value="Submit">
+				<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
+			</form>
+			<script>
+				document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
+			</script>
+		</div>
+
 
 		<script>
 			document.getElementById('new_registration').onsubmit = (e) => updateRequest(e, updateRegistrationRp);
