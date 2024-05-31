@@ -1,4 +1,3 @@
-<form id="new_person" novalidate action="../actions/PersonActions.php">
 <fieldset>
 	<legend>Personal Information</legend>
 	<i style="clear: both;">You must enter at least a first and last name, email address, city and state.</i><p/>
@@ -160,14 +159,8 @@
 		<label for="other_credentials">Other Credentials</label>
 	</span>
 	<br/>
-
-	<input type="submit" id="new_personSubmit" value="Submit">
-	<?php if(isset($data)) { ?>
-		<input type="button" value="Delete Entry" onclick="deleteRq()" form="delete_person">
-	<?php } ?>
-	<input type="button" id="new_personCancel" class="modalCancel" value="Cancel" />
 </fieldset>
-</form>
+
 <script>
 
 // Once we know the DB update was successful:
@@ -186,14 +179,14 @@ function updatePersonRp( personId ){
 	}
 }	
 
-function deleteRq(){
+function deletePersonRq(){
 	const id = document.getElementById('person_id').value;
 	if(confirm("Are you sure you want to remove Person ID# " + id + " permanently?")){
 		var request = new XMLHttpRequest();
 		// if the request is successful, execute the callback
 		request.onreadystatechange = function() {
       if (request.readyState == 4 && request.status == 200) {
-        deleteRp(request.responseText);
+        deletePersonRp(request.responseText);
       }
   	}; 
 		const data = JSON.stringify({person_id:id});
@@ -201,14 +194,11 @@ function deleteRq(){
 		request.send();
 	}
 }
-function deleteRp( rsp ){
+function deletePersonRp( rsp ){
 	alert("Deleted ID#: " + rsp );
 	const urlValue = baseURL + `/views/Person.php`;
 	window.location = urlValue;
 }
-
-
-document.getElementById('new_person').onsubmit = (e) => updateRequest(e, updatePersonRp);
 
 // turn off autocomplete if we're already looking at an established person
 if(document.getElementById('person_id').value != "") {

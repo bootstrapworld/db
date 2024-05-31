@@ -22,14 +22,14 @@
 			}
 		}
 
-		function deleteRq(){
+		function deleteEventRq(){
 			const id = document.getElementById('event_id').value;
 			if(confirm("Are you sure you want to remove Event ID# " + id + " permanently?")){
 				var request = new XMLHttpRequest();
 				// if the request is successful, execute the callback
 				request.onreadystatechange = function() {
 					if (request.readyState == 4 && request.status == 200) {
-						deleteRp(request.responseText);
+						deleteEventRp(request.responseText);
 					}
 				}; 
 				const data = JSON.stringify({event_id:id});
@@ -37,7 +37,7 @@
 				request.send();
 			}
 		}
-		function deleteRp( rsp ){
+		function deleteEventRp( rsp ){
 			alert("Deleted ID#: " + rsp );
 			const urlValue = baseURL + `/views/Event.php`;
 			window.location = urlValue;
@@ -50,16 +50,16 @@
 		if(isset($_GET["event_id"])) {
 			$mysqli = openDB_Connection();
 	
-			$sql = "SELECT * FROM Events As E, Organizations AS O WHERE E.org_id = O.org_id AND event_id=".$_REQUEST["event_id"];
-			$result = $mysqli->query($sql);
-			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
-
             $sql = "SELECT * FROM `Registrations` AS R, `People` AS P WHERE R.person_id = P.person_id AND event_id = ".$_REQUEST["event_id"];
 			$registrations = $mysqli->query($sql);
 
 			$sql = "SELECT SUM(price) AS total FROM `Registrations` AS R, `Events` AS E 
 							WHERE R.event_id = E.event_id AND E.event_id=".$_REQUEST["event_id"];
 			$sales = $mysqli->query($sql);
+
+			$sql = "SELECT * FROM Events As E LEFT JOIN Organizations AS O ON E.org_id = O.org_id WHERE event_id=".$_REQUEST["event_id"];
+			$result = $mysqli->query($sql);
+			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 
 			$mysqli->close();
 		}
@@ -69,19 +69,21 @@
 	<div id="content">
 		<h1>Add or Edit a Event</h1>
 		<form id="new_event" novalidate action="../actions/EventActions.php">
-				<?php 
-						if($_GET["event_id"] && !$data) {
-								echo "NOTE: no records matched <tt>event_id=".$_REQUEST["event_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>event_id</tt>.";
-						}
-				?>
-			<input type="hidden" id="event_id"	name="event_id"
-					 value="<?php echo $data["event_id"] ?>" 
-			/>
+			<?php 
+			
+					if($_GET["event_id"] && !$data) {
+							echo "NOTE: no records matched <tt>event_id=".$_REQUEST["event_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>event_id</tt>.";
+					}
+			?>
 
 			<fieldset>
 				<legend>Event Information</legend>
 				<i style="clear: both;">You must enter at least a title, type, start & end time, and price.</i><p/>
 				
+				<input type="hidden" id="event_id"	name="event_id"
+						 value="<?php echo $data["event_id"] ?>" 
+				/>
+
 				<span class="formInput">
 					<input  id="title" name="title"
 						placeholder="Webinar about stuff..." validator="alphanum" 
@@ -91,12 +93,8 @@
 				</span>
 
 				<span class="formInput">
-					<select  id="type" name="type" required="yes">
-							<option value="">--</option>
-							<option value="Webinar">Webinar</option>
-							<option value="Professional Development">Professional Development</option>
-					</select>
-					<label for="type">Type of Event</label>
+					<?php echo generateDropDown("type", "type", $eventTypeOpts, $data["type"], true); ?>
+					<label for="curriculum">Event Type</label>
 				</span>
 				<br/>
 
@@ -174,9 +172,12 @@
 
 			<input type="submit" value="Submit">
 			<?php if(isset($data)) { ?>
-				<input type="button" value="Delete Entry" onclick="deleteRq()">
+				<input type="button" value="Delete Event" onclick="deleteEventRq()">
 			<?php } ?>
 		</form>
+		<script>
+			document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);
+		</script>
 
 		<?php 
 			if(isset($_REQUEST["event_id"])) { 
@@ -199,8 +200,6 @@
 		
 	</div>
 	<script>
-	document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);
-
 /***************************************************************************** 
 	Populate placeholders with fun sample values 
 */

@@ -76,12 +76,29 @@
 				}
 			?>
 			<!-- Person form -->
-			<?php include 'fragments/person-fragment.php' ?>
+			<form id="new_person" novalidate action="../actions/PersonActions.php">
+				<?php include 'fragments/person-fragment.php' ?>
+				<input type="submit" id="new_personSubmit" value="Submit">
+				<?php if(isset($data)) { ?>
+					<input type="button" value="Delete Person" onclick="deletePersonRq()">
+				<?php } ?>
+				<input type="button" id="new_personCancel" class="modalCancel" value="Cancel" />
+			</form>
+			<script>
+				document.getElementById('new_person').onsubmit = (e) => updateRequest(e, updatePersonRp);
+			</script>
 
-		<div id="neworganization" class="modal" method="#" onsubmit="return false;">
 			<!-- Organization modal -->
-			<?php include 'fragments/organization-fragment.php' ?>
-		</div>
+			<div id="neworganization" class="modal">
+				<form id="new_organization" novalidate action="../actions/OrganizationActions.php">
+					<?php include 'fragments/organization-fragment.php' ?>
+					<input type="submit" id="new_organizationSubmit" value="Submit">
+					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
+				</form>
+				<script>
+					document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
+				</script>
+			</div>
 
 		<h2>Events</h2>
 		<ul>

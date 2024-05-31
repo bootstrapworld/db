@@ -67,6 +67,8 @@ $currOpts = ["Algebra",
 						 "Reactive", 
 						 "History/SS"];
 
+$eventTypeOpts = ["Presentation","Coaching","Training","Meetup","Panel"];
+
 $stateOpts = [
 	["AL", "Alabama"],
 	["AK", "Alaska"],

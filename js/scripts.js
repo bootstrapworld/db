@@ -246,7 +246,7 @@ const pioneers = [
 	return {first: nameArray.shift(), last: nameArray.join(' ')};
 });
 
-const addresses = ["221B Baker Street", "42 Wallaby Way", "742 Evergreen Terrace", "4 Privet Drive", "12 Grimmauld Place", "177A Bleecker Street", "124 Conch St.", "344 Clinton St., Apt. 3B", "Apt. 56B, Whitehaven Mansions", "1640 Riverside Drive", "9764 Jeopardy Lane", "Apt 5A, 129 West 81st St.","2630 Hegal Place, Apt. 42","3170 W. 53 Rd. #35", "420, Paper St","2311N (4th floor) Los Robles Avenue"]
+const addresses = ["221B Baker Street", "42 Wallaby Way", "742 Evergreen Terrace", "4 Privet Drive", "12 Grimmauld Place", "177A Bleecker Street", "124 Conch St.", "344 Clinton St., Apt. 3B", "Apt. 56B, Whitehaven Mansions", "1640 Riverside Drive", "9764 Jeopardy Lane", "Apt 5A, 129 West 81st St.","2630 Hegal Place, Apt. 42","3170 W. 53 Rd. #35", "420 Paper St","2311N (4th floor) Los Robles Avenue"]
 const cities = ["Sydney", "London", "Metropolis", "Hill Valley", "Chicago", "New York", "301 Cobblestone Way", "Alexandria","Annapolis","Wilmington","Pasadena", "Bedrock"]
 const states = ["CA", "RI", "MA", "IL", "VA", "MD", "DE","LA"]
 const zipcodes = ["94086", "02907", "02130","19886","70777"]

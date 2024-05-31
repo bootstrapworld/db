@@ -150,3 +150,128 @@ CREATE TABLE `Submissions` (
   PRIMARY KEY (`score_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
+
+
+## Views
+
+There is a dedicated View for each Entity, which serves as an **update**/**delete** form when given an `id` in the URL, and an **add** form when there is no `id`. Each Entity View also lists *related* information. For example:
+
+- The `Person` View also lists any registrations
+- The `Organization` View also lists any employees or events
+- The `Event` View also lists any registrations, as well as a total of tickets sold
+
+Each Entity View includes one or more SQL queries at the top, which check to see if an `id` is defined and load relevant information from the database. This information is then used in the construction of the web page for the View.
+
+### Event Handlers
+Each Entity View declares three Javascript functions:
+
+#### Update Response Handler
+
+After an Update Request returns, this function is called with the result. In the example below, the handler displays a dialog notifying the user that the update worked, then changes the URL to show the data for this newly-created `thing_id`.
+
+```
+function updateThingRp( thingId ){
+  if ( thingId ){
+    alert( "Update successful." );
+    const urlValue = baseURL + `/views/ThingView.php?thing_id=${thingId}`;
+    window.location = urlValue;
+  }
+}
+```
+
+#### Delete Request Handler
+
+Entity Views are responsible for allowing those entities to be deleted, as well. In the example below, the handler grabs the `thing_id` from the form, uses it to create a simple JSON string, and then calls `ThingActions.php` with the `delete` method and the JSON string. It passes the response to the *delete response handler* `deleteRp`.
+
+```
+function deleteRq(){
+  const id = document.getElementById('thing_id').value;
+  if(confirm("Are you sure you want to remove Thing ID# " + id + " permanently?")){
+    var request = new XMLHttpRequest();
+    // if the request is successful, execute the callback
+    request.onreadystatechange = function() {
+      if (request.readyState == 4 && request.status == 200) {
+        deleteRp(request.responseText);
+      }
+    }; 
+    const data = JSON.stringify({event_id:id});
+    request.open('POST', "../actions/ThingActions.php?method=delete&data="+data);
+    request.send();
+  }
+}
+```
+
+#### Delete Response Handler
+
+When a delete request is completed, the response handler is called with the result. In the example below, the user sees a dialog box confirming the deletion, followed by a change in URL to the Entity View *without* the `thing_id`. This allows the user to create a new Entity.
+
+```
+function deleteRp( rsp ){
+  alert("Deleted ID#: " + rsp );
+  const urlValue = baseURL + `/views/ThingView.php`;
+  window.location = urlValue;
+}
+```
+
+### Forms
+Each Entity View also includes one or more <b>forms</b>. Here's an (contrived) example:
+
+```
+<form id="new_thing" novalidate action="../actions/ThingActions.php">
+  <fieldset>
+    <input type="hidden" id="thing_id"  name="thing_id"
+         value="<?php echo $data["thing_id"] ?>" 
+    />
+    
+    <span class="formInput">
+      <input  id="title" name="title"
+        placeholder="Webinar about stuff..." validator="alphanum" 
+        value="<?php echo $data["title"] ?>" 
+        type="text" size="40" maxlength="50" required="yes"/>
+      <label for="title">Event Title</label>
+    </span>
+  </fieldset>
+  <input type="submit" value="Submit">
+  <?php if(isset($data)) { ?>
+    <input type="button" value="Delete Entry" onclick="deleteRq()">
+  <?php } ?>
+</form>
+<script>
+  document.getElementById('new_thing').onsubmit = (e) => updateRequest(e, updateThingRp);
+</script>
+```
+
+Note that the form itself declares an `id`, uses the `novalidate` attribute to turn off browsers' default validation so that we can use our own, and an `action` that points to a server-side processor for form input.
+
+- All data fields are contained in one or more `<fieldset>` elements. 
+- Each data field has a `title` and `name`. These are often the same, unless a form has a repeated field. This could happen, for example, if a form contains a list of people: every data field would have a unique `id`, but the same `name`. During form submission, duplicate `name`s are combined into an *array of values*.
+- Most data fields include a `validator` attribute, which we use to handle advanced form validation. See `/js/validate.js` for details on how each of these are handled.
+- Values are prepopulated when `<thing>_id` is set in the URL, and a specific Entity is being viewed.
+- Placeholder values are provided whenever possible. Some of the time they're even drawn randomly from a dataset of computing pioneers!
+- Every form has a `Submit` button, which adds or updates the Entity. If `<thing>_id` is set, the form will also have a `Delete` button that calls the **delete request handler** (described above).
+
+**NOTE:** *Every form must also hook up the submit event via JS, to use our custom validators and AJAX code!* You can see how this is done at the bottom of the example, where `onsubmit` event is set to a call to `updateRequest`, which passes in the submit event `e` and a pointer to the **update response handler** (described above).
+
+### Modals and Nested Forms
+
+Sometimes an Entity needs to refer to *another* Entity that does not yet exist. For example, when adding a `Person` Entity we also want to enter their employer. The user would begin typing the name of the employer in a field with the type set to `dropdown`. The autosuggest menu appears as they type, suggesting Organizations already in the database with matching names and allowing the user to add a new organization. Clicking this button will open a Modal, passing in the button itself, the `id` of the form contained in the Modal, and a `callback` function. 
+
+A Modal is an object that contains a form (described above, including the handlers, submit and delete buttons). It also contains a `Cancel` button, which will close the modal and return focus. When the submit button is called on the modal, an AJAX request is made to the database. If the request is successful, the Modal is closed and the resulting Entity `id` is passed back to the `callback` function, which is responsible for updating the Entity View accordingly. 
+
+In our example, the callback receives the `org_id` of the new Organization and sets the `employer_id` field accordingly.
+
+This allows Views for one Entity to contain forms for that Entity *as well as forms for other entities.* If a form is used across multiple views, its `fieldset` is defined in the `fragments` folder. These fragments also declare the associated Javascript handlers (described above). **NOTE:** Views that include these fragments are responsible for declaring their `form`, `submit`, `delete`, and `cancel` elements accordingly, as the fragments themselves do not include them.
+
+```
+<!-- Organization modal -->
+<div id="neworganization" class="modal">
+  <form id="new_organization" novalidate action="../actions/OrganizationActions.php">
+    <?php include 'fragments/organization-fragment.php' ?>
+    <input type="submit" id="new_organizationSubmit" value="Submit">
+    <input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
+  </form>
+  <script>
+    document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
+  </script>
+  </div>
+```      

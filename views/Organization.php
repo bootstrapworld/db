@@ -12,30 +12,6 @@
 	<script type="text/javascript" src="../js/autosuggest.js"></script> 
 	<script type="text/javascript" src="../js/modal.js"></script>
 	
-	<!--- AJAX calls --->
-	<script type="text/javascript">
-		function deleteRq(){
-			const id = document.getElementById('org_id').value;
-			if(confirm("Are you sure you want to remove Organization ID# " + id + " permanently?")){
-				var request = new XMLHttpRequest();
-				// if the request is successful, execute the callback
-				request.onreadystatechange = function() {
-					if (request.readyState == 4 && request.status == 200) {
-						deleteRp(request.responseText);
-					}
-				}; 
-				const data = JSON.stringify({person_id:id});
-				request.open('POST', "../actions/OrganizationActions.php?method=delete&data="+data);
-				request.send();
-			}
-		}
-		function deleteRp( rsp ){
-			alert("Deleted ID#: " + rsp );
-			const urlValue = baseURL + `/views/Organization.php`;
-			window.location = urlValue;
-		}
-
-	</script>
 	<?php
 
 		include 'common.php';
@@ -77,7 +53,29 @@
 						}
 				?>
 			<!-- Organization Form -->
-			<?php include 'fragments/organization-fragment.php' ?>
+			<form id="new_organization" novalidate action="../actions/OrganizationActions.php">
+				<?php include 'fragments/organization-fragment.php' ?>
+				<input type="submit" id="new_organizationSubmit" value="Submit">
+				<?php if(isset($data)) { ?>
+					<input type="button" value="Delete Organization" onclick="deleteOrgRq()">
+				<?php } ?>
+					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
+			</form>
+			<script>
+				document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
+			</script>
+
+			<!-- Organization modal -->
+			<div id="neworganization" class="modal">
+				<form id="new_organization_modal" novalidate action="../actions/OrganizationActions.php">
+					<?php include 'fragments/organization-fragment.php' ?>
+					<input type="submit" id="new_organizationSubmit" value="Submit">
+					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
+				</form>
+				<script>
+					document.getElementById('new_organization_modal').onsubmit = (e) => updateRequest(e, updateOrgRp);
+			</script>
+			</div>
 
 			<h2>Employees</h2>
 			<ul>
@@ -136,7 +134,6 @@
 				}
 			?>
 			</ul>
-					
 	</div>
 </body>
 </html>

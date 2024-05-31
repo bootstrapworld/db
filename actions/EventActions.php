@@ -2,47 +2,8 @@
 
 	include 'common.php';
 
-	function update($data) {
-		$mysqli = openDB_Connection();
-
-		// create comma-delimited strings for columns, values, and col=val pairs
-		$columns = implode(", ", array_keys($data));
-		$values = implode(", ", array_map('quoteOrNull', array_values($data)));
-		$updateFields = implode(", ", array_map(
-			function($column,$value) { return $column."=".$value; }, 
-			array_keys($data), array_map('quoteOrNull', array_values($data))
-		));
-
-		// insert these strings into a query
-		$sql = "INSERT INTO Events ($columns)
-						VALUES ($values) 
-						ON DUPLICATE KEY UPDATE 
-						$updateFields;";
-			 
-		
-		$result = $mysqli->query($sql);
-		if($result){
-			echo $mysqli->insert_id;
-		} else {
-			echo "ERROR: Sorry $sql. ". $mysqli->error;
-		}
-		$mysqli -> close();
-	}
-
-	function delete($event_id) {
-		$mysqli = openDB_Connection();
-
-		$values = implode(", ", array_map('quoteOrNull', array_values($event_id)));
-
-		$sql = "DELETE FROM Events WHERE event_id=$values;";
-		$result = $mysqli->query($sql);
-		if($result){
-			echo $values;
-		} else {
-			echo "ERROR: Sorry $sql. ". $mysqli->error;
-		}
-		$mysqli -> close();
-	}
+	function update($data) { genericInsertOrUpdate("Events", $data); }
+	function delete($data) { genericDelete("Events", 'event_id', $data); }
 
 	function searchForNames() {
 		$mysqli = openDB_Connection();
