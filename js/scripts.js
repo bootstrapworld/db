@@ -7,6 +7,7 @@ var baseURL = 'https://bootstrapworld.org/data/'
 // generate DOM from JSON, fix IE6, attach validators to fields, make draggable items draggable
 window.onload = function () {
 	attachValidators();
+	if(typeof(SmartTable) !== "undefined") initializeSmartTables();
 	// build error dialog
 	if(!document.getElementById('Err')){ 
 		Err = document.createElement('div');

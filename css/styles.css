@@ -30,8 +30,10 @@ td{	border:solid 1px black;	white-space: nowrap;}
 thead{background: black; color: white; font-weight:	bold;}
 tfoot{background: #88a; color: black; font-weight:	bold;}
 table.compact{width: 550px;}
-table.smart span{display: block;}
-
+table.smart { margin: 0; width: 100%; }
+.smartTableControls { clear: both; width: 100%; background: none; margin: 10px 0; }
+.smartTableControls b { margin-left: 20px; margin-right: 2px; }
+.smartTableControls b:first-child { margin-left: 0; }
 td.controls{width:	20px;}
 
 iframe{display:	none; border:0px none;}

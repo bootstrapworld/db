@@ -8,10 +8,16 @@
 	<link rel="stylesheet" href="../css/autosuggest_inquisitor.css" type="text/css" media="screen" charset="utf-8" />
 
 	<script type="text/javascript" src="../js/sqlstring.js"></script>
-	<script type="text/javascript" src="../js/scripts.js"></script>	
 	<script type="text/javascript" src="../js/validate.js"></script>			
 	<script type="text/javascript" src="../js/autosuggest.js"></script>	
 	<script type="text/javascript" src="../js/modal.js"></script>
+	<script type="text/javascript" src="../js/smarttables.js"></script>
+	<script type="text/javascript" src="../js/scripts.js"></script>	
+
+	<style>
+	    td, th { padding: 5px; }
+	    table { border: 1px solid black; }
+	</style>
 	
 	<!--- AJAX calls --->
 	<script type="text/javascript">
@@ -51,14 +57,22 @@
 		if(isset($_GET["event_id"])) {
 			$mysqli = openDB_Connection();
 	
-            $sql = "SELECT * FROM `Registrations` AS R, `People` AS P WHERE R.person_id = P.person_id AND event_id = ".$_REQUEST["event_id"];
+            $sql = "SELECT *, 
+                        P.city AS person_city,
+                        UPPER(P.state) AS person_state,
+                        O.name AS employer_name,
+                        JSON_VALUE(attendance, '$.total') AS days_attended
+                    FROM `Registrations` AS R, `People` AS P , `Organizations` AS O
+                    WHERE R.person_id = P.person_id 
+                    AND O.org_id = P.employer_id
+                    AND event_id = ".$_REQUEST["event_id"];
 			$registrations = $mysqli->query($sql);
 
 			$sql = "SELECT SUM(price) AS total FROM `Registrations` AS R, `Events` AS E 
 							WHERE R.event_id = E.event_id AND E.event_id=".$_REQUEST["event_id"];
 			$sales = $mysqli->query($sql);
 
-			$sql = "SELECT * FROM Events As E LEFT JOIN Organizations AS O ON E.org_id = O.org_id WHERE event_id=".$_REQUEST["event_id"];
+			$sql = "SELECT *, DATEDIFF(end, start)+1 AS total_days, E.type AS event_type FROM Events As E LEFT JOIN Organizations AS O ON E.org_id = O.org_id WHERE event_id=".$_REQUEST["event_id"];
 			$result = $mysqli->query($sql);
 			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 
@@ -94,7 +108,7 @@
 				</span>
 
 				<span class="formInput">
-					<?php echo generateDropDown("type", "type", $eventTypeOpts, $data["type"], true); ?>
+					<?php echo generateDropDown("type", "type", $eventTypeOpts, $data["event_type"], true); ?>
 					<label for="curriculum">Event Type</label>
 				</span>
 				<br/>
@@ -141,7 +155,7 @@
 				<span class="formInput">
 					<input  id="price" name="price" 
 						placeholder="Price ($USD)" validator="num" 
-						value="<?php echo $data["price"] || '0.00' ?>" 
+						value="<?php echo $data["price"] ?>" 
 						type="text" size="10" maxlength="15" required="yes" />
 						<label for="price">Ticket cost (in $US)</label>
 				</span>
@@ -180,25 +194,49 @@
 			document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);
 		</script>
 
-		<?php 
-			if(isset($_REQUEST["event_id"])) { 
+		<?php
+			if(mysqli_num_rows($registrations)) {
 			    echo '<h2>Sales</h2>';
 			    echo 'Total: $'.mysqli_fetch_assoc($sales)['total'];
-				echo '<h2>Registrations</h2>';
-				echo '<ul>';
-				if(mysqli_num_rows($registrations)) {
-					while($row = mysqli_fetch_assoc($registrations)) {
-						echo '<li><a href="Registration.php?registration_id='.$row['registration_id'].'">';
-						echo $row['name_first'].' ('.$row['name_last'].')';
-						echo '</a></li>';
-					}
-				} else {
-					echo "No registrations were found for this event";
-				}
-			echo '</ul>';
-			} 
+	    ?>
+
+
+        <h2>Registrations</h2>
+	    <table class="smart">
+		    <thead>
+		    <tr>
+		        <th>Name</th>
+		        <th>Role</th>
+		        <th>Grades</th>
+		        <th>Primary Subject</th>
+		        <th>Employer</th>
+		        <th>Location</th>
+		        <th>Attendance</th>
+		    </tr>
+		    </thead>
+		    <tbody>
+		<?php
+				while($row = mysqli_fetch_assoc($registrations)) {
+				    //print_r($row);
 		?>
-		
+		    <tr>
+		        <td><a href="Registration.php?registration_id=<?php echo $row['registration_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
+		        <td><?php echo $row['role'] ?></td>
+		        <td><?php echo $row['grades_taught'] ?></td>
+		        <td><?php echo $row['primary_subject'] ?></td>
+		        <td><a href="Organization.php?org_id=<?php echo $row['employer_id']; ?>"><?php echo $row['employer_name']; ?></a></td>
+		        <td><?php echo $row['person_city']; ?>, <?php echo $row['person_state']; ?></td>
+		        <td><?php echo $row["days_attended"] ?> out of <?php echo $data["total_days"] ?> days</td>
+		    </tr>
+		<?php } ?>
+		    </tbody>
+		</table>
+		<?php
+			} else {
+			echo "No registrations were found for this event";
+			}
+		?>
+
 	</div>
 	<script>
 /***************************************************************************** 

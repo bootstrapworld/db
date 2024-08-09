@@ -12,6 +12,11 @@
 	<script type="text/javascript" src="../js/validate.js"></script>			
 	<script type="text/javascript" src="../js/autosuggest.js"></script>	
 	<script type="text/javascript" src="../js/modal.js"></script>
+	
+	<style>
+	    td, th { padding: 5px; }
+	    table { border: solid 1px black; }
+	</style>
    <?php
 
 	include 'common.php';
@@ -39,7 +44,7 @@
 							cell_phone,
 							home_address,
 							P.city AS person_city,
-							P.state AS person_state,
+							UPPER(P.state) AS person_state,
 							P.zip AS person_zip,
 							grades_taught,
 							primary_subject,
@@ -57,11 +62,16 @@
 	  $result = $mysqli->query($sql);
 	  $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 
-	  $sql =   "SELECT * FROM Registrations AS R, Events AS E
-				LEFT JOIN Organizations AS O
-				ON O.org_id = E.org_id
-				WHERE R.event_id = E.event_id
-				AND R.person_id = ".$_REQUEST["person_id"];
+	  $sql =   "SELECT *, 
+	                JSON_VALUE(attendance, '$.total') AS days_attended,
+                    DATEDIFF(end, start)+1 AS total_days,
+                    E.type AS event_type
+                FROM Registrations AS R, Events AS E
+                LEFT JOIN Organizations AS O
+                ON O.org_id = E.org_id
+                WHERE R.event_id = E.event_id
+                AND R.person_id =".$_REQUEST["person_id"]."
+                ORDER BY start ASC";
 	  $events = $mysqli->query($sql);
 
 	  $mysqli->close();
@@ -102,28 +112,39 @@
 			</div>
 
 		<h2>Events</h2>
-		<ul>
-			<?php
-				if(mysqli_num_rows($events)) {
-					while($row = mysqli_fetch_assoc($events)) {
-						$start = date_create($row['start']);
-						$end   = date_create($row['end']);
-				?>
-					<li><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['title'] ?></a>
-						<?php
-							if(isset($row['org_id'])) {
-								echo 'with <a href="Organization.php?org_id="'.$row["org_id"].'">'.$row["name"].'</a>';
-							}
-						?>
-						<?php if($row['end'] == $row['start']) echo date_format($start,"M jS, Y"); else echo date_format($start,"M jS")." - ".date_format($end,"M jS, Y"); ?>
-					</li>
-			<?php
-					}
-				} else {
-				echo "No events were found that are associated with this organization";
-				}
-			?>
-		</ul>
+		<?php
+			if(mysqli_num_rows($events)) {
+	    ?>
+	    <table>
+		    <thead>
+		    <tr>
+		        <th>Type</th>
+		        <th>Curriculum &amp; Location</th>
+		        <th>Date</th>
+		        <th>Attendance</th>
+		    </tr>
+		    </thead>
+		    <tbody>
+		<?php
+				while($row = mysqli_fetch_assoc($events)) {
+				    //print_r($row);
+					$start = date_create($row['start']);
+					$end   = date_create($row['end']);
+		?>
+		    <tr>
+		        <td><?php echo $row['event_type']; ?></td>
+		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['curriculum'] ?> (<?php echo $row['location'] ?>)</a></td>
+		        <td><?php if($row['end'] == $row['start']) echo date_format($start,"M jS, Y"); else echo date_format($start,"M jS")." - ".date_format($end,"M jS, Y"); ?></td>
+		        <td><?php echo $row["days_attended"] ?> out of <?php echo $row["total_days"] ?> days</td>
+		    </tr>
+		<?php } ?>
+		    </tbody>
+		</table>
+		<?php
+			} else {
+			echo "No events were found that are associated with this organization";
+			}
+		?>
 	</div>
 </body>
 </html>

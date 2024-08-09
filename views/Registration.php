@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Register for a Bootstrap Workshop</title>
+	<title>Registration</title>
 
 	<link rel="stylesheet" type="text/css" href="../css/styles.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/toolbar.css"/>
@@ -68,8 +68,11 @@
     $data = [];
 		if(isset($_GET["registration_id"])) {
 		    
-			$sql = "SELECT * FROM Registrations AS R, People AS P, Events AS E 
-							WHERE R.person_id = P.person_id AND R.event_id = E.event_id AND R.registration_id = ".$_GET["registration_id"];
+			$sql = "SELECT * FROM Registrations AS R
+                    JOIN (SELECT *, city AS person_city, UPPER(state) AS person_state, zip AS person_zip FROM People) AS P ON P.person_id = R.person_id
+                    JOIN Events AS E ON E.event_id = R.event_id
+                    LEFT JOIN (SELECT org_id, name AS employer_name FROM Organizations) AS O ON O.org_id = P.employer_id
+                    WHERE R.registration_id =".$_GET["registration_id"];
 							
 			$result = $mysqli->query($sql);
 			if($result->num_rows == 0) { 
@@ -135,7 +138,7 @@
 </head>
 <body>
 	<div id="content">
-		<h1>Register for a Bootstrap Workshop!</h1>
+		<h1>Register for an Uncoming Bootstrap Workshop!</h1>
 		<form id="new_registration" novalidate action="../actions/RegistrationActions.php">
 				<?php 
 						if(!$_GET["registration_id"] || !$registration) {
