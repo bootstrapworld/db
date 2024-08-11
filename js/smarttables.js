@@ -166,7 +166,10 @@ SmartTable.prototype.sortBy = function(sortCol){
 }
 
 /* Hide every row whose 'filterCol' column does not contain 'filterVal' (already in lowercase format when passed in) */
-SmartTable.prototype.filterBy = function(filterCol, filterVal, exclusive){
+SmartTable.prototype.filterBy = function(filterCol, filterVal, exclusive) {
+    function matches(needle, haystack) { 
+        return needle.split(" ").every(n => haystack.includes(n));
+    }
 	var tbody	= this.table.getElementsByTagName('tbody')[0];
 	var rows	= tbody.getElementsByTagName('TR');
 	this.lastFilterVal = filterVal; this.lastFilterCol = filterCol;		// store the last filter
@@ -184,7 +187,7 @@ SmartTable.prototype.filterBy = function(filterCol, filterVal, exclusive){
 			var v = rows[i].cells[filterCol];
 			v = v.innerText || v.textContent || '';						// 	  if it's a DOM node, pull out the contents
 			v = v.replace(/^\s+|\s+$/g,"").toLowerCase();				// 	  trim whitespace, make case-insensitive
-			if(v.indexOf(filterVal) == -1) this.hiddenRows[i] = true; 	// 	  look at the relevant part
+			if(!matches(filterVal, v)) this.hiddenRows[i] = true 	    // 	  check to see if the row should be filtered out
 			else if(exclusive) 	  		   delete this.hiddenRows[i]; 	// 	  if exclusive, show non-matching rows
 		}
 	}

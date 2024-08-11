@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Person</title>
-
 	<link rel="stylesheet" type="text/css" href="../css/styles.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/toolbar.css"/>
 	<link rel="stylesheet" href="../css/autosuggest_inquisitor.css" type="text/css" media="screen" charset="utf-8" />
@@ -76,11 +74,14 @@
 
 	  $mysqli->close();
 		}
+		
+	  $title = isset($_GET["person_id"])? $data["name_first"]." ".$data["name_last"] : "Add a new Person";
 	?>
+	<title><?php echo $title ?></title>
 </head>
 <body>
 	<div id="content">
-		<h1>Add or Edit a Person</h1>
+		<h1><?php echo $title ?></h1>
 			<?php 
 				if($_GET["person_id"] && !$data) {
 					echo "NOTE: no records matched <tt>person_id=".$_REQUEST["person_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>person_id</tt>.";

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Event</title>
 
 	<link rel="stylesheet" type="text/css" href="../css/styles.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/toolbar.css"/>
@@ -58,10 +57,17 @@
 			$mysqli = openDB_Connection();
 	
             $sql = "SELECT *, 
-                        P.city AS person_city,
-                        UPPER(P.state) AS person_state,
+            		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
                         O.name AS employer_name,
-                        JSON_VALUE(attendance, '$.total') AS days_attended
+                        JSON_VALUE(attendance, '$.total') AS days_attended,
+                        (CASE grades_taught
+                        	WHEN 'High School' THEN 'HS'
+                        	WHEN 'Middle School' THEN 'MS'
+                        	WHEN 'Elementary School' THEN 'ES'
+                        	WHEN 'Middle & High School' THEN 'M&HS'
+                        	WHEN 'Elementary & Middle School' THEN 'E&MS'
+                         	ELSE 'Unknown'
+                        END) AS grades_taught
                     FROM `Registrations` AS R, `People` AS P , `Organizations` AS O
                     WHERE R.person_id = P.person_id 
                     AND O.org_id = P.employer_id
@@ -78,11 +84,13 @@
 
 			$mysqli->close();
 		}
+		$title = isset($_GET["event_id"])? $data["title"] : "New Event";
 	?>
+	<title><?php echo $title ?></title>
 </head>
 <body>
 	<div id="content">
-		<h1>Add or Edit a Event</h1>
+		<h1><?php echo $title ?></h1>
 		<form id="new_event" novalidate action="../actions/EventActions.php">
 			<?php 
 			
@@ -206,11 +214,11 @@
 		    <thead>
 		    <tr>
 		        <th>Name</th>
+		        <th>Email</th>
 		        <th>Role</th>
 		        <th>Grades</th>
 		        <th>Primary Subject</th>
 		        <th>Employer</th>
-		        <th>Location</th>
 		        <th>Attendance</th>
 		    </tr>
 		    </thead>
@@ -220,12 +228,12 @@
 				    //print_r($row);
 		?>
 		    <tr>
-		        <td><a href="Registration.php?registration_id=<?php echo $row['registration_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
+		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
+		        <td><?php echo $row['email'] ?></td>
 		        <td><?php echo $row['role'] ?></td>
 		        <td><?php echo $row['grades_taught'] ?></td>
 		        <td><?php echo $row['primary_subject'] ?></td>
 		        <td><a href="Organization.php?org_id=<?php echo $row['employer_id']; ?>"><?php echo $row['employer_name']; ?></a></td>
-		        <td><?php echo $row['person_city']; ?>, <?php echo $row['person_state']; ?></td>
 		        <td><?php echo $row["days_attended"] ?> out of <?php echo $data["total_days"] ?> days</td>
 		    </tr>
 		<?php } ?>

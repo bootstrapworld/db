@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Organization</title>
-
 	<link rel="stylesheet" type="text/css" href="../css/styles.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/toolbar.css"/>
 	<link rel="stylesheet" href="../css/autosuggest_inquisitor.css" type="text/css" media="screen" charset="utf-8" />
@@ -11,7 +9,14 @@
 	<script type="text/javascript" src="../js/validate.js"></script>      
 	<script type="text/javascript" src="../js/autosuggest.js"></script> 
 	<script type="text/javascript" src="../js/modal.js"></script>
-	
+	<script type="text/javascript" src="../js/smarttables.js"></script>
+	<style>
+	    table { border: solid 1px black; }
+	    tbody tr:nth-child(odd) { background: #eee; }
+	    tbody tr:hover { background: #ccc; }
+	    td, th { padding: 4px 2px; font-size: 11px; }
+	    input[type=button] {margin: 10px 0; }
+	</style>
 	<?php
 
 		include 'common.php';
@@ -32,21 +37,53 @@
 			$result = $mysqli->query($sql);
 			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 
-			$sql = "SELECT * FROM `People` LEFT JOIN `Organizations` ON employer_id = org_id WHERE org_id=".$_REQUEST["org_id"]." OR parent_id=".$_REQUEST["org_id"]." GROUP BY person_id";
+			$sql = "SELECT *, 
+			            COALESCE(NULLIF(email_preferred,''), 
+			            NULLIF(email_professional,''), email_google) AS email,
+			            IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop
+			        FROM Organizations AS O, People AS P
+			        LEFT JOIN Registrations AS R
+                    ON R.person_id = P.person_id
+                    LEFT JOIN Events AS E 
+                    ON E.event_id = R.event_id
+			        WHERE employer_id = O.org_id 
+			            AND (O.org_id=".$_REQUEST["org_id"]." OR parent_id=".$_REQUEST["org_id"].") 
+			        GROUP BY P.person_id";
 			$employees = $mysqli->query($sql);
 
 			$sql = "SELECT * FROM `Organizations` WHERE parent_id = ".$_REQUEST["org_id"];
 			$child_orgs = $mysqli->query($sql);
 
-			$sql = "SELECT * FROM `Events` WHERE org_id = ".$_REQUEST["org_id"];
+			$sql = "SELECT
+            	        E.event_id,
+                        E.title,
+                        E.curriculum,
+                        E.start,
+                        E.end,
+                        E.location,
+                        O.org_id,
+                        O.name,
+                    	COUNT(R.registration_id) AS participants
+                    FROM Events AS E
+                    LEFT JOIN Organizations AS O
+                    ON E.org_id = O.org_id
+                    LEFT JOIN Registrations AS R
+                    ON R.event_id = E.event_id
+                    WHERE O.org_id=".$_REQUEST['org_id']."
+                    GROUP BY E.event_id
+                    ORDER BY start DESC";
 			$events = $mysqli->query($sql);
 			$mysqli->close();
 		}
+		
+		$title = isset($_GET["org_id"])? $data["name"] : "New Organization";
 	?>
+	
+	<title><?php echo $title ?></title>
 </head>
 <body>
 	<div id="content">
-		<h1>Add or Edit an Organization</h1>
+		<h1><?php echo $title ?></h1>
 				<?php 
 						if($_GET["org_id"] && !$data) {
 								echo "NOTE: no records matched <tt>org_id=".$_REQUEST["org_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>org_id</tt>.";
@@ -77,26 +114,41 @@
 			</script>
 			</div>
 
+
+
+		    <?php if($employees->num_rows > 0) { ?>
 			<h2>Employees</h2>
-			<ul>
-					
-			<?php
-				if(mysqli_num_rows($employees)) {
-						while($row = mysqli_fetch_assoc($employees)) {
-				?>
-							<li><a href="Person.php?person_id=<?php echo $row['person_id']; ?>">
-								<?php echo $row['name_first']; ?> <?php echo $row['name_last']; ?>
-								(<a href="Organization.php?org_id=<?php echo $row['employer_id'] ?>"><?php echo $row['name'] ?></a>)
-							</a></li>
-			<?php
-						}
-				} else {
-						echo "No employees were found for this organization";
-				}
-			?>
-			</ul>
+    	    <table class="smart">
+    		    <thead>
+    		    <tr>
+    		        <th>First Name</th>
+    		        <th>Last Name</th>
+    		        <th>Email</th>
+    		        <th>Employment</th>
+    		        <th>Recent Contact</th>
+    		        <th>Recent Workshop</th>
+    		    </tr>
+    		    </thead>
+    		    <tbody>
+    		<?php 
+        		//print_r($data);
+    		    while($row = mysqli_fetch_assoc($employees)) { 
+    		  ?>
+    		    <tr>
+    		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first']; ?></a></td>
+    		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_last']; ?></a></td>
+    		        <td><a href="mailto:<?php echo $row['email']; ?>"><?php echo $row['email']; ?></a></td>
+    		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?></td>
+    		        <td><?php echo $row['recent_contact']; ?></td>
+    		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop']; ?></a></td>
+    		    </tr>
+    		<?php } ?>
+    		    </tbody>
+    		</table>
+    		<?php } ?>
 
 
+		    <?php if($child_orgs->num_rows > 0) { ?>
 			<h2>Child Organizations</h2>
 			<ul>
 						<?php
@@ -113,27 +165,41 @@
 				}
 			?>
 			</ul>
+    		<?php } ?>
 
+		    <?php if($events->num_rows > 0) { ?>
 			<h2>Events</h2>
-			<ul>
-						<?php
-				if(mysqli_num_rows($events)) {
-						while($row = mysqli_fetch_assoc($events)) {
-								$start = date_create($row['start']);
-								$end   = date_create($row['end']);
-				?>
-							<li><a href="Event.php?event_id=<?php echo $row['event_id']; ?>">
-								<?php 
-									echo $row['title']; ?>
-										(<?php if($row['end'] == $row['start']) echo date_format($start,"M jS, Y"); else echo date_format($start,"M jS")." - ".date_format($end,"M jS, Y"); ?>)
-							</a></li>
-			<?php
-						}
-				} else {
-					echo "No events were found that are associated with this organization";
-				}
-			?>
-			</ul>
+			
+    	    <table class="smart">
+    		    <thead>
+    		    <tr>
+    		        <th>Title</th>
+    		        <th>Curriculum</th>
+    		        <th>Duration</th>
+    		        <th>Location</th>
+    		        <th>Partner Org</th>
+    		        <th>Participants</th>
+    		    </tr>
+    		    </thead>
+    		    <tbody>
+    		<?php 
+    		//print_r($data);
+    		    while($row = mysqli_fetch_assoc($events)) { 
+    		       $start = date_create($row['start']);
+    		       $end   = date_create($row['end']);
+        		  ?>
+    		    <tr>
+    		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['title']; ?></a></td>
+    		        <td><?php echo $row['curriculum']; ?></td>
+    		        <td><?php echo date_format($start,"M jS"); ?> - <?php echo date_format($end,"M jS"); ?></td>
+    		        <td><?php echo $row['location']; ?></td>
+    		        <td><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
+    		        <td><?php echo $row['participants']; ?></td>
+    		    </tr>
+    		<?php } ?>
+    		    </tbody>
+    		</table>
+    		<?php } ?>
 	</div>
 </body>
 </html>
