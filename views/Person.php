@@ -72,6 +72,11 @@
                 ORDER BY start ASC";
 	  $events = $mysqli->query($sql);
 
+	  $sql =   "SELECT * FROM Communications WHERE person_id=".$_REQUEST["person_id"]." ORDER BY date DESC";
+	  $comms = $mysqli->query($sql);
+
+
+
 	  $mysqli->close();
 		}
 		
@@ -80,6 +85,13 @@
 	<title><?php echo $title ?></title>
 </head>
 <body>
+    <nav id="header">
+        <a href="People.php">People</a>
+        <a href="Organizations.php">Organizations</a>
+        <a href="Events.php">Events</a>
+    </nav>
+    
+    
 	<div id="content">
 		<h1><?php echo $title ?></h1>
 			<?php 
@@ -111,6 +123,38 @@
 					document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
 				</script>
 			</div>
+			
+		<h2>Contact History</h2>
+		<?php
+			if(mysqli_num_rows($comms)) {
+	    ?>
+	    <table>
+		    <thead>
+		    <tr>
+		        <th>Date</th>
+		        <th>Type</th>
+		        <th>Notes</th>
+		    </tr>
+		    </thead>
+		    <tbody>
+		<?php
+				while($row = mysqli_fetch_assoc($comms)) {
+				    //print_r($row);
+					$date = date_create($row['date']);
+		?>
+		    <tr>
+		        <td><?php echo date_format($date,"M jS, Y"); ?></td>
+		        <td><?php echo $row['type']; ?></td>
+		        <td><?php echo $row['notes']; ?></td>
+		    </tr>
+		<?php } ?>
+		    </tbody>
+		</table>
+		<?php
+			} else {
+			echo "No events were found that are associated with this organization";
+			}
+		?>
 
 		<h2>Events</h2>
 		<?php

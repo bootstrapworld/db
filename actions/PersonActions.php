@@ -15,7 +15,7 @@
 			CONCAT(name_first, ' ', name_last) AS value, 
 			IFNULL(CONCAT(email_preferred, ', ', city, ' ', state), 'no other information available') AS info 
 		FROM People 
-		WHERE name_last LIKE $pattern";
+		WHERE name_last LIKE $pattern OR name_first LIKE $pattern";
 		$result = $mysqli->query($sql);
 		if($result){
 			while($row = $result->fetch_assoc()) { $myArray[] = $row; }

@@ -89,7 +89,13 @@
 	<title><?php echo $title ?></title>
 </head>
 <body>
-	<div id="content">
+    <nav id="header">
+        <a href="People.php">People</a>
+        <a href="Organizations.php">Organizations</a>
+        <a href="Events.php">Events</a>
+    </nav>
+    
+    <div id="content">
 		<h1><?php echo $title ?></h1>
 		<form id="new_event" novalidate action="../actions/EventActions.php">
 			<?php 

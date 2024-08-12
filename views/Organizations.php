@@ -15,7 +15,7 @@
 	<script type="text/javascript" src="../js/smarttables.js"></script>
 	
 	<script>
-	    function addOrganization() { window.location = 'Organiztion.php'; }
+	    function addOrganization() { window.location = 'Organization.php'; }
 	</script>
 	
 	<style>
@@ -50,8 +50,15 @@
 	?>
 </head>
 <body>
+    <nav id="header">
+        <a href="People.php">People</a>
+        <a href="Organizations.php">Organizations</a>
+        <a href="Events.php">Events</a>
+    </nav>
+    
+    
 	<div id="content">
-		<h1>Events</h1>
+		<h1>Organizations</h1>
 
         <input type="button" onclick="addOrganization()" value="+ Add an Organization"/>
 
@@ -64,7 +71,7 @@
 		        <th>City</th>
 		        <th>State</th>
 		        <th>Zip</th>
-		        <th>Parent Org</th>
+		        <th>Parent Organization</th>
 		    </tr>
 		    </thead>
 		    <tbody>
@@ -72,7 +79,7 @@
 		//print_r($orgs);
 		    while($row = mysqli_fetch_assoc($orgs)) { ?>
 		    <tr>
-		        <td><a href="Organizations.php?org_id=<?php echo $row['child_id']; ?>"><?php echo $row['child_name']; ?></a></td>
+		        <td><a href="Organization.php?org_id=<?php echo $row['child_id']; ?>"><?php echo $row['child_name']; ?></a></td>
 		        <td><?php echo $row['type']; ?></td>
 		        <td><?php echo $row['child_address'] ?></td>
 		        <td><?php echo $row['child_city'] ?></td>

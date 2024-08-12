@@ -15,8 +15,7 @@ SmartTable = function(table, i){
 	var rows	= body.getElementsByTagName('TR');						// rows in tbody
 	var thead_r	= head.getElementsByTagName('TR');						// rows in thead
 	this.headers = thead_r[thead_r.length-1].querySelectorAll('TD, TH'); // bottom row in thead
-	pointer		= this.pointer;
-	
+
 	// build table toolbar
 	var controls = document.createElement('div');
 	controls.className = 'smartTableControls';
@@ -38,14 +37,20 @@ SmartTable = function(table, i){
 	controls.appendChild(label);
 	this.sortMenu = document.createElement('select');
 	this.sortMenu.id  = 'sortBy';
-	this.sortMenu.pointer = pointer;
+	this.sortMenu.pointer = this.pointer;
 	this.sortMenu.options[0] = new Option('Select a column:', '-1' , false, false);
-	for(var i = 0; i < this.headers.length; i++){
+	[...this.headers].forEach( (header, i) => {
 		var datatype = getDatatype(rows, i);
-		this.headers[i].setAttribute('datatype', datatype);
-		colName = this.headers[i].innerHTML;
+		header.setAttribute('datatype', datatype);
+		colName = header.innerHTML;
 		this.sortMenu.options[i+1] = new Option(colName, i, false, false);
-	}
+		if(datatype == "email") { 
+		    var emailButton = document.createElement('a');
+		    header.appendChild(emailButton);
+		    emailButton.innerHTML = "<img src='../images/copyIcon.png' style='max-height:12px; margin-left: 10px;'/>";
+		    emailButton.onclick = () => this.copyEmails(i);
+		}
+	})
 	controls.appendChild(this.sortMenu);
 	this.sortMenu.onchange=function(){this.pointer.rebuildTable();}
 	
@@ -80,13 +85,13 @@ SmartTable = function(table, i){
 	controls.appendChild(label);
 	controls.appendChild(this.filter2Col);
 	controls.appendChild(this.filter2val);
-	this.filter1Col.pointer = pointer;
-	this.filter2Col.pointer = pointer;
+	this.filter1Col.pointer = this.pointer;
+	this.filter2Col.pointer = this.pointer;
 	this.filter1Col.onchange=function(){this.pointer.rebuildTable();}
 	this.filter2Col.onchange=function(){this.pointer.rebuildTable();}
 	// filter-as-u-type (use a delay of 500ms to prevent unecessary filtering)
-	this.filter1val.pointer = pointer;
-	this.filter2val.pointer = pointer;
+	this.filter1val.pointer = this.pointer;
+	this.filter2val.pointer = this.pointer;
 	this.filter1val.onkeyup = function(){this.pointer.rebuildTable()};
 	this.filter2val.onkeyup = function(){this.pointer.rebuildTable()};
 	//this.filter3Col	= this.sortMenu.cloneNode(true);
@@ -96,15 +101,27 @@ SmartTable = function(table, i){
 	//this.filter3val.id	= 'filter3id';
 	//controls.appendChild(this.filter3Col);
 	//controls.appendChild(this.filter3val);
-	//this.filter3Col.pointer = pointer;
+	//this.filter3Col.pointer = this.pointer;
 	//this.filter3Col.onchange=function(){this.pointer.rebuildTable();}
-	//this.filter3val.pointer = pointer;
+	//this.filter3val.pointer = this.pointer;
 	//this.filter3val.onkeyup = function(){this.pointer.rebuildTable()};
 	table.parentNode.insertBefore(controls,table);
 
 	this.lastFilterCol = null;
 	this.lastFilterVal = null;
 	this.hiddenRows = {};
+}
+
+SmartTable.prototype.copyEmails = function(idx) {
+    var emails = [];
+	var tbody	= this.table.getElementsByTagName('tbody')[0];
+	var rows	= tbody.getElementsByTagName('tr');
+	[...rows].forEach( r => {
+	    email = [...r.cells][idx].innerHTML;
+	    if(email.search(/^\S+@\S+\.\S+$/) != -1) emails.push(email);
+	});
+	navigator.clipboard.writeText(emails.join(', '));
+	console.log('copied '+ emails.join(', '));
 }
 
 SmartTable.prototype.rebuildTable = function(){
@@ -241,10 +258,12 @@ function getDatatype(rows, idx){
 	}
 	var regExp_Currency	=/^[�$���]/;
 	var regExp_Number	=/^(\-)?[0-9]+(\.[0-9]*)?$/;
+	var regExp_Email = /^\S+@\S+\.\S+$/;
 	if(!isNaN(Date.parse(data)))				return "date";
-	if(data.search(regExp_Number) != -1)		return "numeric"
-		if(data.search(regExp_Currency) != -1)		return "currency";
-		else										return "text";
+	if(data.search(regExp_Email)    != -1)      return "email";
+	if(data.search(regExp_Number)   != -1)		return "numeric"
+	if(data.search(regExp_Currency) != -1)		return "currency";
+	else										return "text";
 }
 
 /* Find all tables with the appropriate class, and initialize SmartTables for all of them */

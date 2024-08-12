@@ -40,6 +40,8 @@ $roleOpts = ["Teacher",
 						"Administrator (State)",
 						"Other"];
 
+$commOpts = ["Phone", "Zoom", "Coaching", "Email", "Discourse"];
+
 $subjectOpts = ["English/ELA",
 								"Social Studies",
 								"History",

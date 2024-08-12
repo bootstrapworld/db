@@ -24,6 +24,7 @@
 	    tbody tr:hover { background: #ccc; }
 	    td, th { padding: 4px 2px; font-size: 11px; }
 	    th:nth-child(2), td:nth-child(2) { display: none; }
+	    td:nth-child(6):not(:empty) { cursor: help; }
 	    input[type=button] {margin: 10px 0; }
 	</style>
    <?php
@@ -31,6 +32,7 @@
 	include 'common.php';
 
 	$mysqli = openDB_Connection();
+	
 	
 	$sql = "SELECT
 				P.person_id,
@@ -55,7 +57,8 @@
 				O.org_id AS employer_id,
 				IF(LENGTH(O.name) > 0, CONCAT(' at ', O.name), '') AS employer_name,
                 E.event_id,
-                IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop
+                IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop,
+                C.date AS recent_contact, C.notes
 			FROM People AS P
 			LEFT JOIN Organizations AS O
 			ON P.employer_id=O.org_id
@@ -63,13 +66,22 @@
             ON R.person_id = P.person_id
             LEFT JOIN Events AS E 
             ON E.event_id = R.event_id
-            GROUP BY P.person_id";
+            LEFT JOIN Communications AS C
+            ON C.person_id = P.person_id
+            GROUP BY P.person_id
+            ORDER BY C.date DESC, E.start DESC";
             
 	  $people = $mysqli->query($sql);
 	  $mysqli->close();
 	?>
 </head>
 <body>
+    <nav id="header">
+        <a href="People.php">People</a>
+        <a href="Organizations.php">Organizations</a>
+        <a href="Events.php">Events</a>
+    </nav>
+    
 	<div id="content">
 		<h1>People</h1>
 
@@ -100,7 +112,7 @@
 		            <a href="Organization.php?org_id=<?php echo $row['employer_id']; ?>"><?php echo $row['employer_name']; ?></a>
 		        </td>
 		        <td><?php echo $row['location']; ?></td>
-		        <td><?php echo $row['recent_contact']; ?></td>
+		        <td title="<?php echo $row['notes']; ?>" ><?php echo $row['recent_contact']; ?></td>
 		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop']; ?></a></td>
 		    </tr>
 		<?php } ?>

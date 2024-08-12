@@ -54,8 +54,16 @@
 	?>
 </head>
 <body>
+    <nav id="header">
+        <a href="People.php">People</a>
+        <a href="Organizations.php">Organizations</a>
+        <a href="Events.php">Events</a>
+    </nav>
+    
+    
 	<div id="content">
-		<h1>Events</h1>
+    
+    <h1>Events</h1>
 
         <input type="button" onclick="addEvent()" value="+ Add an Event"/>
 

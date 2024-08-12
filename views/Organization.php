@@ -82,6 +82,13 @@
 	<title><?php echo $title ?></title>
 </head>
 <body>
+    <nav id="header">
+        <a href="People.php">People</a>
+        <a href="Organizations.php">Organizations</a>
+        <a href="Events.php">Events</a>
+    </nav>
+    
+    
 	<div id="content">
 		<h1><?php echo $title ?></h1>
 				<?php 
