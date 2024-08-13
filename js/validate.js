@@ -140,7 +140,7 @@ const lwr		= 'abcdefghijklmnopqrstuvwxyz.- ';
 const upr		= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- ';
 const alpha	= lwr+upr+'.\'&';
 const alphasym = alpha+'.- ,'
-const alphanumbsym = alpha+numb+'.- ,\/'
+const alphanumbsym = alpha+numb+'.- ,\/\:'
 
 function isValid(parm, val) {
 	if (parm == "") return true;

@@ -11,9 +11,15 @@
 			placeholder="Edmund W. Flynn Elementary School" validator="alpha"
 			class="dropdown" datatype="organization" autocomplete="nope"
 			value="<?php echo $data["name"] ?>" 
-			type="text" size="70" maxlength="70" required="yes"/>
+			type="text" size="50" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
 	</span>
+
+	<span class="formInput">
+		<?php echo generateDropDown("type", "type", $orgTypeOpts, $data["type"], false) ?>
+		<label for="state">Type</label>
+	</span>
+
 	<br/>
 	<span class="formInput">
 		<input  id="website" name="website" 
@@ -102,7 +108,7 @@ function deleteOrgRq(){
 }
 function deleteOrgRp( rsp ){
 	alert("Deleted ID#: " + rsp );
-	const urlValue = baseURL + `/views/Organization.php`;
+	const urlValue = baseURL + `/views/Organizations.php`;
 	window.location = urlValue;
 }
 

@@ -196,7 +196,7 @@ function deletePersonRq(){
 }
 function deletePersonRp( rsp ){
 	alert("Deleted ID#: " + rsp );
-	const urlValue = baseURL + `/views/Person.php`;
+	const urlValue = baseURL + `/views/People.php`;
 	window.location = urlValue;
 }
 

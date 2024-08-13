@@ -32,17 +32,13 @@
 	$mysqli = openDB_Connection();
 	
 	$sql = "SELECT 
-            	O.name as child_name, CONCAT(O.type, ' ', O.type2) AS type, 
-                O.address AS child_address, 
-                O.city AS child_city, 
-                UPPER(O.state) AS child_state, 
-                O.zip AS child_zip, 
-                O.org_id AS child_id,
-                O.parent_id AS parent_id,
-                Parents.name AS parent_name
+            	O.name, CONCAT(O.type, IF(ISNULL(O.type2), '', CONCAT(' - ', O.type2))) AS type, 
+                O.address, 
+                O.city, 
+                UPPER(O.state) AS state, 
+                O.zip, 
+                O.org_id
             FROM Organizations AS O
-	        LEFT JOIN Organizations AS Parents
-	        ON Parents.org_id = O.parent_id
 	        ORDER BY O.type ASC, O.type2 ASC";
             
 	  $orgs = $mysqli->query($sql);
@@ -71,7 +67,6 @@
 		        <th>City</th>
 		        <th>State</th>
 		        <th>Zip</th>
-		        <th>Parent Organization</th>
 		    </tr>
 		    </thead>
 		    <tbody>
@@ -79,13 +74,12 @@
 		//print_r($orgs);
 		    while($row = mysqli_fetch_assoc($orgs)) { ?>
 		    <tr>
-		        <td><a href="Organization.php?org_id=<?php echo $row['child_id']; ?>"><?php echo $row['child_name']; ?></a></td>
+		        <td><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><?php echo $row['type']; ?></td>
-		        <td><?php echo $row['child_address'] ?></td>
-		        <td><?php echo $row['child_city'] ?></td>
-		        <td><?php echo $row['child_state'] ?></td>
-		        <td><?php echo $row['child_zip'] ?></td>
-		        <td><a href="Organization.php?org_id=<?php echo $row['parent_id']; ?>"><?php echo $row['parent_name']; ?></a></td>
+		        <td><?php echo $row['address'] ?></td>
+		        <td><?php echo $row['city'] ?></td>
+		        <td><?php echo $row['state'] ?></td>
+		        <td><?php echo $row['zip'] ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>

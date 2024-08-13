@@ -62,7 +62,7 @@
 			FROM People AS P
 			LEFT JOIN Organizations AS O
 			ON P.employer_id=O.org_id
-            LEFT JOIN Registrations AS R
+            LEFT JOIN EventRelationships AS R
             ON R.person_id = P.person_id
             LEFT JOIN Events AS E 
             ON E.event_id = R.event_id

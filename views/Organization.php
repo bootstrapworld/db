@@ -32,7 +32,8 @@
 								city AS org_city,
 								state AS org_state,
 								zip AS org_zip,
-								parent_id
+								parent_id,
+								type
 							FROM Organizations WHERE org_id=".$_REQUEST["org_id"];
 			$result = $mysqli->query($sql);
 			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
@@ -42,7 +43,7 @@
 			            NULLIF(email_professional,''), email_google) AS email,
 			            IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop
 			        FROM Organizations AS O, People AS P
-			        LEFT JOIN Registrations AS R
+			        LEFT JOIN EventRelationships AS R
                     ON R.person_id = P.person_id
                     LEFT JOIN Events AS E 
                     ON E.event_id = R.event_id
@@ -63,12 +64,13 @@
                         E.location,
                         O.org_id,
                         O.name,
-                    	COUNT(R.registration_id) AS participants
+                    	COUNT(R.relationship_id) AS participants
                     FROM Events AS E
                     LEFT JOIN Organizations AS O
                     ON E.org_id = O.org_id
-                    LEFT JOIN Registrations AS R
+                    LEFT JOIN EventRelationships AS R
                     ON R.event_id = E.event_id
+                    AND R.type = 'Participant'
                     WHERE O.org_id=".$_REQUEST['org_id']."
                     GROUP BY E.event_id
                     ORDER BY start DESC";
@@ -122,9 +124,8 @@
 			</div>
 
 
-
-		    <?php if($employees->num_rows > 0) { ?>
-			<h2>Employees</h2>
+<?php if($data) { ?>
+			<h2>Employees (<?php echo mysqli_num_rows($employees); ?>)</h2>
     	    <table class="smart">
     		    <thead>
     		    <tr>
@@ -152,31 +153,8 @@
     		<?php } ?>
     		    </tbody>
     		</table>
-    		<?php } ?>
 
-
-		    <?php if($child_orgs->num_rows > 0) { ?>
-			<h2>Child Organizations</h2>
-			<ul>
-						<?php
-				if(mysqli_num_rows($child_orgs)) {
-						while($row = mysqli_fetch_assoc($child_orgs)) {
-				?>
-							<li><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>">
-								<?php echo $row['name']; ?>
-							</a></li>
-			<?php
-						}
-				} else {
-					echo "No child organizations were found for this organization";
-				}
-			?>
-			</ul>
-    		<?php } ?>
-
-		    <?php if($events->num_rows > 0) { ?>
-			<h2>Events</h2>
-			
+			<h2>Events  (<?php echo mysqli_num_rows($events); ?>)</h2>
     	    <table class="smart">
     		    <thead>
     		    <tr>
@@ -206,7 +184,17 @@
     		<?php } ?>
     		    </tbody>
     		</table>
-    		<?php } ?>
+
+			<h2>Child Organizations (<?php echo mysqli_num_rows($child_orgs); ?>)</h2>
+            <ul>
+				<?php while($row = mysqli_fetch_assoc($child_orgs)) { ?>
+							<li><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>">
+								<?php echo $row['name']; ?>
+							</a></li>
+                <?php } ?>
+			</ul>
+<?php } ?>
+
 	</div>
 </body>
 </html>

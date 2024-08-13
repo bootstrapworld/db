@@ -70,7 +70,7 @@ nav a:focus {
 /* Define our elements */
 br{	clear: left;}
 h1{	font-size:	30px; margin:	10px 0px 0px 0px;}
-h2{	text-decoration: underline; margin: 10px 0px 0px 0px;}
+h2{	text-decoration: underline; margin: 10px 0px; }
 h3{	font-style:	italic; padding: 0px; margin:	10px 10px 0px 10px;}
 
 table{
@@ -86,7 +86,9 @@ thead{background: black; color: white; font-weight:	bold;}
 tfoot{background: #88a; color: black; font-weight:	bold;}
 table.compact{ width: 550px; }
 table.smart { margin: 0; width: 100% ; }
-.smartTableControls { clear: both; width: 100%; background: none; margin: 10px 0; }
+.smartTableControls { clear: both; width: 100%; background: none; margin: 10px 0; display: flex; align-items: baseline; }
+.smartTableControls input, .smartTableControls select { font-size: smaller; }
+.smartTableControls input { flex-grow: 1; }
 .smartTableControls b { margin-left: 12px; margin-right: 2px; }
 .smartTableControls b:first-child { margin-left: 0; }
 

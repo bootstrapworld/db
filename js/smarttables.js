@@ -13,6 +13,7 @@ SmartTable = function(table, i){
 	if (head == null) alert('A SmartTable must include a THEAD element');
 	if (body == null) alert('A SmartTable must include a TBODY element');
 	var rows	= body.getElementsByTagName('TR');						// rows in tbody
+	if(rows.length == 0) return;                                        // bail if the table is empty
 	var thead_r	= head.getElementsByTagName('TR');						// rows in thead
 	this.headers = thead_r[thead_r.length-1].querySelectorAll('TD, TH'); // bottom row in thead
 
@@ -116,8 +117,9 @@ SmartTable.prototype.copyEmails = function(idx) {
     var emails = [];
 	var tbody	= this.table.getElementsByTagName('tbody')[0];
 	var rows	= tbody.getElementsByTagName('tr');
-	[...rows].forEach( r => {
-	    email = [...r.cells][idx].innerHTML;
+	[...rows].forEach( (r, i) => {
+	    if(this.hiddenRows[i]) return;
+	    email = [...r.cells][idx].firstChild.innerHTML;
 	    if(email.search(/^\S+@\S+\.\S+$/) != -1) emails.push(email);
 	});
 	navigator.clipboard.writeText(emails.join(', '));
@@ -250,6 +252,7 @@ SmartTable.prototype.table2JSON = function(){
 
 /* Use RegExps to guess datatypes */
 function getDatatype(rows, idx){
+    if(rows.length == 0) return "text";
 	for(i=0; i < rows.length; i++){							// loop through the column
 		var td = rows[i].cells[idx];						// get the text data out of each cell
 		if(td == undefined) continue;						// if the cell doesn't exist (colspan > 1), keep looking

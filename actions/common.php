@@ -26,14 +26,12 @@ $personFields = array(
 
 
 $registrationFields = array(
-	'registration_id',
+	'relationship_id',
 	'person_id',
 	'event_id',
 	'created',
-	'billing_name',
-	'billing_email',
-	'org_id',
-	'attendance'
+	'attendance',
+	'type'
 );
 
 $method = $_REQUEST["method"];

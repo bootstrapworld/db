@@ -63,8 +63,8 @@
 	  $sql =   "SELECT *, 
 	                JSON_VALUE(attendance, '$.total') AS days_attended,
                     DATEDIFF(end, start)+1 AS total_days,
-                    E.type AS event_type
-                FROM Registrations AS R, Events AS E
+                    R.type AS role, E.type AS event_type
+                FROM EventRelationships AS R, Events AS E
                 LEFT JOIN Organizations AS O
                 ON O.org_id = E.org_id
                 WHERE R.event_id = E.event_id
@@ -124,7 +124,8 @@
 				</script>
 			</div>
 			
-		<h2>Contact History</h2>
+<?php if($data) { ?>			
+		<h2>Contact History (<?php echo mysqli_num_rows($comms); ?>)</h2>
 		<?php
 			if(mysqli_num_rows($comms)) {
 	    ?>
@@ -156,13 +157,14 @@
 			}
 		?>
 
-		<h2>Events</h2>
+		<h2>Events (<?php echo mysqli_num_rows($events); ?>)</h2>
 		<?php
 			if(mysqli_num_rows($events)) {
 	    ?>
 	    <table>
 		    <thead>
 		    <tr>
+		        <th>Role</th>
 		        <th>Type</th>
 		        <th>Curriculum &amp; Location</th>
 		        <th>Date</th>
@@ -177,10 +179,11 @@
 					$end   = date_create($row['end']);
 		?>
 		    <tr>
+		        <td><?php echo $row['role']; ?></td>
 		        <td><?php echo $row['event_type']; ?></td>
 		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['curriculum'] ?> (<?php echo $row['location'] ?>)</a></td>
 		        <td><?php if($row['end'] == $row['start']) echo date_format($start,"M jS, Y"); else echo date_format($start,"M jS")." - ".date_format($end,"M jS, Y"); ?></td>
-		        <td><?php echo $row["days_attended"] ?> out of <?php echo $row["total_days"] ?> days</td>
+		        <td><?php if($row['role'] !== 'Participant') { echo 'N/A'; } else { echo $row['days_attended']." out of ". $row['total_days']." days"; } ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>
@@ -190,6 +193,7 @@
 			echo "No events were found that are associated with this organization";
 			}
 		?>
+<?php } ?>
 	</div>
 </body>
 </html>

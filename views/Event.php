@@ -45,7 +45,7 @@
 		}
 		function deleteEventRp( rsp ){
 			alert("Deleted ID#: " + rsp );
-			const urlValue = baseURL + `/views/Event.php`;
+			const urlValue = baseURL + `/views/Events.php`;
 			window.location = urlValue;
 		}
 	</script>
@@ -53,9 +53,9 @@
 
 		include 'common.php';
 
+		$mysqli = openDB_Connection();
 		if(isset($_GET["event_id"])) {
-			$mysqli = openDB_Connection();
-	
+
             $sql = "SELECT *, 
             		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
                         O.name AS employer_name,
@@ -68,27 +68,49 @@
                         	WHEN 'Elementary & Middle School' THEN 'E&MS'
                          	ELSE 'Unknown'
                         END) AS grades_taught
-                    FROM `Registrations` AS R, `People` AS P , `Organizations` AS O
+                    FROM `EventRelationships` AS R, `People` AS P , `Organizations` AS O
                     WHERE R.person_id = P.person_id 
                     AND O.org_id = P.employer_id
+                    AND R.type = 'Participant'
                     AND event_id = ".$_REQUEST["event_id"];
-			$registrations = $mysqli->query($sql);
+			$participants = $mysqli->query($sql);
 
-			$sql = "SELECT SUM(price) AS total FROM `Registrations` AS R, `Events` AS E 
-							WHERE R.event_id = E.event_id AND E.event_id=".$_REQUEST["event_id"];
-			$sales = $mysqli->query($sql);
+            $sql = "SELECT *, 
+            		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
+                        O.org_id, O.name AS employer_name
+                    FROM `EventRelationships` AS R, `People` AS P
+                    LEFT JOIN `Organizations` AS O
+                    ON O.org_id = P.employer_id
+                    WHERE R.person_id = P.person_id 
+                    AND R.type = 'Facilitator'
+                    AND event_id = ".$_REQUEST["event_id"];
+			$facilitators = $mysqli->query($sql);
+            $sql = "SELECT *, 
+            		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
+                        O.org_id, O.name AS employer_name
+                    FROM `EventRelationships` AS R, `People` AS P
+                    LEFT JOIN `Organizations` AS O
+                    ON O.org_id = P.employer_id
+                    WHERE R.person_id = P.person_id 
+                    AND R.type = 'Admin'
+                    AND event_id = ".$_REQUEST["event_id"];
+			$admins = $mysqli->query($sql);
 
 			$sql = "SELECT *, DATEDIFF(end, start)+1 AS total_days, E.type AS event_type FROM Events As E LEFT JOIN Organizations AS O ON E.org_id = O.org_id WHERE event_id=".$_REQUEST["event_id"];
 			$result = $mysqli->query($sql);
 			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
-
-			$mysqli->close();
+		} else if(isset($_GET["org_id"])) {
+		    $sql = "SELECT * FROM Organizations WHERE org_id=".$_GET["org_id"];
+		    $result = $mysqli->query($sql);
+			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 		}
+		$mysqli->close();
 		$title = isset($_GET["event_id"])? $data["title"] : "New Event";
 	?>
 	<title><?php echo $title ?></title>
 </head>
 <body>
+
     <nav id="header">
         <a href="People.php">People</a>
         <a href="Organizations.php">Organizations</a>
@@ -115,7 +137,7 @@
 
 				<span class="formInput">
 					<input  id="title" name="title"
-						placeholder="Webinar about stuff..." validator="alphanum" 
+						placeholder="Webinar about stuff..." validator="alphanumbsym" 
 						value="<?php echo $data["title"] ?>" 
 						type="text" size="40" maxlength="50" required="yes"/>
 					<label for="title">Event Title</label>
@@ -189,13 +211,59 @@
 				</span>
 				<br/>
 				
-				<span class="formInput">
-					<input  id="calendar_url" name="calendar_url" 
-						placeholder="Calendar URL" validator="url" 
-						value="<?php echo $data["calendar_url"] ?>" 
-						type="text" size="70" maxlength="100"/>
-					<label for="calendar_url">Calendar URL for the event</label>
-				</span>
+                <p/>	
+                
+<?php if($data) { ?>
+				<b>Facilitators (<?php echo mysqli_num_rows($facilitators); ?>)</b><br/>
+	            <table>
+	                <thead>
+	                    <tr>
+	                        <th>Name</th>
+	                        <th>Email</th>
+	                        <th>Employer</th>
+	                   </tr>
+	                </thead>
+	                <tbody>
+	           <?php
+    			if(mysqli_num_rows($facilitators)) {
+	               	while($row = mysqli_fetch_assoc($facilitators)) {
+	           ?>
+	                    <tr>
+	                        <td><?php echo $row['name_first']; ?> <?php echo $row['name_last']; ?></td>
+		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
+		                    <td><a href="Organization.php?org_id=:<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
+	                    </tr>
+	           <?php 
+	                }
+    			}
+	           ?>
+	                </tbody>
+                </table>
+
+                <p/>
+
+				<b>Admins (<?php echo mysqli_num_rows($admins); ?>)</b><br/>
+	            <table>
+	                <thead>
+	                    <tr>
+	                        <th>Name</th>
+	                        <th>Email</th>
+	                        <th>Employer</th>
+	                   </tr>
+	                </thead>
+	                <tbody>
+	           <?php
+	           	while($row = mysqli_fetch_assoc($admins)) {
+	           ?>
+	                    <tr>
+	                        <td><?php echo $row['name_first']; ?> <?php echo $row['name_last']; ?></td>
+		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
+		                    <td><a href="Organization.php?org_id=:<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
+	                    </tr>
+	           <?php } ?>
+	                </tbody>
+                </table>
+<?php } ?>
 
 			</fieldset>
 
@@ -208,14 +276,9 @@
 			document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);
 		</script>
 
-		<?php
-			if(mysqli_num_rows($registrations)) {
-			    echo '<h2>Sales</h2>';
-			    echo 'Total: $'.mysqli_fetch_assoc($sales)['total'];
-	    ?>
+<?php if($data) { ?>
 
-
-        <h2>Registrations</h2>
+        <h2>Participants (<?php echo mysqli_num_rows($participants); ?>)</h2>
 	    <table class="smart">
 		    <thead>
 		    <tr>
@@ -230,12 +293,12 @@
 		    </thead>
 		    <tbody>
 		<?php
-				while($row = mysqli_fetch_assoc($registrations)) {
+				while($row = mysqli_fetch_assoc($participants)) {
 				    //print_r($row);
 		?>
 		    <tr>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
-		        <td><?php echo $row['email'] ?></td>
+		        <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		        <td><?php echo $row['role'] ?></td>
 		        <td><?php echo $row['grades_taught'] ?></td>
 		        <td><?php echo $row['primary_subject'] ?></td>
@@ -245,11 +308,7 @@
 		<?php } ?>
 		    </tbody>
 		</table>
-		<?php
-			} else {
-			echo "No registrations were found for this event";
-			}
-		?>
+<?php } ?>
 
 	</div>
 	<script>

@@ -31,29 +31,36 @@
 
 	$mysqli = openDB_Connection();
 	
-	$sql = "SELECT
-    	    E.event_id,
-            E.title,
-            E.curriculum,
-            E.start,
-            E.end,
-            E.location,
-            O.org_id,
-            O.name,
-        	COUNT(R.registration_id) AS participants
-        FROM Events AS E
-        LEFT JOIN Organizations AS O
-        ON E.org_id = O.org_id
-        LEFT JOIN Registrations AS R
-        ON R.event_id = E.event_id
-        GROUP BY E.event_id
-        ORDER BY start DESC";
+	$sql = "SELECT E2.event_id, E2.org_id, E2.name, curriculum, start, end, location, participants, 
+	               GROUP_CONCAT(DISTINCT CONCAT(
+                       '<a href=\"Person.php?person_id=', FacNames.person_id, '\">',
+                       FacNames.name_first,
+                   	   '</a>') ORDER BY FacNames.name_first SEPARATOR ', ') AS facilitators
+            FROM (SELECT
+    	            E.event_id, E.curriculum, E.start, E.end, E.location,
+      		        O.name, O.org_id,
+        	        COUNT(Participants.relationship_id) AS participants
+                FROM Events AS E
+	            LEFT JOIN Organizations AS O
+                ON O.org_id = E.org_id
+                LEFT JOIN EventRelationships AS Participants
+                ON Participants.event_id = E.event_id
+                AND Participants.type = 'Participant'
+                GROUP BY E.event_id) AS E2
+        LEFT JOIN EventRelationships AS Facilitators
+        ON Facilitators.event_id = E2.event_id
+        AND Facilitators.type = 'Facilitator'
+        LEFT JOIN People AS FacNames
+        ON FacNames.person_id = Facilitators.person_id
+		GROUP BY Facilitators.event_id
+		ORDER BY start DESC";
             
 	  $events = $mysqli->query($sql);
 	  $mysqli->close();
 	?>
 </head>
 <body>
+    
     <nav id="header">
         <a href="People.php">People</a>
         <a href="Organizations.php">Organizations</a>
@@ -70,11 +77,11 @@
 	    <table class="smart">
 		    <thead>
 		    <tr>
-		        <th>Title</th>
 		        <th>Curriculum</th>
 		        <th>Duration</th>
 		        <th>Location</th>
 		        <th>Partner Org</th>
+		        <th>Facilitators</th>
 		        <th>Participants</th>
 		    </tr>
 		    </thead>
@@ -86,11 +93,11 @@
 		       $end   = date_create($row['end']);
 		  ?>
 		    <tr>
-		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['title']; ?></a></td>
 		        <td><?php echo $row['curriculum']; ?></td>
-		        <td><?php echo date_format($start,"M jS"); ?> - <?php echo date_format($end,"M jS"); ?></td>
+		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo date_format($start,"M jS"); ?> - <?php echo date_format($end,"M jS"); ?></a></td>
 		        <td><?php echo $row['location']; ?></td>
 		        <td><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
+		        <td><?php echo $row['facilitators']; ?></td>
 		        <td><?php echo $row['participants']; ?></td>
 		    </tr>
 		<?php } ?>

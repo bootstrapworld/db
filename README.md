@@ -119,21 +119,18 @@ CREATE TABLE `Implementations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-#### Registrations
-Registrations track basic fields needed for payment processing, connecting a `Person` to an `Event`. **Note:** we use a JSON field to store attendance data as part of registration!
+#### EventRelationships
+EventRelationships track basic fields needed to connect a `Person` to an `Event`. They are used for things like participants, facilitators, admins, etc **Note:** we use a JSON field to store attendance data as part of registration!
 
 ```
-CREATE TABLE `Registrations` (
-  `registration_id` int(255) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `EventRelationships` (
+  `relationship_id` int(255) NOT NULL AUTO_INCREMENT,
   `person_id` int(255) NOT NULL,
   `event_id` int(255) NOT NULL,
   `created` datetime NOT NULL DEFAULT current_timestamp(),
-  `paid` datetime DEFAULT NULL,
-  `billing_name` varchar(255) NOT NULL,
-  `billing_email` varchar(255) NOT NULL,
-  `org_id` int(11) DEFAULT NULL,
   `attendance` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' CHECK (json_valid(`attendance`)),
-  PRIMARY KEY (`registration_id`)
+  `type` enum('Participant','Admin','Facilitator') NOT NULL DEFAULT 'Participant',
+  PRIMARY KEY (`relationship_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
