@@ -48,6 +48,11 @@ function attachValidators () {
 										callback: (id, obj) => setInfoFromDropDown(id, obj, target, "person")
 										}
 						break;
+					case "event":
+						var options = { script:	"../actions/EventActions.php?method=searchForNames&", varname: "search", json: true,
+										callback: (id, obj) => setInfoFromDropDown(id, obj, target, "event")
+										}
+						break;
 					case "organization":
 						var options = { script:	"../actions/OrganizationActions.php?method=searchForNames&", varname: "search", json: true,
 										callback: (id, obj) => setInfoFromDropDown(id, obj, target, "org")

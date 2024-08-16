@@ -26,7 +26,7 @@ $personFields = array(
 
 
 $registrationFields = array(
-	'relationship_id',
+	'enrollment_id',
 	'person_id',
 	'event_id',
 	'created',

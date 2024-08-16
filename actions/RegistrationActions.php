@@ -26,13 +26,13 @@
         $rFields = createUpdateFields($registrationData);
 
 		// add the registration
-		$sql = "INSERT INTO EventRelationships (".$rFields['columns'].")
+		$sql = "INSERT INTO Enrollments (".$rFields['columns'].")
 				VALUES (".$rFields['values'].") 
 				ON DUPLICATE KEY UPDATE ".$rFields['updateFields'].";";
 		$rResult = $mysqli->query($sql);
-		//give back the relationship_id if one exists, otherwise the id of whatever was inserted
+		//give back the enrollment_id if one exists, otherwise the id of whatever was inserted
 		if($rResult){
-			echo $data['relationship_id']? $data['relationship_id'] : $mysqli->insert_id;
+			echo $data['enrollment_id']? $data['enrollment_id'] : $mysqli->insert_id;
 		} else {
 			echo "ERROR: Hush! Sorry $sql. ". $mysqli->error;
 		}
@@ -40,7 +40,7 @@
 		$mysqli -> close();
 	}
 
-    function delete($relationship_id) { genericDelete("EventRelationships", 'relationship_id', $relationship_id); }
+    function delete($enrollment_id) { genericDelete("Enrollments", 'enrollment_id', $enrollment_id); }
 
 
 ?>

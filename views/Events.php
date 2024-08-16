@@ -39,15 +39,15 @@
             FROM (SELECT
     	            E.event_id, E.curriculum, E.start, E.end, E.location,
       		        O.name, O.org_id,
-        	        COUNT(Participants.relationship_id) AS participants
+        	        COUNT(Participants.enrollment_id) AS participants
                 FROM Events AS E
 	            LEFT JOIN Organizations AS O
                 ON O.org_id = E.org_id
-                LEFT JOIN EventRelationships AS Participants
+                LEFT JOIN Enrollments AS Participants
                 ON Participants.event_id = E.event_id
-                AND Participants.type = 'Participant'
+                AND (Participants.type = 'Participant' OR Participants.type = 'Make-up')
                 GROUP BY E.event_id) AS E2
-        LEFT JOIN EventRelationships AS Facilitators
+        LEFT JOIN Enrollments AS Facilitators
         ON Facilitators.event_id = E2.event_id
         AND Facilitators.type = 'Facilitator'
         LEFT JOIN People AS FacNames

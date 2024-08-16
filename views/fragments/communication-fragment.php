@@ -11,7 +11,7 @@
 
 	<span class="formInput">
 		<input  id="name" name="name" ignore="yes"
-			placeholder="Conact's name" validator="alpha"
+			placeholder="Contact's name" validator="alpha"
 			class="dropdown" datatype="person" autocomplete="nope"
 			value="<?php echo $data["name"] ?>" 
 			type="text" size="50" maxlength="70" required="yes"/>
@@ -54,7 +54,7 @@ function addComm(elt) {
 	const m = new Modal(elt, 'new_communication', (id) => window.location.reload());
 	document.getElementById('person_id').value  = elt.dataset.person_id;
 	document.getElementById('name').value       = elt.dataset.name;
-	document.getElementById('date').value       = "<?php echo date("Y-m-d") ?>";
+	document.getElementById('date').value       = "<?php echo date("m/d/Y") ?>";
 	m.showModal();
 }
 
@@ -69,8 +69,7 @@ function updateCommRp( commId ){
 				console.log('returning', commId,'from updateCommRp');
 				return commId; 
 		} else {
-			const urlValue = baseURL + `/views/Person.php?person_id=${person_id}`;
-			window.location = urlValue;
+			window.location.reload();
 		}
 	}
 }	

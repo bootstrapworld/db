@@ -149,7 +149,7 @@ AutoSuggest.prototype.createList = function(arr){
 	// if (arr.length == 0) {}
 
 	// loop through arr of suggestions, creating an LI element for each suggestion
-	for (var i=0;i<arr.length;i++){
+	for (var i=0; i<arr.length ;i++){
 		var val		= arr[i].value;
 		var match	= val.toLowerCase().indexOf( this.sInput.toLowerCase() );
 		var output	= val.substring(0,match) + "<em>" + val.substring(match, match+this.sInput.length) + "</em>" + val.substring(match+this.sInput.length);

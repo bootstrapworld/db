@@ -14,16 +14,16 @@
 	
 	<!--- AJAX calls --->
 	<script type="text/javascript">
-		function updateRegistrationRp( relationship_id ){
-			if ( relationship_id ){
+		function updateRegistrationRp( enrollment_id ){
+			if ( enrollment_id ){
 				alert( "Update successful." );
-				const urlValue = baseURL + `/views/Registration.php?relationship_id=${relationship_id}`;
+				const urlValue = baseURL + `/views/Registration.php?enrollment_id=${enrollment_id}`;
 				window.location = urlValue;
 			}
 		}
 
 		function deleteRegRq(){
-			const id = document.getElementById('relationship_id').value;
+			const id = document.getElementById('enrollment_id').value;
 			if(confirm("Are you sure you want to remove Registration ID# " + id + " permanently?")){
 				var request = new XMLHttpRequest();
 				// if the request is successful, execute the callback
@@ -32,7 +32,7 @@
 						deleteRegRp(request.responseText);
 					}
 				}; 
-				const data = JSON.stringify({relationship_id:id});
+				const data = JSON.stringify({enrollment_id:id});
 				request.open('POST', "../actions/RegistrationActions.php?method=delete&data="+data);
 				request.send();
 			}
@@ -66,17 +66,17 @@
 		}
 
     $data = [];
-		if(isset($_GET["relationship_id"])) {
+		if(isset($_GET["enrollment_id"])) {
 		    
-			$sql = "SELECT * FROM EventRelationships AS R
+			$sql = "SELECT * FROM Enrollments AS R
                     JOIN (SELECT *, city AS person_city, UPPER(state) AS person_state, zip AS person_zip FROM People) AS P ON P.person_id = R.person_id
                     JOIN Events AS E ON E.event_id = R.event_id
                     LEFT JOIN (SELECT org_id, name AS employer_name FROM Organizations) AS O ON O.org_id = P.employer_id
-                    WHERE R.relationship_id =".$_GET["relationship_id"];
+                    WHERE R.enrollment_id =".$_GET["enrollment_id"];
 							
 			$result = $mysqli->query($sql);
 			if($result->num_rows == 0) { 
-			    $_GET["relationship_id"] = null;
+			    $_GET["enrollment_id"] = null;
 			} else {
 			    $registration = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 			    $data = array_merge($data, $registration);
@@ -138,11 +138,11 @@
 </head>
 <body>
 	<div id="content">
-		<h1>Register for an Uncoming Bootstrap Workshop!</h1>
+		<h1>Register for an Upcoming Bootstrap Workshop!</h1>
 		<form id="new_registration" novalidate action="../actions/RegistrationActions.php">
 				<?php 
-						if(!$_GET["relationship_id"] || !$registration) {
-								echo "NOTE: no records matched <tt>relationship_id=".$_REQUEST["relationship_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>relationship_id</tt>.";
+						if(!$_GET["enrollment_id"] || !$registration) {
+								echo "NOTE: no records matched <tt>enrollment_id=".$_REQUEST["enrollment_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>enrollment_id</tt>.";
 						}
 				?>
 
@@ -153,8 +153,8 @@
 			<fieldset>
 				<legend>Registration</legend>
 				
-				<input type="hidden" id="relationship_id"	name="relationship_id"
-						 value="<?php echo $data["relationship_id"] ?>" 
+				<input type="hidden" id="enrollment_id"	name="enrollment_id"
+						 value="<?php echo $data["enrollment_id"] ?>" 
 				/>
 
 				<span class="formInput">
@@ -181,7 +181,7 @@
 				<br/>
 			</fieldset>
 			<input type="submit" id="new_registrationSubmit" value="Submit">
-			<?php if(isset($data['relationship_id'])) { ?>
+			<?php if(isset($data['enrollment_id'])) { ?>
 				<input type="button" value="Delete Registration" onclick="deleteRegRq()">
 			<?php } ?>
 		</form>

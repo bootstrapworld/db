@@ -47,7 +47,7 @@
 			            NULLIF(email_professional,''), email_google) AS email,
 			            IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop
 			        FROM Organizations AS O, People AS P
-			        LEFT JOIN EventRelationships AS R
+			        LEFT JOIN Enrollments AS R
                     ON R.person_id = P.person_id
                     LEFT JOIN Events AS E 
                     ON E.event_id = R.event_id
@@ -68,11 +68,11 @@
                         E.location,
                         O.org_id,
                         O.name,
-                    	COUNT(R.relationship_id) AS participants
+                    	COUNT(R.enrollment_id) AS participants
                     FROM Events AS E
                     LEFT JOIN Organizations AS O
                     ON E.org_id = O.org_id
-                    LEFT JOIN EventRelationships AS R
+                    LEFT JOIN Enrollments AS R
                     ON R.event_id = E.event_id
                     AND R.type = 'Participant'
                     WHERE O.org_id=".$_REQUEST['org_id']."

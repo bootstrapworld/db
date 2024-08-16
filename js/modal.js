@@ -69,7 +69,6 @@ Modal.prototype.showModal = function(){
 	var submit = document.getElementById(this.id + "Submit");
 	cancel.onclick = () => pointer.hideModal();
 	const oldOnSubmit = this.contents.onsubmit;
-	console.log(this.contents)
 	this.contents.onsubmit = (e) => {
 		result = oldOnSubmit(e).then(id => {
 			console.log('got result', id, 'in outer submit handler')

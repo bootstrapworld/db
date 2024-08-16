@@ -64,7 +64,7 @@
 	                JSON_VALUE(attendance, '$.total') AS days_attended,
                     DATEDIFF(end, start)+1 AS total_days,
                     R.type AS role, E.type AS event_type
-                FROM EventRelationships AS R, Events AS E
+                FROM Enrollments AS R, Events AS E
                 LEFT JOIN Organizations AS O
                 ON O.org_id = E.org_id
                 WHERE R.event_id = E.event_id
@@ -90,7 +90,6 @@
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
     </nav>
-    
     
 	<div id="content">
 		<h1><?php echo $title ?></h1>
@@ -146,7 +145,6 @@
 		                data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
 		                data-type="<?php echo $row['type']; ?>"
 		                data-date="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
-		                data-person_id="<?php echo $data['person_id']; ?>"
 		                data-notes="<?php echo $row['notes']; ?>"
 		                >
 		                <img src="../images/edit.gif">
@@ -167,12 +165,19 @@
 		?>
 
 		<h2>Events (<?php echo mysqli_num_rows($events); ?>)</h2>
+		        
+		<input type="button" onmouseup="addEnrollment(this);" value="+ Add an Entry"
+		    data-person_id="<?php echo $data['person_id']; ?>"
+		    data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
+		/>
+
 		<?php
 			if(mysqli_num_rows($events)) {
 	    ?>
 	    <table>
 		    <thead>
 		    <tr>
+                <th></th>
 		        <th>Role</th>
 		        <th>Type</th>
 		        <th>Curriculum &amp; Location</th>
@@ -188,6 +193,20 @@
 					$end   = date_create($row['end']);
 		?>
 		    <tr>
+		        <td class="controls">
+		            <a onmouseup="editEnrollment(this);" 
+		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
+		                data-event_id="<?php echo $row['event_id']; ?>"
+		                data-person_id="<?php echo $data['person_id']; ?>"
+		                data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
+		                data-title="<?php echo $row['title']?>"
+		                data-type="<?php echo $row['role']; ?>"
+		                data-created="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
+		                >
+		                <img src="../images/edit.gif">
+		            </a>
+		            <a href="javascript:deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"><img src="../images/delete.gif"></a>
+		        </td>
 		        <td><?php echo $row['role']; ?></td>
 		        <td><?php echo $row['event_type']; ?></td>
 		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['curriculum'] ?> (<?php echo $row['location'] ?>)</a></td>
@@ -216,6 +235,17 @@
 				</script>
 			</div>
 
+			<!-- Enrollment modal -->
+			<div id="newenrollment" class="modal">
+				<form id="new_enrollment" novalidate action="../actions/EnrollmentActions.php">
+					<?php include 'fragments/enrollment-fragment.php'; ?>
+					<input type="submit" id="new_enrollmentSubmit" value="Submit">
+					<input type="button" id="new_enrollmentCancel" class="modalCancel" value="Cancel" />
+				</form>
+				<script>
+					document.getElementById('new_enrollment').onsubmit = (e) => updateRequest(e, updateEnrollmentRp);
+				</script>
+			</div>
 
 	</div>
 </body>

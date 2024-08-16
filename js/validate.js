@@ -135,12 +135,13 @@ function validate(elt, type, value){
 
 const numb	= '0123456789.';
 const date	= numb+'/.-';
-const numbsym = numb+'#\'\"\,\!\?\$/';
+const sym   = '#\'\"\,\!\?\$/:-\(\)\[\]';
+const numbsym = numb+sym;
 const lwr		= 'abcdefghijklmnopqrstuvwxyz.- ';
 const upr		= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- ';
 const alpha	= lwr+upr+'.\'&';
-const alphasym = alpha+'.- ,'
-const alphanumbsym = alpha+numb+'.- ,\/\:'
+const alphasym = alpha+sym;
+const alphanumbsym = alpha+numb+sym;
 
 function isValid(parm, val) {
 	if (parm == "") return true;

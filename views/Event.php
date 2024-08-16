@@ -67,18 +67,19 @@
                         	WHEN 'Middle & High School' THEN 'M&HS'
                         	WHEN 'Elementary & Middle School' THEN 'E&MS'
                          	ELSE 'Unknown'
-                        END) AS grades_taught
-                    FROM `EventRelationships` AS R, `People` AS P , `Organizations` AS O
+                        END) AS grades_taught,
+                        R.type AS type
+                    FROM `Enrollments` AS R, `People` AS P , `Organizations` AS O
                     WHERE R.person_id = P.person_id 
                     AND O.org_id = P.employer_id
-                    AND R.type = 'Participant'
+                    AND (R.type = 'Participant' OR R.type = 'Make-up')
                     AND event_id = ".$_REQUEST["event_id"];
 			$participants = $mysqli->query($sql);
 
             $sql = "SELECT *, 
             		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
                         O.org_id, O.name AS employer_name
-                    FROM `EventRelationships` AS R, `People` AS P
+                    FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON O.org_id = P.employer_id
                     WHERE R.person_id = P.person_id 
@@ -88,7 +89,7 @@
             $sql = "SELECT *, 
             		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
                         O.org_id, O.name AS employer_name
-                    FROM `EventRelationships` AS R, `People` AS P
+                    FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON O.org_id = P.employer_id
                     WHERE R.person_id = P.person_id 
@@ -215,7 +216,7 @@
                 
 <?php if($data) { ?>
 				<b>Facilitators (<?php echo mysqli_num_rows($facilitators); ?>)</b><br/>
-	            <table>
+	            <table class="smart">
 	                <thead>
 	                    <tr>
 	                        <th>Name</th>
@@ -243,7 +244,7 @@
                 <p/>
 
 				<b>Admins (<?php echo mysqli_num_rows($admins); ?>)</b><br/>
-	            <table>
+	            <table class="smart">
 	                <thead>
 	                    <tr>
 	                        <th>Name</th>
@@ -279,9 +280,16 @@
 <?php if($data) { ?>
 
         <h2>Participants (<?php echo mysqli_num_rows($participants); ?>)</h2>
+		        
+		<input type="button" onmouseup="addEnrollment(this);" value="+ Add an Entry"
+		    data-event_id="<?php echo $data['event_id']; ?>"
+		    data-title="<?php echo $data['title']; ?>"
+		/>
+
 	    <table class="smart">
 		    <thead>
 		    <tr>
+		        <th></th>
 		        <th>Name</th>
 		        <th>Email</th>
 		        <th>Role</th>
@@ -297,6 +305,20 @@
 				    //print_r($row);
 		?>
 		    <tr>
+		        <td class="controls">
+		            <a onmouseup="editEnrollment(this);" 
+		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
+		                data-event_id="<?php echo $data['event_id']; ?>"
+		                data-person_id="<?php echo $row['person_id']; ?>"
+		                data-name="<?php echo $row['name_first']." ".$data['name_last']; ?>"
+		                data-title="<?php echo $data['title']?>"
+		                data-type="<?php echo $row['type']; ?>"
+		                data-created="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
+		                >
+		                <img src="../images/edit.gif">
+		            </a>
+		            <a href="javascript:deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"><img src="../images/delete.gif"></a>
+		        </td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
 		        <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		        <td><?php echo $row['role'] ?></td>
@@ -309,6 +331,19 @@
 		    </tbody>
 		</table>
 <?php } ?>
+
+			<!-- Enrollment modal -->
+			<div id="newenrollment" class="modal">
+				<form id="new_enrollment" novalidate action="../actions/EnrollmentActions.php">
+					<?php include 'fragments/enrollment-fragment.php'; ?>
+					<input type="submit" id="new_enrollmentSubmit" value="Submit">
+					<input type="button" id="new_enrollmentCancel" class="modalCancel" value="Cancel" />
+				</form>
+				<script>
+					document.getElementById('new_enrollment').onsubmit = (e) => updateRequest(e, updateEnrollmentRp);
+				</script>
+			</div>
+
 
 	</div>
 	<script>

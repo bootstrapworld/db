@@ -8,10 +8,10 @@
 	function searchForNames() {
 		$mysqli = openDB_Connection();
 
-		$pattern = "'".$_REQUEST['search']."%'";
+		$pattern = "'%".$_REQUEST['search']."%'";
 
 		// insert these strings into a query
-		$sql = "SELECT * FROM Events WHERE title LIKE $pattern";
+		$sql = "SELECT event_id AS id, title AS value, location AS info FROM Events WHERE title LIKE $pattern";
 		$result = $mysqli->query($sql);
 		if($result){
 			while($row = $result->fetch_assoc()) { $myArray[] = $row; }

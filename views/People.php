@@ -58,11 +58,12 @@
 				IF(LENGTH(O.name) > 0, CONCAT(' at ', O.name), '') AS employer_name,
                 E.event_id,
                 IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop,
+                R.type AS recent_workshop_role,
                 C.date AS recent_contact, C.notes
 			FROM People AS P
 			LEFT JOIN Organizations AS O
 			ON P.employer_id=O.org_id
-            LEFT JOIN EventRelationships AS R
+            LEFT JOIN Enrollments AS R
             ON R.person_id = P.person_id
             LEFT JOIN Events AS E 
             ON E.event_id = R.event_id
@@ -113,7 +114,7 @@
 		        </td>
 		        <td><?php echo $row['location']; ?></td>
 		        <td title="<?php echo $row['notes']; ?>" ><?php echo $row['recent_contact']; ?></td>
-		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop']; ?></a></td>
+		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop']; ?> - <?php echo $row['recent_workshop_role']; ?></a></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>
