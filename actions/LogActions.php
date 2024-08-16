@@ -81,11 +81,24 @@ function deleteAllRows() {
 	$mysqli->close();
 }
 
+function getLogs() {
+    $mysqli = openDB_Connection();
+    $sql = "SELECT * FROM Logs LIMIT 100000";
+    $logs = $mysqli->query($sql);
+    $ret_json = array();
+    while($row = mysqli_fetch_assoc($logs)) {
+      $ret_json[] = $row;
+    }
+    header('Content-type: application/json');
+    echo json_encode($ret_json);
+}
+
 $method = $_REQUEST["method"];
 $data = json_decode($_REQUEST["data"], true);
 
 if($method == "update") { writeToLog($data); }
 if($method == "pyretLog") { pyretLog(); }
 if($method == "deleteAll") { deleteAllRows(); }
+if($method == "logs") { getLogs(); }
 
 ?>

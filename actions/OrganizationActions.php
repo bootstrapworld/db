@@ -8,7 +8,7 @@
 	function searchForNames() {
 		$mysqli = openDB_Connection();
 
-		$pattern = "'".$_REQUEST['search']."%'";
+		$pattern = "'%".$_REQUEST['search']."%'";
 
 		// Search for org names that match 
 		$sql = "SELECT 

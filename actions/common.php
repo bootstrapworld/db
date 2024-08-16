@@ -61,18 +61,21 @@ function openDB_Connection() {
 
 function genericInsertOrUpdate($table, $data) {
 		$mysqli = openDB_Connection();
-		$columns = implode(", ", array_keys($data));
-		$values = implode(", ", array_map('quoteOrNull', array_values($data)));
-
+		$columns = array_keys($data);
+		$values = array_values($data);
+		for( $i = 0; $i < count($values); $i++ ){
+            $values[$i] = quoteOrNull(mysqli_real_escape_string( $mysqli, $values[$i] ));
+        }
 		$updateFields = implode(", ", array_map(
 			function($column,$value) { return $column."=".$value; }, 
-			array_keys($data), array_map('quoteOrNull', array_values($data))
+			$columns, $values
 		));
-        
-		$sql = "INSERT INTO $table ($columns)
-				VALUES ($values) 
+
+		$sql = "INSERT INTO $table (".implode(', ', $columns).")
+				VALUES (".implode(', ', $values).") 
 				ON DUPLICATE KEY UPDATE $updateFields";
-		
+
+
 		$result = $mysqli->query($sql);
 		if($result){
 			echo $mysqli->insert_id;

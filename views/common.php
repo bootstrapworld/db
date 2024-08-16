@@ -40,7 +40,7 @@ $roleOpts = ["Teacher",
 						"Administrator (State)",
 						"Other"];
 
-$commOpts = ["Phone", "Zoom", "Coaching", "Email", "Discourse"];
+$commTypeOpts = ["Phone", "Zoom", "Coaching", "Email", "Discourse"];
 
 $orgTypeOpts = ['School','District','Charter School Network','NonProfit/Foundation','Company','Unknown','State Dept of Ed','For Profit','College/University'];
 

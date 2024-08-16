@@ -25,16 +25,20 @@
 			$mysqli = openDB_Connection();
 	
 			$sql = "SELECT 
-								org_id,
-								name,
-								website,
-								address,
-								city AS org_city,
-								state AS org_state,
-								zip AS org_zip,
-								parent_id,
-								type
-							FROM Organizations WHERE org_id=".$_REQUEST["org_id"];
+								O.org_id,
+								O.name,
+								O.website,
+								O.address,
+								O.city AS org_city,
+								O.state AS org_state,
+								O.zip AS org_zip,
+								O.parent_id,
+								P.name AS parent_name,
+								O.type
+							FROM Organizations AS O
+							LEFT JOIN Organizations as P
+							ON O.parent_id = P.org_id
+							WHERE O.org_id=".$_REQUEST["org_id"];
 			$result = $mysqli->query($sql);
 			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 

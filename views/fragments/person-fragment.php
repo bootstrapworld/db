@@ -153,9 +153,7 @@
 		<textarea id="other_credentials" name="other_credentials"
 			placeholder="Are you licensed by a State or other organization (e.g. NYS Math 7-12, etc)? Do you hold a degree in Education (e.g. MS Ed Mathematics, Secondary Science, etc)? Do you belong to a Professional Organization? (e.g. Math for America Fellow, NCTM, etc)? Something else?" 
 			validator="alphanumbsym"
-			value="<?php echo $data["other_credentials"] ?>"  
-			cols="70" rows="4" maxlength="1000"/>
-		</textarea>
+			cols="70" rows="4" maxlength="1000"/><?php echo $data["other_credentials"] ?></textarea>
 		<label for="other_credentials">Other Credentials</label>
 	</span>
 	<br/>

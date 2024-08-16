@@ -231,7 +231,7 @@
 	                    <tr>
 	                        <td><?php echo $row['name_first']; ?> <?php echo $row['name_last']; ?></td>
 		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
-		                    <td><a href="Organization.php?org_id=:<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
+		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
 	                    </tr>
 	           <?php 
 	                }
@@ -258,7 +258,7 @@
 	                    <tr>
 	                        <td><?php echo $row['name_first']; ?> <?php echo $row['name_last']; ?></td>
 		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
-		                    <td><a href="Organization.php?org_id=:<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
+		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
 	                    </tr>
 	           <?php } ?>
 	                </tbody>

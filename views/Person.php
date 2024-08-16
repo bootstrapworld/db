@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="../js/validate.js"></script>			
 	<script type="text/javascript" src="../js/autosuggest.js"></script>	
 	<script type="text/javascript" src="../js/modal.js"></script>
-	
+
 	<style>
 	    td, th { padding: 5px; }
 	    table { border: solid 1px black; }
@@ -72,7 +72,7 @@
                 ORDER BY start ASC";
 	  $events = $mysqli->query($sql);
 
-	  $sql =   "SELECT * FROM Communications WHERE person_id=".$_REQUEST["person_id"]." ORDER BY date DESC";
+	  $sql =   "SELECT * FROM Communications WHERE person_id=".$_REQUEST["person_id"]." ORDER BY date DESC, communication_id DESC";
 	  $comms = $mysqli->query($sql);
 
 
@@ -112,26 +112,21 @@
 				document.getElementById('new_person').onsubmit = (e) => updateRequest(e, updatePersonRp);
 			</script>
 
-			<!-- Organization modal -->
-			<div id="neworganization" class="modal">
-				<form id="new_organization" novalidate action="../actions/OrganizationActions.php">
-					<?php include 'fragments/organization-fragment.php' ?>
-					<input type="submit" id="new_organizationSubmit" value="Submit">
-					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
-				</form>
-				<script>
-					document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
-				</script>
-			</div>
-			
 <?php if($data) { ?>			
-		<h2>Contact History (<?php echo mysqli_num_rows($comms); ?>)</h2>
+		<h2>Communication (<?php echo mysqli_num_rows($comms); ?>)</h2>
+		        
+		<input type="button" onmouseup="addComm(this);" value="+ Add an Entry"
+		    data-person_id="<?php echo $data['person_id']; ?>"
+		    data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
+		/>
+		
 		<?php
 			if(mysqli_num_rows($comms)) {
 	    ?>
 	    <table>
 		    <thead>
 		    <tr>
+		        <th></th>
 		        <th>Date</th>
 		        <th>Type</th>
 		        <th>Notes</th>
@@ -144,6 +139,20 @@
 					$date = date_create($row['date']);
 		?>
 		    <tr>
+		        <td class="controls">
+		            <a onmouseup="editComm(this);" 
+		                data-communication_id="<?php echo $row['communication_id']; ?>"
+		                data-person_id="<?php echo $row['person_id']; ?>"
+		                data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
+		                data-type="<?php echo $row['type']; ?>"
+		                data-date="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
+		                data-person_id="<?php echo $data['person_id']; ?>"
+		                data-notes="<?php echo $row['notes']; ?>"
+		                >
+		                <img src="../images/edit.gif">
+		            </a>
+		            <a href="javascript:deleteCommRq(<?php echo $row['communication_id']; ?>)"><img src="../images/delete.gif"></a>
+		        </td>
 		        <td><?php echo date_format($date,"M jS, Y"); ?></td>
 		        <td><?php echo $row['type']; ?></td>
 		        <td><?php echo $row['notes']; ?></td>
@@ -153,7 +162,7 @@
 		</table>
 		<?php
 			} else {
-			echo "No events were found that are associated with this organization";
+			echo "<p/>No communication records were found that are associated with this person";
 			}
 		?>
 
@@ -190,10 +199,24 @@
 		</table>
 		<?php
 			} else {
-			echo "No events were found that are associated with this organization";
+			echo "<p/>No events were found that are associated with this person";
 			}
 		?>
 <?php } ?>
+
+			<!-- Communication modal -->
+			<div id="newcommunication" class="modal">
+				<form id="new_communication" novalidate action="../actions/CommunicationActions.php">
+					<?php include 'fragments/communication-fragment.php'; ?>
+					<input type="submit" id="new_communicationSubmit" value="Submit">
+					<input type="button" id="new_communicationCancel" class="modalCancel" value="Cancel" />
+				</form>
+				<script>
+					document.getElementById('new_communication').onsubmit = (e) => updateRequest(e, updateCommRp);
+				</script>
+			</div>
+
+
 	</div>
 </body>
 </html>

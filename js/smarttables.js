@@ -48,7 +48,7 @@ SmartTable = function(table, i){
 		if(datatype == "email") { 
 		    var emailButton = document.createElement('a');
 		    header.appendChild(emailButton);
-		    emailButton.innerHTML = "<img src='../images/copyIcon.png' style='max-height:12px; margin-left: 10px;'/>";
+		    emailButton.innerHTML = "<img src='../images/copyIcon.png' style='max-height:12px; margin-left: 10px; cursor: pointer;'/>";
 		    emailButton.onclick = () => this.copyEmails(i);
 		}
 	})

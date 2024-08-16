@@ -9,6 +9,7 @@ Modal contain:
 - a callback function, to return some result when the modal is closed
 */
 Modal = function(showButton, id, callback){
+    console.log('modal called with id=',id)
 	pointer				= this;
 	this.showButton		= showButton;
 	this.id				= id;
@@ -68,6 +69,7 @@ Modal.prototype.showModal = function(){
 	var submit = document.getElementById(this.id + "Submit");
 	cancel.onclick = () => pointer.hideModal();
 	const oldOnSubmit = this.contents.onsubmit;
+	console.log(this.contents)
 	this.contents.onsubmit = (e) => {
 		result = oldOnSubmit(e).then(id => {
 			console.log('got result', id, 'in outer submit handler')

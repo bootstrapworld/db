@@ -91,8 +91,8 @@ table.smart { margin: 0; width: 100% ; }
 .smartTableControls input { flex-grow: 1; }
 .smartTableControls b { margin-left: 12px; margin-right: 2px; }
 .smartTableControls b:first-child { margin-left: 0; }
-
-
+td.controls img { max-height: 12px; }
+td.controls img+img { margin-left: 10px; }
 td.controls{width:	20px;}
 
 iframe{display:	none; border:0px none;}
@@ -118,10 +118,10 @@ div#modalWindow{
 	width:				auto;
 	height:				auto;
 }
-div#modalWindow fieldset{background: black; width: 600px; padding: 10px;}
+div#modalWindow fieldset{ border: none; width: 600px; padding: 10px; }
 div.edit{width: 600px;}
 div.edit img{border: solid 1px black;}
-div.modal{display:none; text-align: center; }
+div.modal{display:none; text-align: center; background: black; padding-bottom: 10px; }
 /* only display the cancel button when it's inside a modal! */
 .modalCancel { display: none; }
 div.modal .modalCancel { display: inline-block; }
@@ -154,7 +154,7 @@ fieldset{
 }
 fieldset span.formInput { display: inline-block; margin: 2px; }
 legend { font-weight: bold; }
-input, select {
+input, select, textarea {
 	padding: 2px; 
 	font-family: arial, helvetica, 
 	serif; 

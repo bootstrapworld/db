@@ -8,7 +8,7 @@
 	function searchForNames() {
 		$mysqli = openDB_Connection();
 
-		$pattern = "'".trim($_REQUEST['search'])."%'";
+		$pattern = "'%".trim($_REQUEST['search'])."%'";
 
 		$sql = "SELECT 
 			person_id AS id, 
