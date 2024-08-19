@@ -233,7 +233,7 @@ Please correct all the boxes marked in red, and then resubmit.`);
 	});
 
 	// remove any elements that should be ignored
-	const eltsToIgnore = [...document.querySelectorAll('*[ignore]')];
+	const eltsToIgnore = [...submitEvent.target.querySelectorAll('*[ignore]')];
 	eltsToIgnore.forEach(elt => delete formObject[elt.name]);
 
 	return formObject;
