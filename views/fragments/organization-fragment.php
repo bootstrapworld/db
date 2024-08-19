@@ -20,7 +20,7 @@
 		<label for="state">Type</label>
 	</span>
 
-	<br/>
+	<p/>
 	<span class="formInput">
 		<input  id="website" name="website" 
 			placeholder="https://www.flynn.schools.state.ri" validator="url" 
@@ -28,7 +28,7 @@
 			type="text" size="70" maxlength="70" />
 		<label for="website">Website (don't forget the <tt>http://</tt>!)</label>
 	</span>
-	<br/>
+	<p/>
 	<span class="formInput">
 		<input  id="address" name="address" 
 			placeholder="255 8-bit Way" validator="alphanum" 
@@ -36,7 +36,7 @@
 			type="text" size="50" maxlength="30" />
 		<label for="address">Street Address</label>
 	</span>
-	<br/>
+	<p/>
 
 	<span class="formInput">
 		<input  id="city" name="city" 
@@ -58,7 +58,7 @@
 			type="text" size="10" maxlength="10" />
 		<label for="zip">ZIP Code</label>
 	</span>
-	<br/>
+	<p/>
 
 	<input type="hidden" id="parent_id"	name="parent_id"
    		value="<?php echo $data["parent_id"] ?>" 

@@ -203,8 +203,9 @@ function validateSubmission(submitEvent){
 
 	// get all the form elements that are SELECT or text entry boxes (ignore modals)
 	elts = [...submitEvent.target.elements].filter(elt => 
-		(elt.nodeName == "SELECT") || (elt.type == "hidden") || 
-		((elt.type == "text") && (elt.classname !== "modal")));
+	    (elt.getAttribute("ignore") !== "yes") &&
+		    ((elt.nodeName == "SELECT") || (elt.type == "hidden") || 
+		     ((elt.type == "text") && (elt.classname !== "modal"))));
 
 	// validate every one of them
 	// we have to map first, to force the validator to check EVERYTHING

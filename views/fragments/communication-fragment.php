@@ -23,7 +23,7 @@
 		<label for="state">Type</label>
 	</span>
 
-	<br/>
+	<p/>
 	<span class="formInput">
 		<input  id="date" name="date" 
 			validator="date" 
@@ -31,7 +31,7 @@
 			type="date"  required="yes" />
 		<label for="date">Date</label>
 	</span>
-	<br/>
+	<p/>
 	<span class="formInput">
 		<textarea  id="notes" name="notes"  validator="alphanumbsym"
 			rows="10" cols="80" required="yes"><?php echo $data["notes"]; ?></textarea>

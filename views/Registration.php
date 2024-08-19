@@ -139,7 +139,7 @@
 <body>
 	<div id="content">
 		<h1>Register for an Upcoming Bootstrap Workshop!</h1>
-		<form id="new_registration" novalidate action="../actions/RegistrationActions.php">
+		<form id="new_registration" novalidate class="locked" action="../actions/RegistrationActions.php">
 				<?php 
 						if(!$_GET["enrollment_id"] || !$registration) {
 								echo "NOTE: no records matched <tt>enrollment_id=".$_REQUEST["enrollment_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>enrollment_id</tt>.";
@@ -161,7 +161,7 @@
 					<?php echo generateDropDown("event_id", "event_id", $eventOpts, $data["event_id"], true) ?>
 					<label for="event_id">Which event are you registering for?</label>
 				</span>
-				<br/>
+				<p/>
 
 				<span class="formInput">
 					<input  id="billing_name" name="billing_name" 
@@ -178,7 +178,7 @@
 						type="text" size="30" maxlength="40" required="yes" />
 					<label for="billing_email">Payee Email</label>
 				</span>
-				<br/>
+				<p/>
 			</fieldset>
 			<input type="submit" id="new_registrationSubmit" value="Submit">
 			<?php if(isset($data['enrollment_id'])) { ?>

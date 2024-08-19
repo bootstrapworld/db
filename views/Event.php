@@ -121,17 +121,25 @@
     
     <div id="content">
 		<h1><?php echo $title ?></h1>
-		<form id="new_event" novalidate action="../actions/EventActions.php">
+		<form id="new_event" novalidate action="../actions/EventActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
 			<?php 
-			
 					if($_GET["event_id"] && !$data) {
 							echo "NOTE: no records matched <tt>event_id=".$_REQUEST["event_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>event_id</tt>.";
 					}
 			?>
+			
+			<span class="buttons">
+    			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
+    			<input type="submit" title="Save" value="💾">
+	    		<?php if(isset($data)) { ?>
+	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
+		    		<input type="button" title="Delete" value="🗑️️" onclick="deleteEventRq()">
+			    <?php } ?>
+			</span>
 
 			<fieldset>
 				<legend>Event Information</legend>
-				<i style="clear: both;">You must enter at least a title, type, start & end time, and price.</i><p/>
+				<span class="instructions">You must enter at least a title, type, start & end time, and price.</span><p/>
 				
 				<input type="hidden" id="event_id"	name="event_id"
 						 value="<?php echo $data["event_id"] ?>" 
@@ -141,7 +149,7 @@
 					<input  id="title" name="title"
 						placeholder="Webinar about stuff..." validator="alphanumbsym" 
 						value="<?php echo $data["title"] ?>" 
-						type="text" size="40" maxlength="50" required="yes"/>
+						type="text" size="60" maxlength="70" required="yes"/>
 					<label for="title">Event Title</label>
 				</span>
 
@@ -149,7 +157,7 @@
 					<?php echo generateDropDown("type", "type", $eventTypeOpts, $data["event_type"], true); ?>
 					<label for="curriculum">Event Type</label>
 				</span>
-				<br/>
+				<p/>
 
 				<span class="formInput">
 					<input  id="location" name="location"  validator="alphanumbsym"
@@ -158,7 +166,7 @@
 						type="text" size="70" maxlength="100" required="yes"/>
 					</span>
 					<label for="location">Address or videoconference link</label>
-				<br/>
+				<p/>
 
 				<input type="hidden" id="org_id"	name="org_id"
 						value="<?php echo $data["org_id"] ?>" 
@@ -172,7 +180,7 @@
 						type="text" size="70" maxlength="70" ignore="yes" />
 					<label for="employer_name">Partner Organization</label>
 				</span>
-				<br/>
+				<p/>
 
 				<span class="formInput">
 					<input  id="start" name="start" 
@@ -202,7 +210,7 @@
 					<?php echo generateDropDown("curriculum", "curriculum", $currOpts, $data["curriculum"], true); ?>
 					<label for="curriculum">Curriculum</label>
 				</span>
-				<br/>
+				<p/>
 
 				<span class="formInput">
 					<input  id="webpage_url" name="webpage_url" 
@@ -211,12 +219,12 @@
 						type="text" size="70" maxlength="100"/>
 					<label for="webpage_url">Web page for the event</label>
 				</span>
-				<br/>
+				<p/>
 				
                 <p/>	
                 
 <?php if($data) { ?>
-				<b>Facilitators (<?php echo mysqli_num_rows($facilitators); ?>)</b><br/>
+				<b>Facilitators (<?php echo mysqli_num_rows($facilitators); ?>)</b><p/>
 	            <table class="smart">
 	                <thead>
 	                    <tr>
@@ -244,7 +252,7 @@
 
                 <p/>
 
-				<b>Admins (<?php echo mysqli_num_rows($admins); ?>)</b><br/>
+				<b>Admins (<?php echo mysqli_num_rows($admins); ?>)</b><p/>
 	            <table class="smart">
 	                <thead>
 	                    <tr>
@@ -268,11 +276,6 @@
 <?php } ?>
 
 			</fieldset>
-
-			<input type="submit" value="Submit">
-			<?php if(isset($data)) { ?>
-				<input type="button" value="Delete Event" onclick="deleteEventRq()">
-			<?php } ?>
 		</form>
 		<script>
 			document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);

@@ -132,13 +132,16 @@ div.modal{display:none; text-align: center; background: black; padding-bottom: 1
 /* only display the cancel button when it's inside a modal! */
 .modalCancel { display: none; }
 div.modal .modalCancel { display: inline-block; }
+
 /* *********** FORM STYLES *********** */
-form div{
+form { position: relative; }
+form div {
 	position:			relative; 
 	float:				left; 
 	margin-right:		10px;
 }
-div.header input{
+form .instructions { font-style: italic; clear: both; }
+div.header input {
 	position:			relative; 
 	float:				left;
 	font-size:			30px; 
@@ -146,14 +149,14 @@ div.header input{
 	margin:				10px 0px 0px 0px;
 	font-family:		arial, helvetica, serif;
 }
-div.header span{
+div.header span {
 	font-size:			30px; 
 	font-weight:		bold;
 	font-family:		sans-serif; 
 	margin-bottom:		10px;
 	clear: none;
 }
-td span{margin: 3px; padding:0px;}
+td span{ margin: 3px; padding:0px; }
 fieldset{
 	text-align: 		left;
 	width:				98%; 
@@ -192,9 +195,29 @@ label {
 	color:				black;
 }
 
-div.modal label{color: white;}
-div.modal legend{background: white;}
-input.dropdown {font-size: 12px;}
+div.modal label{ color: white; }
+div.modal legend{ background: white; }
+input.dropdown { font-size: 12px; }
+
+form.locked :not(.buttons, .smartTableControls)>input, form.locked textarea { border: none; pointer-events: none; resize: none; }
+form.locked *::-webkit-input-placeholder { visibility: hidden; }
+form.locked :not(.smartTableControls)>select {
+    border: none;
+    pointer-events: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: '';
+}
+form.locked .instructions, form.locked .buttons input[title=Save], form.locked .buttons input[title=Delete] { display: none; } 
+form.unlocked .buttons input[title=Edit] { display: none; } 
+
+form.locked input[title=Save] { display: none; }
+form.locked input[title=Cancel] { display: none; }
+form.locked input[title=Delete] { display: none; }
+form .buttons { position: absolute; right: 1em; top: 1em; }
+form .buttons * { width: 32px; height: 32px; }
+form .buttons *:first-child { margin-right: 5px;}
 /* *********** CALENDAR STYLES *********** */
 /* the table (within the div) that holds the date picker calendar */
 .dpTable {

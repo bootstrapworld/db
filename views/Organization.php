@@ -103,12 +103,17 @@
 						}
 				?>
 			<!-- Organization Form -->
-			<form id="new_organization" novalidate action="../actions/OrganizationActions.php">
+			<form id="new_organization" novalidate action="../actions/OrganizationActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
+			<span class="buttons">
+    			<input type="button" title="Edit" value="✏️">
+    			<input type="submit" title="Save" value="💾" id="new_organizationSubmit">
+	    		<?php if(isset($data)) { ?>
+	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
+		    		<input type="button" title="Delete" value="🗑️️" onclick="deleteOrgRq()">
+			    <?php } ?>
+			</span>
+			    
 				<?php include 'fragments/organization-fragment.php' ?>
-				<input type="submit" id="new_organizationSubmit" value="Submit">
-				<?php if(isset($data)) { ?>
-					<input type="button" value="Delete Organization" onclick="deleteOrgRq()">
-				<?php } ?>
 					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
 			</form>
 			<script>

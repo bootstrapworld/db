@@ -37,6 +37,7 @@ SmartTable = function(table, i){
 	label.innerHTML = "Sort by: "
 	controls.appendChild(label);
 	this.sortMenu = document.createElement('select');
+	this.sortMenu.setAttribute("ignore", "yes"); // don't run this through the validator
 	this.sortMenu.id  = 'sortBy';
 	this.sortMenu.pointer = this.pointer;
 	this.sortMenu.options[0] = new Option('Select a column:', '-1' , false, false);
@@ -62,6 +63,7 @@ SmartTable = function(table, i){
 	this.sortAsc.options[1] = new Option("Desc", "", false, false);
 	this.sortAsc.pointer = this.pointer;
 	this.sortAsc.onchange=function(){this.pointer.rebuildTable();}
+	this.sortAsc.setAttribute("ignore", "yes"); // don't run this through the validator
 	controls.appendChild(this.sortAsc);
 	
 	// filter menus
@@ -75,6 +77,8 @@ SmartTable = function(table, i){
 	this.filter2val.setAttribute('size','10');
 	this.filter1val.id	= 'filter1id';
 	this.filter2val.id	= 'filter2id';
+	this.filter1val.setAttribute("ignore", "yes"); // don't run this through the validator
+	this.filter2val.setAttribute("ignore", "yes"); // don't run this through the validator
 	
 	var label = document.createElement("b");
 	label.innerHTML = "Filter: "
@@ -106,6 +110,7 @@ SmartTable = function(table, i){
 	//this.filter3Col.onchange=function(){this.pointer.rebuildTable();}
 	//this.filter3val.pointer = this.pointer;
 	//this.filter3val.onkeyup = function(){this.pointer.rebuildTable()};
+	//this.filter3val.setAttribute("ignore", "yes"); // don't run this through the validator
 	table.parentNode.insertBefore(controls,table);
 
 	this.lastFilterCol = null;

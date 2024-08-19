@@ -92,19 +92,24 @@
     </nav>
     
 	<div id="content">
-		<h1><?php echo $title ?></h1>
+		<h1><?php echo $title; ?></h1>
+		
 			<?php 
 				if($_GET["person_id"] && !$data) {
 					echo "NOTE: no records matched <tt>person_id=".$_REQUEST["person_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>person_id</tt>.";
 				}
 			?>
 			<!-- Person form -->
-			<form id="new_person" novalidate action="../actions/PersonActions.php">
+			<form id="new_person" novalidate action="../actions/PersonActions.php"  class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
+			<span class="buttons">
+    			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
+    			<input type="submit" title="Save" value="💾" id="new_personSubmit">
+	    		<?php if(isset($data)) { ?>
+	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
+		    		<input type="button" title="Delete" value="🗑️️" onclick="deletePersonRq()">
+			    <?php } ?>
+			</span>
 				<?php include 'fragments/person-fragment.php' ?>
-				<input type="submit" id="new_personSubmit" value="Submit">
-				<?php if(isset($data)) { ?>
-					<input type="button" value="Delete Person" onclick="deletePersonRq()">
-				<?php } ?>
 				<input type="button" id="new_personCancel" class="modalCancel" value="Cancel" />
 			</form>
 			<script>

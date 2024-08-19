@@ -22,13 +22,13 @@
 			type="text" size="40" maxlength="40" required="yes"/>
 		<label for="name_last">Last Name</label>
 	</span>
-	<br/>
+	<p/>
 
 	<span class="formInput">
 		<input  id="email_preferred" name="email_preferred" 
 			placeholder="Preferred Email" validator="email" 
 			value="<?php echo $data["email_preferred"] ?>" 
-			type="text" size="25" maxlength="50" required="yes"/>
+			type="text" size="32" maxlength="50" required="yes"/>
 		<label for="email_preferred">Preferred Email</label>
 	</span>
 
@@ -36,7 +36,7 @@
 		<input  id="email_professional" name="email_professional" 
 			placeholder="Professional (School) Email" validator="email" 
 			value="<?php echo $data["email_professional"] ?>" 
-			type="text" size="25" maxlength="50"/>
+			type="text" size="32" maxlength="50"/>
 		<label for="email_professional">Work/School Email</label>
 	</span>
 
@@ -44,10 +44,10 @@
 		<input  id="email_google" name="email_google" 
 			placeholder="Google Email" validator="email" 
 			value="<?php echo $data["email_google"] ?>" 
-			type="text" size="25" maxlength="50"/>
+			type="text" size="32" maxlength="50"/>
 		<label for="email_google">Google Email</label>
 	</span>
-	<br/>
+	<p/>
 
 	<span class="formInput">
 		<input  id="home_address" name="home_address" 
@@ -56,7 +56,7 @@
 			type="text" size="50" maxlength="30" />
 		<label for="home_address">Street Address</label>
 	</span>
-	<br/>
+	<p/>
 
 	<span class="formInput">
 		<input  id="person_city" name="city" 
@@ -78,7 +78,7 @@
 			type="text" size="10" maxlength="10" />
 		<label for="zip">ZIP Code</label>
 	</span>
-	<br/>
+	<p/>
 
 	<span class="formInput">
 		<input  id="home_phone" name="home_phone"
@@ -103,7 +103,7 @@
 			type="text" size="14" maxlength="20" />		
 		<label for="cell_phone">Cell Phone</label>
 	</span>
-	<br/>
+	<p/>
 
 	<span class="formInput">
 		<?php echo generateDropDown("race", "race", $raceOpts, $data["race"], true); ?>
@@ -117,7 +117,7 @@
 			type="text" size="30" maxlength="3" />
 		<label for="prior_years_coding"># Years Coding Experience</label>
 	</span>
-	<br/>
+	<p/>
 
 	<input type="hidden" id="employer_id"	name="employer_id"
    		value="<?php echo $data["employer_id"] ?>" 
@@ -131,7 +131,7 @@
 			type="text" size="70" maxlength="70" ignore="yes" />
 		<label for="employer_name">School or Employer Name</label>
 	</span>
-	<br/>
+	<p/>
 
 	<span class="formInput">
 		<?php echo generateDropDown("role", "role", $roleOpts, $data["role"], true) ?>
@@ -147,7 +147,7 @@
 		<?php echo generateDropDown("primary_subject", "primary_subject", $subjectOpts, $data["primary_subject"], false); ?>
 		<label for="primary_subject">Current primary subject</label>
 	</span>
-	<br/>
+	<p/>
 
 	<span class="formInput">
 		<textarea id="other_credentials" name="other_credentials"
@@ -156,7 +156,7 @@
 			cols="70" rows="4" maxlength="1000"/><?php echo $data["other_credentials"] ?></textarea>
 		<label for="other_credentials">Other Credentials</label>
 	</span>
-	<br/>
+	<p/>
 </fieldset>
 
 <script>

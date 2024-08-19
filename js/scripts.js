@@ -266,3 +266,9 @@ const randomFormInfo = {
 	state: states[Math.floor(Math.random()*states.length)],
 	zip: 	zipcodes[Math.floor(Math.random()*zipcodes.length)]
 }
+
+
+function unlockForm(unlockButton) {
+    unlockButton.form.classList.remove("locked");
+    unlockButton.form.classList.add("unlocked");
+}
