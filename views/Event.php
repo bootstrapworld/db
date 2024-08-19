@@ -59,6 +59,7 @@
             $sql = "SELECT *, 
             		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
                         O.name AS employer_name,
+                        CONCAT(P.name_first, ' ', name_last) AS name,
                         JSON_VALUE(attendance, '$.total') AS days_attended,
                         (CASE grades_taught
                         	WHEN 'High School' THEN 'HS'
@@ -306,18 +307,17 @@
 		?>
 		    <tr>
 		        <td class="controls">
-		            <a onmouseup="editEnrollment(this);" 
+		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
 		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
 		                data-event_id="<?php echo $data['event_id']; ?>"
 		                data-person_id="<?php echo $row['person_id']; ?>"
-		                data-name="<?php echo $row['name_first']." ".$data['name_last']; ?>"
+		                data-name="<?php echo $row['name']; ?>"
 		                data-title="<?php echo $data['title']?>"
 		                data-type="<?php echo $row['type']; ?>"
 		                data-created="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
 		                >
-		                <img src="../images/edit.gif">
 		            </a>
-		            <a href="javascript:deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"><img src="../images/delete.gif"></a>
+		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
 		        </td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
 		        <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>

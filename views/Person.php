@@ -139,7 +139,7 @@
 		?>
 		    <tr>
 		        <td class="controls">
-		            <a onmouseup="editComm(this);" 
+		            <a class="editButton" href="#" onmouseup="editComm(this);" 
 		                data-communication_id="<?php echo $row['communication_id']; ?>"
 		                data-person_id="<?php echo $row['person_id']; ?>"
 		                data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
@@ -147,9 +147,8 @@
 		                data-date="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
 		                data-notes="<?php echo $row['notes']; ?>"
 		                >
-		                <img src="../images/edit.gif">
 		            </a>
-		            <a href="javascript:deleteCommRq(<?php echo $row['communication_id']; ?>)"><img src="../images/delete.gif"></a>
+		            <a class="deleteButton" href="#" onmouseup="deleteCommRq(<?php echo $row['communication_id']; ?>)"></a>
 		        </td>
 		        <td><?php echo date_format($date,"M jS, Y"); ?></td>
 		        <td><?php echo $row['type']; ?></td>
@@ -194,7 +193,7 @@
 		?>
 		    <tr>
 		        <td class="controls">
-		            <a onmouseup="editEnrollment(this);" 
+		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
 		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
 		                data-event_id="<?php echo $row['event_id']; ?>"
 		                data-person_id="<?php echo $data['person_id']; ?>"
@@ -203,9 +202,8 @@
 		                data-type="<?php echo $row['role']; ?>"
 		                data-created="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
 		                >
-		                <img src="../images/edit.gif">
 		            </a>
-		            <a href="javascript:deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"><img src="../images/delete.gif"></a>
+		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
 		        </td>
 		        <td><?php echo $row['role']; ?></td>
 		        <td><?php echo $row['event_type']; ?></td>

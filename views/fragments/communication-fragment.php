@@ -41,7 +41,7 @@
 
 <script>
 function editComm(elt) {
-    const m = new Modal(elt, 'new_communication', (id) => window.location.reload());
+    const m = new Modal(elt, 'new_communication', (id) => console.log(id));
 	document.getElementById('communication_id').value   = elt.dataset.communication_id;
 	document.getElementById('person_id').value          = elt.dataset.person_id;
 	document.getElementById('name').value               = elt.dataset.name;
@@ -51,7 +51,7 @@ function editComm(elt) {
 	m.showModal();
 }
 function addComm(elt) {
-	const m = new Modal(elt, 'new_communication', (id) => window.location.reload());
+	const m = new Modal(elt, 'new_communication', (id) => console.log(id));
 	document.getElementById('person_id').value  = elt.dataset.person_id;
 	document.getElementById('name').value       = elt.dataset.name;
 	document.getElementById('date').value       = "<?php echo date("m/d/Y") ?>";

@@ -73,6 +73,13 @@ h1{	font-size:	30px; margin:	10px 0px 0px 0px;}
 h2{	text-decoration: underline; margin: 10px 0px; }
 h3{	font-style:	italic; padding: 0px; margin:	10px 10px 0px 10px;}
 
+/* Edit and Delete buttons */
+.editButton:after   { content: '✏️' ; }
+.deleteButton:after { content: '❌'; }
+.editButton, .deleteButton { margin: 0 5px; text-decoration: none !important; }
+.editButton:hover, .deleteButton:hover { background: lightgray; }
+.editButton img, .deleteButton img { display: none; }
+
 table{
 	width:				100%; 
 	border-collapse:	collapse;

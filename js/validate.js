@@ -222,13 +222,13 @@ Please correct all the boxes marked in red, and then resubmit.`);
 	formData.forEach((value, key) => {
 		// Reflect.has in favor of: object.hasOwnProperty(key)
 		if(!Reflect.has(formObject, key)){
-			formObject[key] = value;
+			formObject[key] = encodeURIComponent(value);
 			return;
 		}
 		if(!Array.isArray(formObject[key])){
 			formObject[key] = [formObject[key]];    
 		}
-		formObject[key].push(value);
+		formObject[key].push(encodeURIComponent(value));
 	});
 
 	// remove any elements that should be ignored
