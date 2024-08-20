@@ -1,8 +1,7 @@
 if (typeof(SmartTable) == "undefined") SmartTable = {}
 
 /* Initialize a Smart Table */
-SmartTable = function(table, i){
-	this.num			= i;
+SmartTable = function(table){
 	id					= table.id;
 	this.table			= table;
 	this.pointer		= this;
@@ -113,8 +112,6 @@ SmartTable = function(table, i){
 	//this.filter3val.setAttribute("ignore", "yes"); // don't run this through the validator
 	table.parentNode.insertBefore(controls,table);
 
-	this.lastFilterCol = null;
-	this.lastFilterVal = null;
 	this.hiddenRows = {};
 }
 
@@ -134,9 +131,11 @@ SmartTable.prototype.copyEmails = function(idx) {
 SmartTable.prototype.rebuildTable = function(){
 	// perform sort
 	if(this.sortMenu.value !== "-1") this.sortBy(this.sortMenu.value, this.sortAsc.value);
+	let filters = [];
 	// perform filters
-	if(this.filter1Col.value !== "-1") this.filterBy(this.filter1Col.value, this.filter1val.value.toLowerCase(), true);
-	if(this.filter2Col.value !== "-1") this.filterBy(this.filter2Col.value, this.filter2val.value.toLowerCase(), false);
+	if(this.filter1Col.value !== "-1") filters.push({idx: this.filter1Col.value, exp: this.filter1val.value.toLowerCase()});
+	if(this.filter2Col.value !== "-1") filters.push({idx: this.filter2Col.value, exp: this.filter2val.value.toLowerCase()});
+	this.filterBy(filters);
 	//if(this.filter3Col.value !== "-1") this.filterBy(this.filter3Col.value, this.filter3val.value.toLowerCase(), false);
 }
 
@@ -181,7 +180,7 @@ SmartTable.prototype.sortBy = function(sortCol){
 	// 2. sort the *real* rows in C*n time with a big C, using our indices as a cheat cheat
 	// reverse-decerement won't work here, since the order must be ascending
 	var sortedBody  = document.createElement('tbody');
-	for(var i = 0; i < assoc.length; i++) sortedBody.appendChild(rows[assoc[i][0]].cloneNode(true));
+	assoc.forEach( a => sortedBody.appendChild(rows[a[0]].cloneNode(true)));
 
 	// 3. swap the old body for the sorted one.
 	this.table.removeChild(tbody);
@@ -189,42 +188,41 @@ SmartTable.prototype.sortBy = function(sortCol){
 	return;
 }
 
-/* Hide every row whose 'filterCol' column does not contain 'filterVal' (already in lowercase format when passed in) */
-SmartTable.prototype.filterBy = function(filterCol, filterVal, exclusive) {
-    function matches(needle, haystack) { 
-        return needle.split(" ").every(n => haystack.includes(n));
-    }
+function matches(needle, haystack) { 
+    return needle.split(" ").every(n => haystack.includes(n));
+}
+
+
+/* Hide every row whose 'filterCol' column does not satisfy the 'filterExp', which is based on 'filterVal' (already in lowercase format when passed in) */
+SmartTable.prototype.filterBy = function(filters) {
 	var tbody	= this.table.getElementsByTagName('tbody')[0];
-	var rows	= tbody.getElementsByTagName('TR');
-	this.lastFilterVal = filterVal; this.lastFilterCol = filterCol;		// store the last filter
-		
-	// If it's not a subsearch, reset hiddenRows.
-	if(!((filterCol == this.lastFilterCol) 			   &&
-		(filterVal.length > this.lastFilterVal.length) &&
-		(filterVal.indexOf(this.lastFilterVal) == 0))) {
-		this.hiddenRows = {};
-	}
-	tbody.style.display='none';											// hide the body so our magic can happen without repainting
-	var i = rows.length-1;												// use the reverse-decrement loop to optimize loop conditions
-	do{																	// 1) WHICH ROWS ARE HIDDEN?
-		if(!this.hiddenRows[i]) {										// 	  if it's already hidden, ignore
-			var v = rows[i].cells[filterCol];
-			v = v.innerText || v.textContent || '';						// 	  if it's a DOM node, pull out the contents
-			v = v.replace(/^\s+|\s+$/g,"").toLowerCase();				// 	  trim whitespace, make case-insensitive
-			if(!matches(filterVal, v)) this.hiddenRows[i] = true 	    // 	  check to see if the row should be filtered out
-			else if(exclusive) 	  		   delete this.hiddenRows[i]; 	// 	  if exclusive, show non-matching rows
-		}
-	}
-	while(i--);
-	i = rows.length-1;
-	do{ rows[i].style.display = this.hiddenRows[i]? "none" : null; }	// 2) UPDATE THE DOM
-	while(i--);
-	tbody.style.display='';												// NOW display the filtered body
+	var rows	= [...tbody.getElementsByTagName('TR')];
+	this.lastFilter = filters;              // save the filter
+	this.hiddenRows = [];                   // TODO(Emmanuel): only do this if the filter is not a narrowing of lastFilter
+	tbody.style.display='none';		        // hide the body so our magic can happen without repainting
+
+    filters.forEach( ({idx, exp}) => {
+        const datatype = [...this.headers][idx].getAttribute('datatype');
+        rows.forEach((r, i) => {
+            if(this.hiddenRows[i]) { return; } // skip hidden rows
+            const cell = rows[i].cells[idx];
+            var v = cell.innerText || cell.textContent || '';			// 	  if it's a DOM node, pull out the contents
+            v = v.replace(/^\s+|\s+$/g,"").toLowerCase();				// 	  trim whitespace, make case-insensitive
+            if(datatype == "date") {
+                console.log('filtering by date not yet supported');
+            } else {
+                if(!matches(exp, v)) this.hiddenRows[i] = true 	            // 	  check to see if the row should be filtered out
+            }
+        });
+    });
+    // set row visibility accordingly
+    rows.forEach((r, i) => r.style.display = this.hiddenRows[i]? "none" : null);
+	tbody.style.display=null;										    // NOW display the filtered body
  	return;
 }
 
 
-/* encode the table as a 2-dimensional JSON array */
+/* encode the table as a 2-dimensional JSON array 
 SmartTable.prototype.table2JSON = function(){
 	var rows = this.table.getElementsByTagName('TR');			
 	var table_json = new Array();
@@ -253,11 +251,12 @@ SmartTable.prototype.table2JSON = function(){
 	form.submit();
 	document.body.removeChild(form);						// remove the form
 }
-
+*/
 
 /* Use RegExps to guess datatypes */
 function getDatatype(rows, idx){
     if(rows.length == 0) return "text";
+    // USE A FOR LOOP SO WE CAN BREAK EARLY!
 	for(i=0; i < rows.length; i++){							// loop through the column
 		var td = rows[i].cells[idx];						// get the text data out of each cell
 		if(td == undefined) continue;						// if the cell doesn't exist (colspan > 1), keep looking
@@ -276,9 +275,5 @@ function getDatatype(rows, idx){
 
 /* Find all tables with the appropriate class, and initialize SmartTables for all of them */
 function initializeSmartTables(){
-	var tables = document.getElementsByTagName('TABLE');
-	for(var i = 0; i < tables.length; i++){
-		if(tables[i].className == "smart") new SmartTable(tables[i], i);
-	}
-	return;
+	[...document.querySelectorAll('table.smart')].forEach(t => new SmartTable(t));
 }
