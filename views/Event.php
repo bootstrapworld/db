@@ -148,7 +148,8 @@
 				<span class="formInput">
 					<input  id="title" name="title"
 						placeholder="Webinar about stuff..." validator="alphanumbsym" 
-						value="<?php echo $data["title"] ?>" 
+						value="<?php echo $data["title"] ?>"
+						autocomplete="nope"
 						type="text" size="60" maxlength="70" required="yes"/>
 					<label for="title">Event Title</label>
 				</span>

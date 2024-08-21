@@ -135,7 +135,7 @@ function validate(elt, type, value){
 
 const numb	= '0123456789.';
 const date	= numb+'/.-';
-const sym   = '#\'\"\,\!\?\$/:-\(\)\[\]';
+const sym   = '#\'\"\,\!\?\$/:-\(\)\[\]\|';
 const numbsym = numb+sym;
 const lwr		= 'abcdefghijklmnopqrstuvwxyz.- ';
 const upr		= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- ';
@@ -206,11 +206,11 @@ function validateSubmission(submitEvent){
 	    (elt.getAttribute("ignore") !== "yes") &&
 		    ((elt.nodeName == "SELECT") || (elt.type == "hidden") || 
 		     ((elt.type == "text") && (elt.classname !== "modal"))));
-
+		     
 	// validate every one of them
 	// we have to map first, to force the validator to check EVERYTHING
 	// instead of short-circuiting
-	valid = elts.map( elt => validate(elt, elt.getAttribute('validator') || '', elt.value)).every(v=>v);
+	valid = elts.map( elt => validate(elt, elt.getAttribute('validator') || '', elt.value)).every(v => v);
 
 	// warn if there are errors and return
 	if (!valid){
@@ -234,8 +234,9 @@ Please correct all the boxes marked in red, and then resubmit.`);
 
 	// remove any elements that should be ignored
 	const eltsToIgnore = [...submitEvent.target.querySelectorAll('*[ignore]')];
-	eltsToIgnore.forEach(elt => delete formObject[elt.name]);
 
+	eltsToIgnore.forEach(elt => delete formObject[elt.name]);
+	
 	return formObject;
 }
 
