@@ -3,7 +3,7 @@ body {
 	font-size:			12px;
 	padding:			0px;
 	margin:				0px;
-	max-width:			800px;
+	max-width:			1000px;
 }
 
 
@@ -93,11 +93,15 @@ thead{background: black; color: white; font-weight:	bold;}
 tfoot{background: #88a; color: black; font-weight:	bold;}
 table.compact{ width: 550px; }
 table.smart { margin: 0; width: 100% ; }
+table.smart th a { color: white !important; text-decoration: underline !important; }
+table.smart th a.ascending :after { content: '▲'; }
+table.smart th a.descending:after { content: '▼'; }
 .smartTableControls { clear: both; width: 100%; background: none; margin: 10px 0; display: flex; align-items: baseline; }
 .smartTableControls input, .smartTableControls select { font-size: smaller; }
 .smartTableControls input { flex-grow: 1; }
 .smartTableControls b { margin-left: 12px; margin-right: 2px; }
 .smartTableControls b:first-child { margin-left: 0; }
+.smartTableControls .filterGt, .smartTableControls .filterLt { display: none; }
 td.controls img { max-height: 12px; }
 td.controls img+img { margin-left: 10px; }
 td.controls{width:	20px;}
@@ -199,7 +203,7 @@ div.modal label{ color: white; }
 div.modal legend{ background: white; }
 input.dropdown { font-size: 12px; }
 
-form.locked :not(.buttons, .smartTableControls)>input, form.locked textarea { border: none; pointer-events: none; resize: none; }
+form.locked :not(.buttons, .smartTableControls)>input, form.locked textarea { border: none; pointer-events: none; resize: none; border-bottom: solid 1px black; }
 form.locked *::-webkit-input-placeholder { visibility: hidden; }
 form.locked :not(.smartTableControls)>select {
     border: none;
@@ -207,7 +211,7 @@ form.locked :not(.smartTableControls)>select {
   -webkit-appearance: none;
   -moz-appearance: none;
   text-indent: 1px;
-  text-overflow: '';
+  border-bottom: solid 1px black;
 }
 form.locked .instructions, form.locked .buttons input[title=Save], form.locked .buttons input[title=Delete] { display: none; } 
 form.unlocked .buttons input[title=Edit] { display: none; } 

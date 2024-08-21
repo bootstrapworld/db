@@ -4,7 +4,7 @@ if (typeof(SmartTable) == "undefined") SmartTable = {}
 SmartTable = function(table){
 	id					= table.id;
 	this.table			= table;
-	this.pointer		= this;
+	this.pointer		= that = this;
 	
 	// extract table parts
 	var head	= table.getElementsByTagName('THEAD')[0];				// thead element
@@ -19,32 +19,24 @@ SmartTable = function(table){
 	// build table toolbar
 	var controls = document.createElement('div');
 	controls.className = 'smartTableControls';
-	
-	/*
-	// export button
-	var button = document.createElement('input');
-	button.pointer = pointer;
-	button.style.float = 'left';
-	button.setAttribute('type','image');
-	button.setAttribute('src','../images/excel.gif');
-	button.onclick = function (){ this.pointer.table2JSON();}	
-	controls.appendChild(button);
-	*/
-	
+	this.controls = controls;
+
 	// column headers menu
 	var label = document.createElement("b");
-	label.innerHTML = "Sort by: "
 	controls.appendChild(label);
-	this.sortMenu = document.createElement('select');
-	this.sortMenu.setAttribute("ignore", "yes"); // don't run this through the validator
-	this.sortMenu.id  = 'sortBy';
-	this.sortMenu.pointer = this.pointer;
-	this.sortMenu.options[0] = new Option('Select a column:', '-1' , false, false);
+	const colMenu = document.createElement('select');
+	colMenu.options[0] = new Option('Select a column:', '-1' , false, false);
 	[...this.headers].forEach( (header, i) => {
 		var datatype = getDatatype(rows, i);
 		header.setAttribute('datatype', datatype);
 		colName = header.innerHTML;
-		this.sortMenu.options[i+1] = new Option(colName, i, false, false);
+		const sortLink = document.createElement('a');
+		sortLink.innerHTML = colName;
+		sortLink.addEventListener('click', () => this.sortBy(i));
+		sortLink.classList.add('nosort');
+		header.innerHTML = '';
+		header.appendChild(sortLink);
+		colMenu.options[i+1] = new Option(colName, i, false, false);
 		if(datatype == "email") { 
 		    var emailButton = document.createElement('a');
 		    header.appendChild(emailButton);
@@ -52,64 +44,53 @@ SmartTable = function(table){
 		    emailButton.onclick = () => this.copyEmails(i);
 		}
 	})
-	controls.appendChild(this.sortMenu);
-	this.sortMenu.onchange=function(){this.pointer.rebuildTable();}
-	
-	// sortAsc menu
-	this.sortAsc = document.createElement('select');
-	this.sortAsc.id = 'sortAsc';
-	this.sortAsc.options[0] = new Option("Asc", "1", false, false);
-	this.sortAsc.options[1] = new Option("Desc", "", false, false);
-	this.sortAsc.pointer = this.pointer;
-	this.sortAsc.onchange=function(){this.pointer.rebuildTable();}
-	this.sortAsc.setAttribute("ignore", "yes"); // don't run this through the validator
-	controls.appendChild(this.sortAsc);
-	
+
 	// filter menus
-	this.filter1Col	= this.sortMenu.cloneNode(true);
-	this.filter2Col	= this.sortMenu.cloneNode(true);
-	this.filter1Col.id	= 'filter1Col';
-	this.filter2Col.id	= 'filter2Col';
-	this.filter1val	= document.createElement('input');
-	this.filter2val	= document.createElement('input');
-	this.filter1val.setAttribute('size','10');
-	this.filter2val.setAttribute('size','10');
-	this.filter1val.id	= 'filter1id';
-	this.filter2val.id	= 'filter2id';
-	this.filter1val.setAttribute("ignore", "yes"); // don't run this through the validator
-	this.filter2val.setAttribute("ignore", "yes"); // don't run this through the validator
+	this.filter1Col	= colMenu.cloneNode(true);
+	this.filter2Col	= colMenu.cloneNode(true);
+	this.filter1Col.classList.add('filter1Col');
+	this.filter2Col.classList.add('filter2Col');
+	
+	const filter1HTML = `<span class="filter1Opts">
+	    <select>
+	        <option value="contains">contains</options>
+	        <option value="greaterThan">></options>
+	        <option value="lessThan"><</options>
+	        <option value="between">between</options>
+	    </select>
+	    <input class="contains" size="10" />
+	    <input class="greaterThan" size="10" />
+	    <input class="lessThan" size="10" />
+	</span>`;
+	const filter2HTML = `<span class="filter2Opts">
+	    <select>
+	        <option value="contains">contains</options>
+	        <option value="greaterThan">></options>
+	        <option value="lessThan"><</options>
+	        <option value="between">between</options>
+	    </select>
+	    <input class="contains" size="10" />
+	    <input class="greaterThan" size="10" />
+	    <input class="lessThan" size="10" />
+	</span>`;	
 	
 	var label = document.createElement("b");
 	label.innerHTML = "Filter: "
 	controls.appendChild(label);
 	controls.appendChild(this.filter1Col);
-	controls.appendChild(this.filter1val);
+	controls.innerHTML += filter1HTML;
 	var label = document.createElement("b");
 	label.innerHTML = "Filter: 2"
 	controls.appendChild(label);
 	controls.appendChild(this.filter2Col);
-	controls.appendChild(this.filter2val);
+	controls.innerHTML += filter2HTML;
 	this.filter1Col.pointer = this.pointer;
 	this.filter2Col.pointer = this.pointer;
-	this.filter1Col.onchange=function(){this.pointer.rebuildTable();}
-	this.filter2Col.onchange=function(){this.pointer.rebuildTable();}
-	// filter-as-u-type (use a delay of 500ms to prevent unecessary filtering)
-	this.filter1val.pointer = this.pointer;
-	this.filter2val.pointer = this.pointer;
-	this.filter1val.onkeyup = function(){this.pointer.rebuildTable()};
-	this.filter2val.onkeyup = function(){this.pointer.rebuildTable()};
-	//this.filter3Col	= this.sortMenu.cloneNode(true);
-	//this.filter3Col.id	= 'filter3Col';
-	//this.filter3val	= document.createElement('input');	
-	//this.filter3val.setAttribute('size','10');
-	//this.filter3val.id	= 'filter3id';
-	//controls.appendChild(this.filter3Col);
-	//controls.appendChild(this.filter3val);
-	//this.filter3Col.pointer = this.pointer;
-	//this.filter3Col.onchange=function(){this.pointer.rebuildTable();}
-	//this.filter3val.pointer = this.pointer;
-	//this.filter3val.onkeyup = function(){this.pointer.rebuildTable()};
-	//this.filter3val.setAttribute("ignore", "yes"); // don't run this through the validator
+
+	// Rebuild the table if any of the selects are changed, or inputs recieve a keyup
+	// Ignore these elements when validating forms
+    [...this.controls.querySelectorAll('select')].forEach( slct => { slct.setAttribute('ignore', 'yes'); slct.addEventListener('change', e => this.rebuildTable()); });
+    [...this.controls.querySelectorAll('input') ].forEach( inpt => { inpt.setAttribute('ignore', 'yes'); inpt.addEventListener('keyup',  e => this.rebuildTable()); });
 	table.parentNode.insertBefore(controls,table);
 
 	this.hiddenRows = {};
@@ -128,15 +109,22 @@ SmartTable.prototype.copyEmails = function(idx) {
 	console.log('copied '+ emails.join(', '));
 }
 
-SmartTable.prototype.rebuildTable = function(){
+SmartTable.prototype.rebuildTable = function () {
+
 	// perform sort
-	if(this.sortMenu.value !== "-1") this.sortBy(this.sortMenu.value, this.sortAsc.value);
+	this.sortBy(this.sortCol);
 	let filters = [];
-	// perform filters
-	if(this.filter1Col.value !== "-1") filters.push({idx: this.filter1Col.value, exp: this.filter1val.value.toLowerCase()});
-	if(this.filter2Col.value !== "-1") filters.push({idx: this.filter2Col.value, exp: this.filter2val.value.toLowerCase()});
+	
+    const filter1Col = this.controls.querySelector('.filter1Col').value;
+    const filter2Col = this.controls.querySelector('.filter2Col').value;
+    if(filter1Col !== "-1") return;
+    const filter1By = this.controls.querySelector('.filter1Opts select').value;
+    if(filter2Col !== "-1") return;
+    const filter2By = this.controls.querySelector('.filter2Opts select').value;
+
+	console.log(filter1By);
+	
 	this.filterBy(filters);
-	//if(this.filter3Col.value !== "-1") this.filterBy(this.filter3Col.value, this.filter3val.value.toLowerCase(), false);
 }
 
 /* Sort a table by the column selected, defaulting to ASC */
@@ -144,6 +132,12 @@ SmartTable.prototype.sortBy = function(sortCol){
 	var tbody	= this.table.getElementsByTagName('tbody')[0];
 	var all_rows= this.table.getElementsByTagName('tr');
 	var rows	= tbody.getElementsByTagName('tr');
+	const already_ascending = this.headers[sortCol].firstChild.classList.contains('ascending');
+	[...this.headers].forEach(th => th.firstChild.className = 'nosort');
+	this.sortOrder = already_ascending? 'descending' : 'ascending';
+	
+	this.sortCol = sortCol;
+	this.headers[sortCol].firstChild.className = this.sortOrder;
 
 	// set comparison function for this column's datatype
 	switch (this.headers[sortCol].getAttribute('datatype')){
@@ -175,7 +169,7 @@ SmartTable.prototype.sortBy = function(sortCol){
 
 	// 1. sort the flat array in C*n*log(n) time with a tiny C, and keep track of sorted indices
 	assoc.sort(function () {return compare(arguments[0][1], arguments[1][1])});
-	if(!this.sortAsc.value) assoc.reverse();
+	if(this.sortOrder == 'descending') assoc.reverse();
 
 	// 2. sort the *real* rows in C*n time with a big C, using our indices as a cheat cheat
 	// reverse-decerement won't work here, since the order must be ascending
@@ -192,7 +186,6 @@ function matches(needle, haystack) {
     return needle.split(" ").every(n => haystack.includes(n));
 }
 
-
 /* Hide every row whose 'filterCol' column does not satisfy the 'filterExp', which is based on 'filterVal' (already in lowercase format when passed in) */
 SmartTable.prototype.filterBy = function(filters) {
 	var tbody	= this.table.getElementsByTagName('tbody')[0];
@@ -208,10 +201,13 @@ SmartTable.prototype.filterBy = function(filters) {
             const cell = rows[i].cells[idx];
             var v = cell.innerText || cell.textContent || '';			// 	  if it's a DOM node, pull out the contents
             v = v.replace(/^\s+|\s+$/g,"").toLowerCase();				// 	  trim whitespace, make case-insensitive
-            if(datatype == "date") {
-                console.log('filtering by date not yet supported');
+            
+            if(["numeric", "date", "currency"].includes(datatype)) {
+                if(!matches(exp, v)) this.hiddenRows[i] = true
+            } else if(["text", "email"].includes(datatype)) {
+                if(!matches(exp, v)) this.hiddenRows[i] = true
             } else {
-                if(!matches(exp, v)) this.hiddenRows[i] = true 	            // 	  check to see if the row should be filtered out
+                console.error("Tried to filter by unknown datatype:", datatype);
             }
         });
     });
@@ -220,38 +216,6 @@ SmartTable.prototype.filterBy = function(filters) {
 	tbody.style.display=null;										    // NOW display the filtered body
  	return;
 }
-
-
-/* encode the table as a 2-dimensional JSON array 
-SmartTable.prototype.table2JSON = function(){
-	var rows = this.table.getElementsByTagName('TR');			
-	var table_json = new Array();
-	for(var i=0; i < rows.length; i++){	
-		if(rows[i].style.display == "none") continue;		// skip hidden rows
-		var cells = rows[i].getElementsByTagName('TD');		
-		var row_json = new Array();
-		for(var j=0; j < cells.length; j++){			
-			// pull out all non-HTML content (special-case for IE and null)
-			var data = cells[j].innerText || cells[j].textContent || '';
-			data = data.replace(/^\s+|\s+$/g,"");			// trim whitespace
-			row_json.push('"'+ data +'"');					
-		}
-		table_json.push('['+row_json.join(',')+']');		// encode entire row for transmission
-	}
-	var json = '['+table_json.join(',')+']';				// encode entire table for transmission
-	var form = document.createElement('form');				// build form and POST to the server
-	form.setAttribute('method','post');
-	form.setAttribute('action','ajax/ajaxFunctions.cfc?method=makeCSV');
-	var data = document.createElement('input');
-	data.setAttribute('type', 'hidden');
-	data.setAttribute('name', 'jsonObject');
-	data.value = json;
-	form.appendChild(data);
-	document.body.appendChild(form);
-	form.submit();
-	document.body.removeChild(form);						// remove the form
-}
-*/
 
 /* Use RegExps to guess datatypes */
 function getDatatype(rows, idx){
@@ -274,6 +238,4 @@ function getDatatype(rows, idx){
 }
 
 /* Find all tables with the appropriate class, and initialize SmartTables for all of them */
-function initializeSmartTables(){
-	[...document.querySelectorAll('table.smart')].forEach(t => new SmartTable(t));
-}
+function initializeSmartTables() { [...document.querySelectorAll('table.smart')].forEach(t => new SmartTable(t)); }
