@@ -101,7 +101,6 @@ table.smart th a.descending:after { content: '▼'; }
 .smartTableControls input { flex-grow: 1; }
 .smartTableControls b { margin-left: 12px; margin-right: 2px; }
 .smartTableControls b:first-child { margin-left: 0; }
-.smartTableControls .filterGt, .smartTableControls .filterLt { display: none; }
 td.controls img { max-height: 12px; }
 td.controls img+img { margin-left: 10px; }
 td.controls{width:	20px;}

@@ -1,11 +1,13 @@
-if (typeof(SmartTable) == "undefined") SmartTable = {}
+if (typeof(SmartTable) == "undefined") SmartTable = {};
 
 /* Initialize a Smart Table */
 SmartTable = function(table){
 	id					= table.id;
 	this.table			= table;
-	this.pointer		= that = this;
-	
+	this.buildThrottle; // only rebuild after a pause...
+	const DELAY = 250;  // ...of 250ms
+
+
 	// extract table parts
 	var head	= table.getElementsByTagName('THEAD')[0];				// thead element
 	var body	= table.getElementsByTagName('TBODY')[0];				// tbody element
@@ -21,10 +23,11 @@ SmartTable = function(table){
 	controls.className = 'smartTableControls';
 	this.controls = controls;
 
-	// column headers menu
+	// build column headers menu
 	const colMenu = document.createElement('select');
 	colMenu.options[0] = new Option('Select a column:', '-1' , false, false);
-	[...this.headers].forEach( (header, i) => {
+	this.sortCol = '-1';
+	this.headers.forEach( (header, i) => {
 		var datatype = getDatatype(rows, i);
 		header.setAttribute('datatype', datatype);
 		colName = header.innerHTML;
@@ -41,58 +44,41 @@ SmartTable = function(table){
 		    emailButton.innerHTML = "<img src='../images/copyIcon.png' style='max-height:12px; margin-left: 10px; cursor: pointer;'/>";
 		    emailButton.onclick = () => this.copyEmails(i);
 		}
-	})
+	});
 
-	// filter menus
+	// build filter menus and inputs
 	this.filter1Col	= colMenu.cloneNode(true);
 	this.filter2Col	= colMenu.cloneNode(true);
 	this.filter1Col.classList.add('filter1Col');
 	this.filter2Col.classList.add('filter2Col');
 	
-	const filter1HTML = `<span class="filter1Opts">
-	    <select>
+	const filterHTML = `<span class="filterOpts contains">
+	    <select class="filterType">
 	        <option value="contains">contains</options>
 	        <option value="greaterThan">></options>
 	        <option value="lessThan"><</options>
-	        <option value="between">between</options>
 	    </select>
-	    <input class="contains" size="10" />
-	    <input class="greaterThan" size="10" />
-	    <input class="lessThan" size="10" />
+	    <input class="filter" size="10" />
 	</span>`;
-	const filter2HTML = `<span class="filter2Opts">
-	    <select>
-	        <option value="contains">contains</options>
-	        <option value="greaterThan">></options>
-	        <option value="lessThan"><</options>
-	        <option value="between">between</options>
-	    </select>
-	    <input class="contains" size="10" />
-	    <input class="greaterThan" size="10" />
-	    <input class="lessThan" size="10" />
-	</span>`;	
-	
-	var label = document.createElement("b");
-	label.innerHTML = "Filter 1: "
-	controls.appendChild(label);
+
+    controls.innerHTML += "<b>Filter 1:</b>";
 	controls.appendChild(this.filter1Col);
-	controls.innerHTML += filter1HTML;
-	var label = document.createElement("b");
-	label.innerHTML = "Filter 2:"
-	controls.appendChild(label);
+	controls.innerHTML += filterHTML;
+    controls.innerHTML += "<b>Filter 2:</b>";
 	controls.appendChild(this.filter2Col);
-	controls.innerHTML += filter2HTML;
-	this.filter1Col.pointer = this.pointer;
-	this.filter2Col.pointer = this.pointer;
+	controls.innerHTML += filterHTML;
+	table.parentNode.insertBefore(controls,table);
 
 	// Rebuild the table if any of the selects are changed, or inputs recieve a keyup
 	// Ignore these elements when validating forms
-    [...this.controls.querySelectorAll('select')].forEach( slct => { slct.setAttribute('ignore', 'yes'); slct.addEventListener('change', e => this.rebuildTable()); });
-    [...this.controls.querySelectorAll('input') ].forEach( inpt => { inpt.setAttribute('ignore', 'yes'); inpt.addEventListener('keyup',  e => this.rebuildTable()); });
-	table.parentNode.insertBefore(controls,table);
+    [...this.controls.querySelectorAll('select, input')].forEach( elt => { 
+        elt.setAttribute('ignore', 'yes'); 
+        elt.addEventListener('change', e => { clearTimeout(this.buildThrottle); this.buildThrottle = setTimeout(() =>  this.rebuildTable(e), DELAY) }); 
+        elt.addEventListener('keyup',  e => { clearTimeout(this.buildThrottle); this.buildThrottle = setTimeout(() =>  this.rebuildTable(e), DELAY) }); 
+    });
 
 	this.hiddenRows = {};
-}
+};
 
 SmartTable.prototype.copyEmails = function(idx) {
     var emails = [];
@@ -105,24 +91,54 @@ SmartTable.prototype.copyEmails = function(idx) {
 	});
 	navigator.clipboard.writeText(emails.join(', '));
 	console.log('copied '+ emails.join(', '));
+};
+
+function matches(needle, haystack) { 
+    return needle.split(" ").every(n => haystack.includes(n));
 }
 
-SmartTable.prototype.rebuildTable = function () {
+SmartTable.prototype.rebuildTable = function (e) {
+    const trigger = e.srcElement;
+    const filter1Col  = this.controls.querySelector('.filter1Col');
+    const filter2Col  = this.controls.querySelector('.filter2Col');
+    const filter1Type = this.controls.querySelector('.filter1Col+.filterOpts select');
+    const filter2Type = this.controls.querySelector('.filter2Col+.filterOpts select');
+    const filter1Inpt = this.controls.querySelector('.filter1Col+.filterOpts input')
+    const filter2Inpt = this.controls.querySelector('.filter2Col+.filterOpts input')
 
-	// perform sort
-	this.sortBy(this.sortCol);
+    // if it was a changed filterType, set the class name, then reset the filter inputs and return
+    if(trigger.nodeName == 'SELECT') {
+        let isDate;
+        console.log(e);
+        [...trigger.nextElementSibling.querySelectorAll('input')].forEach(inpt => inpt.value = null);
+        if(filter1Col.value !== "-1") {
+            filter1Inpt.type = (this.headers[filter1Col.value].getAttribute('datatype') == "date")? "date" : '';
+        }
+        if(filter2Col.value !== "-1") {
+            filter2Inpt.type = (this.headers[filter2Col.value].getAttribute('datatype') == "date")? "date" : '';
+        }
+        return;
+    }
+
+    //  build filters
 	let filters = [];
-	
-    const filter1Col = this.controls.querySelector('.filter1Col').value;
-    const filter2Col = this.controls.querySelector('.filter2Col').value;
-    if(filter1Col !== "-1") return;
-    const filter1By = this.controls.querySelector('.filter1Opts select').value;
-    if(filter2Col !== "-1") return;
-    const filter2By = this.controls.querySelector('.filter2Opts select').value;
-
-	console.log(filter1By);
-	
+    if(filter1Col.value !== "-1") {
+        const filter1 = filter1Inpt.value;
+        if(     filter1Type.value == 'contains'   ) { filters.push({idx: filter1Col.value, fn: v => matches(filter1, v)   }) }
+        else if(filter1Type.value == 'lessThan'   ) { filters.push({idx: filter1Col.value, fn: v => v < filter1           }) }
+        else if(filter1Type.value == 'greaterThan') { filters.push({idx: filter1Col.value, fn: v => v > filter1           }) }
+    }
+    
+    if(filter2Col.value !== "-1") {
+        const filter2 = filter2Inpt.value;
+        if(     filter1Type.value == 'contains'   ) { filters.push({idx: filter2Col.value, fn: v => matches(filter2, v)   }) }
+        else if(filter2Type.value == 'lessThan'   ) { filters.push({idx: filter2Col.value, fn: v => v < filter2           }) }
+        else if(filter2Type.value == 'greaterThan') { filters.push({idx: filter2Col.value, fn: v => v > filter2           }) }
+    }
 	this.filterBy(filters);
+	
+	// perform sort
+	if(this.sortCol !== '-1') this.sortBy(this.sortCol);
 }
 
 /* Sort a table by the column selected, defaulting to ASC */
@@ -131,7 +147,7 @@ SmartTable.prototype.sortBy = function(sortCol){
 	var all_rows= this.table.getElementsByTagName('tr');
 	var rows	= tbody.getElementsByTagName('tr');
 	const already_ascending = this.headers[sortCol].firstChild.classList.contains('ascending');
-	[...this.headers].forEach(th => th.firstChild.className = 'nosort');
+	this.headers.forEach(th => th.firstChild.className = 'nosort');
 	this.sortOrder = already_ascending? 'descending' : 'ascending';
 	
 	this.sortCol = sortCol;
@@ -180,33 +196,24 @@ SmartTable.prototype.sortBy = function(sortCol){
 	return;
 }
 
-function matches(needle, haystack) { 
-    return needle.split(" ").every(n => haystack.includes(n));
-}
 
 /* Hide every row whose 'filterCol' column does not satisfy the 'filterExp', which is based on 'filterVal' (already in lowercase format when passed in) */
 SmartTable.prototype.filterBy = function(filters) {
+    console.log(filters)
 	var tbody	= this.table.getElementsByTagName('tbody')[0];
 	var rows	= [...tbody.getElementsByTagName('TR')];
 	this.lastFilter = filters;              // save the filter
 	this.hiddenRows = [];                   // TODO(Emmanuel): only do this if the filter is not a narrowing of lastFilter
 	tbody.style.display='none';		        // hide the body so our magic can happen without repainting
 
-    filters.forEach( ({idx, exp}) => {
-        const datatype = [...this.headers][idx].getAttribute('datatype');
+    filters.forEach( ({idx, fn}) => {
+        const datatype = this.headers[idx].getAttribute('datatype');
         rows.forEach((r, i) => {
             if(this.hiddenRows[i]) { return; } // skip hidden rows
             const cell = rows[i].cells[idx];
             var v = cell.innerText || cell.textContent || '';			// 	  if it's a DOM node, pull out the contents
             v = v.replace(/^\s+|\s+$/g,"").toLowerCase();				// 	  trim whitespace, make case-insensitive
-            
-            if(["numeric", "date", "currency"].includes(datatype)) {
-                if(!matches(exp, v)) this.hiddenRows[i] = true
-            } else if(["text", "email"].includes(datatype)) {
-                if(!matches(exp, v)) this.hiddenRows[i] = true
-            } else {
-                console.error("Tried to filter by unknown datatype:", datatype);
-            }
+            if(!fn(v)) this.hiddenRows[i] = true;                       //    use the filter function, and hide the row if it fails
         });
     });
     // set row visibility accordingly
