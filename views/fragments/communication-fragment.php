@@ -1,3 +1,5 @@
+<div id="newcommunication" class="modal">
+	<form id="new_communication" novalidate action="../actions/CommunicationActions.php">
 <fieldset>
 	<legend>Communication Information</legend>
 	
@@ -12,7 +14,7 @@
 	<span class="formInput">
 		<input  id="name" name="name" ignore="yes"
 			placeholder="Contact's name" validator="alpha"
-			class="dropdown" datatype="person" autocomplete="nope"
+			class="dropdown" datatype="person" target="person_id"
 			value="<?php echo $data["name"] ?>" 
 			type="text" size="50" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
@@ -38,8 +40,14 @@
 		<label for="notes">Notes</label>
 	</span>
 </fieldset>
+<input type="submit" id="new_communicationSubmit" value="Submit">
+<input type="button" id="new_communicationCancel" class="modalCancel" value="Cancel" />
+</form>
+</div>
 
 <script>
+document.getElementById('new_communication').onsubmit = (e) => updateRequest(e, updateCommRp);
+
 function editComm(elt) {
     const m = new Modal(elt, 'new_communication', (id) => console.log(id));
 	document.getElementById('communication_id').value   = elt.dataset.communication_id;
@@ -52,8 +60,8 @@ function editComm(elt) {
 }
 function addComm(elt) {
 	const m = new Modal(elt, 'new_communication', (id) => console.log(id));
-	document.getElementById('person_id').value  = elt.dataset.person_id;
-	document.getElementById('name').value       = elt.dataset.name;
+	document.getElementById('person_id').value  = elt.dataset.person_id || '';
+	document.getElementById('name').value       = elt.dataset.name || '';
 	document.getElementById('date').value       = "<?php echo date("m/d/Y") ?>";
 	m.showModal();
 }

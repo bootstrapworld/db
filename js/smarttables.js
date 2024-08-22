@@ -22,8 +22,6 @@ SmartTable = function(table){
 	this.controls = controls;
 
 	// column headers menu
-	var label = document.createElement("b");
-	controls.appendChild(label);
 	const colMenu = document.createElement('select');
 	colMenu.options[0] = new Option('Select a column:', '-1' , false, false);
 	[...this.headers].forEach( (header, i) => {
@@ -75,12 +73,12 @@ SmartTable = function(table){
 	</span>`;	
 	
 	var label = document.createElement("b");
-	label.innerHTML = "Filter: "
+	label.innerHTML = "Filter 1: "
 	controls.appendChild(label);
 	controls.appendChild(this.filter1Col);
 	controls.innerHTML += filter1HTML;
 	var label = document.createElement("b");
-	label.innerHTML = "Filter: 2"
+	label.innerHTML = "Filter 2:"
 	controls.appendChild(label);
 	controls.appendChild(this.filter2Col);
 	controls.innerHTML += filter2HTML;

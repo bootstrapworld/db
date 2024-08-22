@@ -157,7 +157,7 @@
 		        </td>
 		        <td><?php echo date_format($date,"M jS, Y"); ?></td>
 		        <td><?php echo $row['type']; ?></td>
-		        <td><?php echo $row['notes']; ?></td>
+		        <td style="white-space: break-spaces;"><?php echo $row['notes']; ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>
@@ -227,28 +227,10 @@
 <?php } ?>
 
 			<!-- Communication modal -->
-			<div id="newcommunication" class="modal">
-				<form id="new_communication" novalidate action="../actions/CommunicationActions.php">
-					<?php include 'fragments/communication-fragment.php'; ?>
-					<input type="submit" id="new_communicationSubmit" value="Submit">
-					<input type="button" id="new_communicationCancel" class="modalCancel" value="Cancel" />
-				</form>
-				<script>
-					document.getElementById('new_communication').onsubmit = (e) => updateRequest(e, updateCommRp);
-				</script>
-			</div>
+			<?php include 'fragments/communication-fragment.php'; ?>
 
 			<!-- Enrollment modal -->
-			<div id="newenrollment" class="modal">
-				<form id="new_enrollment" novalidate action="../actions/EnrollmentActions.php">
-					<?php include 'fragments/enrollment-fragment.php'; ?>
-					<input type="submit" id="new_enrollmentSubmit" value="Submit">
-					<input type="button" id="new_enrollmentCancel" class="modalCancel" value="Cancel" />
-				</form>
-				<script>
-					document.getElementById('new_enrollment').onsubmit = (e) => updateRequest(e, updateEnrollmentRp);
-				</script>
-			</div>
+			<?php include 'fragments/enrollment-fragment.php'; ?>
 
 	</div>
 </body>

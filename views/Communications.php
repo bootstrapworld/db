@@ -58,7 +58,7 @@
 	<div id="content">
 		<h1>Communications</h1>
 
-        <input type="button" onclick="addComm()" value="+ Add a Communication"/>
+        <input type="button" onclick="addComm(this)" value="+ Add a Communication"/>
 
 	    <table class="smart">
 		    <thead>

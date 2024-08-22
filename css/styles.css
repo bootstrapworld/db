@@ -93,8 +93,8 @@ thead{background: black; color: white; font-weight:	bold;}
 tfoot{background: #88a; color: black; font-weight:	bold;}
 table.compact{ width: 550px; }
 table.smart { margin: 0; width: 100% ; }
-table.smart th a { color: white !important; text-decoration: underline !important; }
-table.smart th a.ascending :after { content: '▲'; }
+table.smart th a { color: white !important; text-decoration: underline !important; cursor: pointer; }
+table.smart th a.ascending:after  { content: '▲'; }
 table.smart th a.descending:after { content: '▼'; }
 .smartTableControls { clear: both; width: 100%; background: none; margin: 10px 0; display: flex; align-items: baseline; }
 .smartTableControls input, .smartTableControls select { font-size: smaller; }

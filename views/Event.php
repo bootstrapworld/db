@@ -240,7 +240,7 @@
 	               	while($row = mysqli_fetch_assoc($facilitators)) {
 	           ?>
 	                    <tr>
-	                        <td><?php echo $row['name_first']; ?> <?php echo $row['name_last']; ?></td>
+		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
 		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
 	                    </tr>
@@ -267,7 +267,7 @@
 	           	while($row = mysqli_fetch_assoc($admins)) {
 	           ?>
 	                    <tr>
-	                        <td><?php echo $row['name_first']; ?> <?php echo $row['name_last']; ?></td>
+		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
 		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
 	                    </tr>
@@ -337,17 +337,7 @@
 <?php } ?>
 
 			<!-- Enrollment modal -->
-			<div id="newenrollment" class="modal">
-				<form id="new_enrollment" novalidate action="../actions/EnrollmentActions.php">
-					<?php include 'fragments/enrollment-fragment.php'; ?>
-					<input type="submit" id="new_enrollmentSubmit" value="Submit">
-					<input type="button" id="new_enrollmentCancel" class="modalCancel" value="Cancel" />
-				</form>
-				<script>
-					document.getElementById('new_enrollment').onsubmit = (e) => updateRequest(e, updateEnrollmentRp);
-				</script>
-			</div>
-
+			<?php include 'fragments/enrollment-fragment.php'; ?>
 
 	</div>
 	<script>

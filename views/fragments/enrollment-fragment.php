@@ -1,3 +1,5 @@
+<div id="newenrollment" class="modal">
+<form id="new_enrollment" novalidate action="../actions/EnrollmentActions.php">
 <fieldset>
 	<legend>Event Enrollment</legend>
 	
@@ -40,8 +42,14 @@
 		<label for="state">Type</label>
 	</span>
 </fieldset>
+<input type="submit" id="new_enrollmentSubmit" value="Submit">
+<input type="button" id="new_enrollmentCancel" class="modalCancel" value="Cancel" />
+</form>
+</div>
 
 <script>
+document.getElementById('new_enrollment').onsubmit = (e) => updateRequest(e, updateEnrollmentRp);
+					
 function editEnrollment(elt) {
     const m = new Modal(elt, 'new_enrollment', (id) => window.location.reload());
     const fields = ["enrollment_id", "person_id", "name", "event_id", "title", "type"];
