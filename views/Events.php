@@ -80,8 +80,9 @@
 		    <tr>
 		        <th>Curriculum</th>
 		        <th>Type</th>
-		        <th>Duration</th>
-		        <th>Location</th>
+		        <th>Year</th>
+		        <th>When</th>
+		        <th>Where</th>
 		        <th>Partner Org</th>
 		        <th>Facilitators</th>
 		        <th>Participants</th>
@@ -96,8 +97,9 @@
 		  ?>
 		    <tr>
 		        <td><?php echo $row['curriculum']; ?></td>
-		        <td><?php echo $row['type']; ?></td>
-		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo date_format($start,"M jS"); ?> - <?php echo date_format($end,"M jS"); ?></a></td>
+		        <td style="text-align:center;"><?php echo $row['type']; ?></td>
+		        <td><?php echo date_format($start,"Y"); ?></td>
+		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><span style="width:0; overflow:hidden; display:inline-block; margin:0;"><?php echo date_format($start,"Y / m / d"); ?></span><?php echo date_format($start,"M jS"); ?> - <?php echo date_format($end,"M jS"); ?></a></td>
 		        <td><?php echo $row['location']; ?></td>
 		        <td><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><?php echo $row['facilitators']; ?></td>
