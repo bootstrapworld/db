@@ -58,7 +58,7 @@ SmartTable = function(table){
 	        <option value="greaterThan">></options>
 	        <option value="lessThan"><</options>
 	    </select>
-	    <input class="filter" size="10" />
+	    <input class="filter" size="20" />
 	</span>`;
 
     controls.innerHTML += "<b>Filter 1:</b>";
@@ -109,13 +109,16 @@ SmartTable.prototype.rebuildTable = function (e) {
     // if it was a changed filterType, set the class name, then reset the filter inputs and return
     if(trigger.nodeName == 'SELECT') {
         let isDate;
-        console.log(e);
         [...trigger.nextElementSibling.querySelectorAll('input')].forEach(inpt => inpt.value = null);
         if(filter1Col.value !== "-1") {
-            filter1Inpt.type = (this.headers[filter1Col.value].getAttribute('datatype') == "date")? "date" : '';
+            const datatype1 = this.headers[filter1Col.value].getAttribute('datatype');
+            filter1Inpt.setAttribute('type', datatype1);
+            filter1Type.setAttribute('datatype', datatype1);
         }
         if(filter2Col.value !== "-1") {
-            filter2Inpt.type = (this.headers[filter2Col.value].getAttribute('datatype') == "date")? "date" : '';
+            const datatype2 = this.headers[filter2Col.value].getAttribute('datatype');
+            filter2Inpt.setAttribute('type', datatype2);
+            filter2Type.setAttribute('datatype', datatype2);
         }
         return;
     }
@@ -199,7 +202,6 @@ SmartTable.prototype.sortBy = function(sortCol){
 
 /* Hide every row whose 'filterCol' column does not satisfy the 'filterExp', which is based on 'filterVal' (already in lowercase format when passed in) */
 SmartTable.prototype.filterBy = function(filters) {
-    console.log(filters)
 	var tbody	= this.table.getElementsByTagName('tbody')[0];
 	var rows	= [...tbody.getElementsByTagName('TR')];
 	this.lastFilter = filters;              // save the filter

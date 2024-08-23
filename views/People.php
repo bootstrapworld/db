@@ -22,7 +22,7 @@
 	    table { border: solid 1px black; }
 	    tbody tr:nth-child(odd) { background: #eee; }
 	    tbody tr:hover { background: #ccc; }
-	    td, th { padding: 4px 2px; font-size: 11px; }
+	    td, th { padding: 4px 2px; font-size: 12px; }
 	    th:nth-child(2), td:nth-child(2) { display: none; }
 	    td:nth-child(6):not(:empty) { cursor: help; }
 	    input[type=button] {margin: 10px 0; }
@@ -59,7 +59,9 @@
                 E.event_id,
                 IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop,
                 R.type AS recent_workshop_role,
-                C.date AS recent_contact, C.notes
+                C.type AS comm_type,
+                C.date AS recent_contact, 
+                C.notes AS comm_notes
 			FROM People AS P
 			LEFT JOIN Organizations AS O
 			ON P.employer_id=O.org_id
@@ -81,6 +83,7 @@
         <a href="People.php">People</a>
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
+        <a href="Communications.php">Communications</a>
     </nav>
     
 	<div id="content">
@@ -109,12 +112,13 @@
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_last']; ?></a></td>
 		        <td><a href="mailto:<?php echo $row['email']; ?>"><?php echo $row['email']; ?></a></td>
-		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?> 
-		            <a href="Organization.php?org_id=<?php echo $row['employer_id']; ?>"><?php echo $row['employer_name']; ?></a>
+		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?></a>
 		        </td>
 		        <td><?php echo $row['location']; ?></td>
-		        <td title="<?php echo $row['notes']; ?>" ><?php echo $row['recent_contact']; ?></td>
-		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop']; ?> - <?php echo $row['recent_workshop_role']; ?></a></td>
+		        <td style="text-align:center" title="(via <?php echo $row['comm_type']; ?>)
+		        
+<?php echo $row['comm_notes']; ?>" ><?php echo $row['recent_contact']; ?></td>
+		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop_role']; ?> - <?php echo $row['recent_workshop']; ?></a></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>

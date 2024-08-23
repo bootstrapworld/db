@@ -22,7 +22,7 @@
 	    table { border: solid 1px black; }
 	    tbody tr:nth-child(odd) { background: #eee; }
 	    tbody tr:hover { background: #ccc; }
-	    td, th { padding: 4px 2px; font-size: 11px; }
+	    td, th { padding: 4px 2px; font-size: 12px; }
 	    input[type=button] {margin: 10px 0; }
 	</style>
    <?php
@@ -50,6 +50,7 @@
         <a href="People.php">People</a>
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
+        <a href="Communications.php">Communications</a>
     </nav>
     
     
@@ -65,8 +66,8 @@
 		        <th>Type</th>
 		        <th>Address</th>
 		        <th>City</th>
-		        <th>State</th>
-		        <th>Zip</th>
+		        <th style="text-align: center;">State</th>
+		        <th style="text-align: center;">Zip</th>
 		    </tr>
 		    </thead>
 		    <tbody>
@@ -78,8 +79,8 @@
 		        <td><?php echo $row['type']; ?></td>
 		        <td><?php echo $row['address'] ?></td>
 		        <td><?php echo $row['city'] ?></td>
-		        <td><?php echo $row['state'] ?></td>
-		        <td><?php echo $row['zip'] ?></td>
+		        <td style="text-align: center;"><?php echo $row['state'] ?></td>
+		        <td style="text-align: center;"><?php echo $row['zip'] ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>

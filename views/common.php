@@ -66,14 +66,15 @@ $subjectOpts = ["English/ELA",
 								"Other"];
 
 $currOpts = ["Algebra", 
-						 "Algebra 2", 
-						 "Data Science", 
-						 "Early Math", 
-						 "Physics", 
-						 "Reactive", 
-						 "History/SS"];
+    "Algebra & Data Science",
+	"Algebra 2", 
+	"Data Science", 
+	"Early Math", 
+	"Physics", 
+	"Reactive", 
+	"History/SS"];
 
-$eventTypeOpts = ["Presentation","Coaching","Training","Meetup","Panel"];
+$eventTypeOpts = ["Presentation","Coaching","Training","Meetup","Panel","AYW"];
 
 $stateOpts = [
 	["AL", "Alabama"],

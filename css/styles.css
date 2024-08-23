@@ -97,10 +97,12 @@ table.smart th a { color: white !important; text-decoration: underline !importan
 table.smart th a.ascending:after  { content: '▲'; }
 table.smart th a.descending:after { content: '▼'; }
 .smartTableControls { clear: both; width: 100%; background: none; margin: 10px 0; display: flex; align-items: baseline; }
-.smartTableControls input, .smartTableControls select { font-size: smaller; }
 .smartTableControls input { flex-grow: 1; }
-.smartTableControls b { margin-left: 12px; margin-right: 2px; }
+.smartTableControls b { margin-left: 40px; margin-right: 2px; }
 .smartTableControls b:first-child { margin-left: 0; }
+/* if the type is text or email, hide the options for < and > */
+.smartTableControls .filterType[datatype=text] option[value="greaterThan"], .smartTableControls .filterType[datatype=email] option[value="greaterThan"] { display: none; }
+.smartTableControls .filterType[datatype=text] option[value="lessThan"],    .smartTableControls .filterType[datatype=email] option[value="lessThan"]    { display: none; }
 td.controls img { max-height: 12px; }
 td.controls img+img { margin-left: 10px; }
 td.controls{width:	20px;}
@@ -169,6 +171,7 @@ fieldset span.formInput { display: inline-block; margin: 2px; }
 legend { font-weight: bold; }
 input, select, textarea {
 	padding: 2px; 
+	margin: 0 2px;
 	font-family: arial, helvetica, 
 	serif; 
 	font-size:12px;

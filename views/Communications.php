@@ -53,6 +53,7 @@
         <a href="People.php">People</a>
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
+        <a href="Communications.php">Communications</a>
     </nav>
     
 	<div id="content">
@@ -99,17 +100,8 @@
 		</table>
 		
 			<!-- Communication modal -->
-			<div id="newcommunication" class="modal">
-				<form id="new_communication" novalidate action="../actions/CommunicationActions.php">
-					<?php include 'fragments/communication-fragment.php'; ?>
-					<input type="submit" id="new_communicationSubmit" value="Submit">
-					<input type="button" id="new_communicationCancel" class="modalCancel" value="Cancel" />
-				</form>
-				<script>
-					document.getElementById('new_communication').onsubmit = (e) => updateRequest(e, updateCommRp);
-				</script>
-			</div>
-		
+			<?php include 'fragments/communication-fragment.php'; ?>
+
 	</div>
 </body>
 </html>

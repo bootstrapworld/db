@@ -22,7 +22,7 @@
 	    table { border: solid 1px black; }
 	    tbody tr:nth-child(odd) { background: #eee; }
 	    tbody tr:hover { background: #ccc; }
-	    td, th { padding: 4px 2px; font-size: 11px; }
+	    td, th { padding: 4px 2px; font-size: 12px; }
 	    input[type=button] {margin: 10px 0; }
 	</style>
    <?php
@@ -31,13 +31,13 @@
 
 	$mysqli = openDB_Connection();
 	
-	$sql = "SELECT E2.event_id, E2.org_id, E2.name, curriculum, start, end, location, participants, 
+	$sql = "SELECT E2.event_id, E2.type, E2.org_id, E2.name, curriculum, start, end, location, participants, 
 	               GROUP_CONCAT(DISTINCT CONCAT(
                        '<a href=\"Person.php?person_id=', FacNames.person_id, '\">',
                        FacNames.name_first,
                    	   '</a>') ORDER BY FacNames.name_first SEPARATOR ', ') AS facilitators
             FROM (SELECT
-    	            E.event_id, E.curriculum, E.start, E.end, E.location,
+    	            E.event_id, E.curriculum, E.start, E.end, E.location, E.type,
       		        O.name, O.org_id,
         	        COUNT(Participants.enrollment_id) AS participants
                 FROM Events AS E
@@ -65,6 +65,7 @@
         <a href="People.php">People</a>
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
+        <a href="Communications.php">Communications</a>
     </nav>
     
     
@@ -78,6 +79,7 @@
 		    <thead>
 		    <tr>
 		        <th>Curriculum</th>
+		        <th>Type</th>
 		        <th>Duration</th>
 		        <th>Location</th>
 		        <th>Partner Org</th>
@@ -94,11 +96,12 @@
 		  ?>
 		    <tr>
 		        <td><?php echo $row['curriculum']; ?></td>
+		        <td><?php echo $row['type']; ?></td>
 		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo date_format($start,"M jS"); ?> - <?php echo date_format($end,"M jS"); ?></a></td>
 		        <td><?php echo $row['location']; ?></td>
 		        <td><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><?php echo $row['facilitators']; ?></td>
-		        <td><?php echo $row['participants']; ?></td>
+		        <td style="text-align: center;"><?php echo $row['participants']; ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>

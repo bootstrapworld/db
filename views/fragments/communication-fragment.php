@@ -40,8 +40,8 @@
 		<label for="notes">Notes</label>
 	</span>
 </fieldset>
-<input type="submit" id="new_communicationSubmit" value="Submit">
-<input type="button" id="new_communicationCancel" class="modalCancel" value="Cancel" />
+<input type="submit" id="new_communicationSubmit" value="💾 Save" onclick="window.location.reload()">
+<input type="button" id="new_communicationCancel" value="❌ Cancel "class="modalCancel">
 </form>
 </div>
 

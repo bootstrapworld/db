@@ -42,8 +42,8 @@
 		<label for="state">Type</label>
 	</span>
 </fieldset>
-<input type="submit" id="new_enrollmentSubmit" value="Submit">
-<input type="button" id="new_enrollmentCancel" class="modalCancel" value="Cancel" />
+<input type="submit" id="new_enrollmentSubmit" value="💾 Save" >
+<input type="button" id="new_enrollmentCancel" value="❌ Cancel "class="modalCancel">
 </form>
 </div>
 
@@ -61,9 +61,9 @@ function addEnrollment(elt) {
     const fields = ["enrollment_id", "event_id", "title", "type"];
     fields.forEach(f => document.querySelector('#new_enrollment [name="'+f+'"]').value  = '');
 	document.querySelector('#new_enrollment [name="person_id"]').value      = elt.dataset.person_id;
-	document.querySelector('#new_enrollment [name="event_id"]').value           = elt.dataset.event_id || null;
+	document.querySelector('#new_enrollment [name="event_id"]').value       = elt.dataset.event_id || null;
 	document.querySelector('#new_enrollment [name="name"]').value           = elt.dataset.name || null;
-	document.querySelector('#new_enrollment [name="title"]').value           = elt.dataset.title || null;
+	document.querySelector('#new_enrollment [name="title"]').value          = elt.dataset.title || null;
 	document.querySelector('#new_enrollment [name="type"]').value           = elt.dataset.type || null;
 	document.querySelector('#new_enrollment [name="created"]').value        = "<?php echo date("m/d/Y") ?>";
 	m.showModal();
