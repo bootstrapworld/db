@@ -72,7 +72,11 @@
                 ORDER BY start ASC";
 	  $events = $mysqli->query($sql);
 
-	  $sql =   "SELECT * FROM Communications WHERE person_id=".$_REQUEST["person_id"]." ORDER BY date DESC, communication_id DESC";
+	  $sql =   "SELECT C.communication_id, C.person_id, C.type, C.notes, C.date, BP.bootstrap_name
+	            FROM Communications AS C 
+	            LEFT JOIN (SELECT person_id, COALESCE(CONCAT(name_first, ' ', name_last,' '),'') AS bootstrap_name FROM People) AS BP
+	            ON BP.person_id = C.bootstrap_id
+	            WHERE C.person_id=".$_REQUEST["person_id"]." ORDER BY date DESC, communication_id DESC";
 	  $comms = $mysqli->query($sql);
 
 
@@ -133,6 +137,7 @@
 		    <tr>
 		        <th></th>
 		        <th>Date</th>
+		        <th>From</th>
 		        <th>Type</th>
 		        <th>Notes</th>
 		    </tr>
@@ -149,6 +154,8 @@
 		                data-communication_id="<?php echo $row['communication_id']; ?>"
 		                data-person_id="<?php echo $row['person_id']; ?>"
 		                data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
+		                data-bootstrap_id="<?php echo $row['bootstrap_id']; ?>"
+		                data-bootstrap_name="<?php echo $row['bootstrap_name']; ?>"
 		                data-type="<?php echo $row['type']; ?>"
 		                data-date="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
 		                data-notes="<?php echo $row['notes']; ?>"
@@ -157,6 +164,7 @@
 		            <a class="deleteButton" href="#" onmouseup="deleteCommRq(<?php echo $row['communication_id']; ?>)"></a>
 		        </td>
 		        <td><?php echo date_format($date,"M jS, Y"); ?></td>
+		        <td><?php echo $row['bootstrap_name']; ?></td>
 		        <td><?php echo $row['type']; ?></td>
 		        <td style="white-space: break-spaces;"><?php echo $row['notes']; ?></td>
 		    </tr>

@@ -36,9 +36,9 @@
 	
 	$sql = "SELECT
 				P.person_id,
-				CONCAT(name_first, ' ', name_last) AS name,
-				name_last,
-				COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
+				CONCAT(P.name_first, ' ', P.name_last) AS name,
+				P.name_last,
+				COALESCE(NULLIF(P.email_preferred,''), NULLIF(P.email_professional,''), P.email_google) AS email,
 				email_professional,
 				role,
 				employer_id,
@@ -61,7 +61,8 @@
                 R.type AS recent_workshop_role,
                 C.type AS comm_type,
                 C.date AS recent_contact, 
-                C.notes AS comm_notes
+                C.notes AS comm_notes,
+                BP.bootstrap_name
 			FROM People AS P
 			LEFT JOIN Organizations AS O
 			ON P.employer_id=O.org_id
@@ -71,6 +72,8 @@
             ON E.event_id = R.event_id
             LEFT JOIN Communications AS C
             ON C.person_id = P.person_id
+            LEFT JOIN (SELECT person_id, COALESCE(CONCAT(name_first, ' ', name_last,' '),'') AS bootstrap_name FROM People) AS BP
+            ON BP.person_id = C.bootstrap_id
             GROUP BY P.person_id
             ORDER BY C.date DESC, E.start DESC";
             
@@ -115,7 +118,7 @@
 		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?></a>
 		        </td>
 		        <td><?php echo $row['location']; ?></td>
-		        <td style="text-align:center" title="(via <?php echo $row['comm_type']; ?>)
+		        <td style="text-align:center" title="(<?php echo $row['bootstrap_name']; ?>via <?php echo $row['comm_type']; ?>)
 		        
 <?php echo $row['comm_notes']; ?>" ><?php echo $row['recent_contact']; ?></td>
 		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop_role']; ?> - <?php echo $row['recent_workshop']; ?></a></td>

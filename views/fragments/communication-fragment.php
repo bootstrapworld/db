@@ -16,16 +16,27 @@
 			placeholder="Contact's name" validator="alpha"
 			class="dropdown" datatype="person" target="person_id"
 			value="<?php echo $data["name"] ?>" 
-			type="text" size="50" maxlength="70" required="yes"/>
+			type="text" size="30" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
 	</span>
 
+	<input type="hidden" id="bootstrap_id"	name="bootstrap_id" validator="num"
+		   value="<?php echo $data["bootstrap_id"] ?>" 
+	/>
+	<span class="formInput">
+		<input  id="bootstrap_name" name="name" ignore="yes"
+			placeholder="Your name" validator="alpha"
+			class="dropdown" datatype="person" target="bootstrap_id"
+			value="<?php echo $data["bootstrap_name"] ?>" 
+			type="text" size="30" maxlength="70" />
+		<label for="name">Contacted by</label>
+	</span>
+	<p/>
 	<span class="formInput">
 		<?php echo generateDropDown("type", "type", $commTypeOpts, $data["type"], true) ?>
 		<label for="state">Type</label>
 	</span>
 
-	<p/>
 	<span class="formInput">
 		<input  id="date" name="date" 
 			validator="date" 
@@ -53,6 +64,8 @@ function editComm(elt) {
 	document.getElementById('communication_id').value   = elt.dataset.communication_id;
 	document.getElementById('person_id').value          = elt.dataset.person_id;
 	document.getElementById('name').value               = elt.dataset.name;
+	document.getElementById('bootstrap_id').value       = elt.dataset.bootstrap_id;
+	document.getElementById('bootstrap_name').value     = elt.dataset.bootstrap_name;
 	document.getElementById('type').value               = elt.dataset.type;
 	document.getElementById('date').value               = elt.dataset.date;
 	document.getElementById('notes').value              = elt.dataset.notes;

@@ -328,8 +328,6 @@ if($data) {
 		/>
 		</p>
 	<form id="updateAttendanceForm" novalidate action="../actions/UpdateAttendance.php">
-		<input type="Submit" id="update_attendance" value="💾 Save Attendance"/>
-
 	    <table class="smart">
 		    <thead>
 		    <tr>
@@ -392,6 +390,8 @@ if($data) {
 		<?php } ?>
 		    </tbody>
 		</table>
+		</p>
+		<input type="Submit" id="update_attendance" value="💾 Save Attendance" style="position: absolute; right: 0; bottom: -35px; margin: 0;" />
 	</form>
 	<script>
 	    function updateAttendance(submitEvent) {
