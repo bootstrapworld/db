@@ -3,7 +3,23 @@
 	include 'common.php';
 
 	function update($data) { genericInsertOrUpdate("Events", $data); }
-	function delete($data) { genericDelete("Events", 'event_id', $data); }
+	function delete($data) { genericDelete("Events", 'event_id', $data); 
+	    $mysqli = openDB_Connection();
+		try {
+		    $mysqli->begin_transaction();
+		    // delete all the enrollments for this event
+	        $sql = "DELETE FROM Enrollments WHERE event_id = ".$data['event_id'];
+	        $result = $mysqli->query($sql);
+	        // delete the event itself
+	        $sql = "DELETE FROM Events WHERE event_id = ".$data['event_id'];    
+	        $result = $mysqli->query($sql);
+		    $mysqli->commit();
+		} catch (mysqli_sql_exception $exception) {
+            $mysqli->rollback();
+            throw $exception;
+        }
+		$mysqli->close();
+	}
 
 	function searchForNames() {
 		$mysqli = openDB_Connection();

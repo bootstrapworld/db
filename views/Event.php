@@ -61,6 +61,7 @@
                         O.name AS employer_name,
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         JSON_VALUE(attendance, '$.total') AS days_attended,
+                        attendance AS attendance,
                         (CASE grades_taught
                         	WHEN 'High School' THEN 'HS'
                         	WHEN 'Middle School' THEN 'MS'
@@ -117,6 +118,7 @@
         <a href="People.php">People</a>
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
+        <a href="Communications.php">Communications</a>
     </nav>
     
     <div id="content">
@@ -282,14 +284,51 @@
 			document.getElementById('new_event').onsubmit = (e) => updateRequest(e, updateEventRp);
 		</script>
 
-<?php if($data) { ?>
+<?php
 
-        <h2>Participants (<?php echo mysqli_num_rows($participants); ?>)</h2>
+// Function to get all the dates in given range
+    function getDatesFromRange($start, $end, $format = 'Y-m-d'){
+        
+        // Declare an empty array
+        $array = array();
+        
+        // Variable that store the date interval
+        // of period 1 day
+        $interval = new DateInterval('P1D');
+        $realEnd = new DateTime($end);
+        $realEnd->add($interval);
+        $period = new DatePeriod(new DateTime($start), $interval, $realEnd);
+        
+        // Use loop to store date into array
+        foreach($period as $date){
+            $array[] = $date->format($format);
+
+        }
+        
+        // Return the array elements
+        return $array;
+
+    }
+?>
+
+
+<?php 
+if($data) { 
+    $participants = $participants->fetch_all(MYSQLI_ASSOC);
+    $dates = getDatesFromRange($data["start"], $data["end"]);
+    $oldFormat = (count($participants) > 0) && isset(json_decode($participants[0]['attendance'], true)['total']);
+?>
+
+
+        <h2>Participants (<?php echo count($participants); ?>)</h2>
 		        
-		<input type="button" onmouseup="addEnrollment(this);" value="+ Add an Entry"
+		<input type="button" onmouseup="addEnrollment(this);" value="+ Add a Participant"
 		    data-event_id="<?php echo $data['event_id']; ?>"
 		    data-title="<?php echo $data['title']; ?>"
 		/>
+		</p>
+	<form id="updateAttendanceForm" novalidate action="../actions/UpdateAttendance.php">
+		<input type="Submit" id="update_attendance" value="💾 Save Attendance"/>
 
 	    <table class="smart">
 		    <thead>
@@ -301,16 +340,24 @@
 		        <th>Grades</th>
 		        <th>Primary Subject</th>
 		        <th>Employer</th>
-		        <th>Attendance</th>
+		        <?php 
+		            if($oldFormat) {
+		                echo "<th>Attendance</th>";
+		            } else {
+		                foreach ($dates as $key => $date) {
+                            echo "<th>".date_format(date_create($date),"M j")."</th>";
+                        }
+		            }
+		        ?>
 		    </tr>
 		    </thead>
 		    <tbody>
 		<?php
-				while($row = mysqli_fetch_assoc($participants)) {
-				    //print_r($row);
+				foreach($participants as $idx => $row) {
 		?>
 		    <tr>
 		        <td class="controls">
+		            <input type="hidden" name="enrollment_id" value="<?php echo $row['enrollment_id']; ?>"/>
 		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
 		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
 		                data-event_id="<?php echo $data['event_id']; ?>"
@@ -329,11 +376,58 @@
 		        <td><?php echo $row['grades_taught'] ?></td>
 		        <td><?php echo $row['primary_subject'] ?></td>
 		        <td><a href="Organization.php?org_id=<?php echo $row['employer_id']; ?>"><?php echo $row['employer_name']; ?></a></td>
-		        <td><?php echo $row["days_attended"] ?> out of <?php echo $data["total_days"] ?> days</td>
+		        <?php 
+		            if($oldFormat) {
+		                echo "<td>".$row["days_attended"]." out of ".$data["total_days"]." days</td>";
+		            } else {
+		                $days_attended = json_decode(json_decode($row['attendance'], true)['days_attended'], true);
+		                foreach ($dates as $key => $date) {
+                            echo '<td style="text-align: center;"><input type="checkbox" name='.date_format(date_create($date),"Y-m-d");
+                            if($days_attended && in_array($date, $days_attended)) { echo " checked='on'"; }
+                            echo '></td>';
+                        }    
+		            }
+		        ?>
 		    </tr>
 		<?php } ?>
 		    </tbody>
 		</table>
+	</form>
+	<script>
+	    function updateAttendance(submitEvent) {
+	        submitEvent.preventDefault();
+	        console.log('updating attendance!', submitEvent);
+	        let attendanceData = {};
+	        const formData = new FormData(submitEvent.target);
+	        
+	        // convert the form data into a JSON object
+	        // enrollment_id's are the keys, arrays of checked date boxes are the values
+	        let last_id;
+	        [...formData.entries()].forEach( ([k, v]) => {
+	            if(k == "enrollment_id") { last_id = v; attendanceData[v] = []; }
+	            else attendanceData[last_id].push(k);
+	        });
+
+	        const data = JSON.stringify(attendanceData);
+	        console.log(data);
+
+	        // append method and JSON-formatted string to post address
+	        const target = event.currentTarget;
+	        target.action += '?method=update&data='+data; 
+
+	        return new Promise(function(resolve, reject) {
+		        var xhr = new XMLHttpRequest();
+		        xhr.onload = function() {
+			        resolve(this.responseText);
+		        };
+		        xhr.onerror = reject;
+		        xhr.open(target.method, target.action);
+		        xhr.send();
+	        }).then(rsp => window.location.reload());	        
+	   }
+	
+		document.getElementById('updateAttendanceForm').onsubmit = (e) => updateAttendance(e, () => window.location.reload());
+	</script>
 <?php } ?>
 
 			<!-- Enrollment modal -->
