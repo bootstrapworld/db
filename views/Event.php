@@ -151,7 +151,7 @@
 					<input  id="title" name="title"
 						placeholder="Webinar about stuff..." validator="alphanumbsym" 
 						value="<?php echo $data["title"] ?>"
-						autocomplete="nope"
+						class="dropdown" datatype="event" autocomplete="off"
 						type="text" size="60" maxlength="70" required="yes"/>
 					<label for="title">Event Title</label>
 				</span>
@@ -187,7 +187,7 @@
 
 				<span class="formInput">
 					<input  id="start" name="start" 
-					placeholder="Start Date" validator="numsym" 
+					placeholder="Start Date" validator="date" 
 					value="<?php echo $data["start"] ?>" 
 					type="date" size="30" maxlength="30" required="yes" />
 					<label for="start">Start Date</label>
@@ -195,7 +195,7 @@
 				
 				<span class="formInput">
 					<input  id="end" name="end" 
-					placeholder="End Date" validator="numsym" 
+					placeholder="End Date" validator="date" 
 					value="<?php echo $data["end"] ?>" 
 					type="date" size="30" maxlength="30"  required="yes" />
 					<label for="end">End Date</label>
@@ -204,7 +204,7 @@
 				<span class="formInput">
 					<input  id="price" name="price" 
 						placeholder="Price ($USD)" validator="num" 
-						value="<?php echo $data["price"] ?>" 
+						value="<?php echo $data["price"] ?? 0 ?>" 
 						type="text" size="10" maxlength="15" required="yes" />
 						<label for="price">Ticket cost (in $US)</label>
 				</span>

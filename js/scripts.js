@@ -69,7 +69,7 @@ function attachValidators () {
 
 				continue;
 			} 
-			if(inputs[i].type == "text"){
+			if(["text", "date"].includes(inputs[i].type)){
 				inputs[i].onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
 			} else continue;
 		}
