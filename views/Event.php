@@ -178,7 +178,7 @@
 				<span class="formInput">
 					<input id="org_name" name="org_name"
 						placeholder="CSforAll" validator="alpha"
-						class="dropdown" datatype="organization" autocomplete="nope" target="org_id"
+						class="dropdown" datatype="organization"  target="org_id"
 						value="<?php echo $data["name"] ?>" 
 						type="text" size="70" maxlength="70" ignore="yes" />
 					<label for="employer_name">Partner Organization</label>

@@ -17,7 +17,7 @@
 	<span class="formInput">
 		<input  id="name_last" name="name_last"  
 			placeholder="Last Name" validator="alpha"
-			class="dropdown" datatype="person" autocomplete="nope"
+			class="dropdown" datatype="person" 
 			value="<?php echo $data["name_last"] ?>" 
 			type="text" size="40" maxlength="40" required="yes"/>
 		<label for="name_last">Last Name</label>
@@ -126,7 +126,7 @@
 	<span class="formInput">
 		<input id="employer_name" name="employer_name"
 			placeholder="Which school or organization do you work for?" validator="alpha"
-			class="dropdown" datatype="organization" autocomplete="nope" target="employer_id"
+			class="dropdown" datatype="organization"  target="employer_id"
 			value="<?php echo $data["employer_name"] ?>" 
 			type="text" size="70" maxlength="70" ignore="yes" />
 		<label for="employer_name">School or Employer Name</label>
