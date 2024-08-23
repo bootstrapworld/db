@@ -82,9 +82,11 @@ function validate_time(value) {
 }
 
 /*************************************************/
+let globalErrTimeout;
 
 /* show a contextual error msg popup near the offending Element */
 function showErr(elt, msg){
+    clearTimeout(globalErrTimeout);
 	if(debug > 3) alert("showErr called with "+msg+" for "+id);
 	
 	var Err	= document.getElementById('Err');
@@ -93,6 +95,7 @@ function showErr(elt, msg){
 	Err.style.left	= left + 10 + 'px';
 	Err.style.top	= bottom + 'px';
 	Err.style.display='block';
+	globalErrTimeout = setTimeout(() => Err.style.display='none', 2000);
 }
 
 /* validate the input, and display error msg or correct the field if necessary */
