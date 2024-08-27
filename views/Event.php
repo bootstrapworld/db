@@ -64,9 +64,9 @@
 		$mysqli = openDB_Connection();
 		if(isset($_GET["event_id"])) {
 
-            $sql = "SELECT *, 
+            $sql = "SELECT 
+                        P.person_id, 
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
-                        O.name AS employer_name,
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         JSON_VALUE(attendance, '$.total') AS days_attended,
                         attendance AS attendance,
@@ -79,7 +79,8 @@
                          	ELSE 'Unknown'
                         END) AS grades_taught,
                         R.type AS type,
-                        COALESCE(R.notes,'') AS notes
+                        COALESCE(R.notes,'') AS notes,
+                        R.type AS type
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON P.employer_id = O.org_id
@@ -88,10 +89,13 @@
                     AND event_id = ".$_REQUEST["event_id"];
 			$participants = $mysqli->query($sql);
 
-            $sql = "SELECT *, 
+            $sql = "SELECT 
+                        P.person_id,
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
+                        CONCAT(P.name_first, ' ', name_last) AS name,
                         O.org_id, O.name AS employer_name,
-                        COALESCE(R.notes,'') AS notes
+                        COALESCE(R.notes,'') AS notes,
+                        R.type AS type
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON O.org_id = P.employer_id
@@ -99,10 +103,13 @@
                     AND R.type = 'Facilitator'
                     AND event_id = ".$_REQUEST["event_id"];
 			$facilitators = $mysqli->query($sql);
-            $sql = "SELECT *, 
+            $sql = "SELECT 
+                        P.person_id,
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
+                        CONCAT(P.name_first, ' ', name_last) AS name,
                         O.org_id, O.name AS employer_name,
-                        COALESCE(R.notes,'') AS notes
+                        COALESCE(R.notes,'') AS notes,
+                        R.type AS type
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON O.org_id = P.employer_id
@@ -146,8 +153,8 @@
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
     			<input type="submit" title="Save" value="💾">
 	    		<?php if(isset($data)) { ?>
-	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
 		    		<input type="button" title="Delete" value="🗑️️" onclick="deleteEventRq()">
+	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
 			    <?php } ?>
 			</span>
 
@@ -320,7 +327,7 @@ if($data) {
             		            </a>
             		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
             		        </td>
-		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
+            		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
 		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
 	                    </tr>
@@ -363,7 +370,7 @@ if($data) {
             		            </a>
             		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
             		        </td>
-		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
+		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
 		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
 	                    </tr>
@@ -416,7 +423,7 @@ if($data) {
 		            </a>
 		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
 		        </td>
-		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
+		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		        <td><?php echo $row['role'] ?></td>
 		        <td><?php echo $row['grades_taught'] ?></td>

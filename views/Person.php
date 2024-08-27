@@ -63,7 +63,8 @@
 	  $sql =   "SELECT *, 
 	                JSON_VALUE(attendance, '$.total') AS days_attended,
                     DATEDIFF(end, start)+1 AS total_days,
-                    R.type AS role, E.type AS event_type
+                    R.type AS role, E.type AS event_type,
+                    R.notes AS notes
                 FROM Enrollments AS R, Events AS E
                 LEFT JOIN Organizations AS O
                 ON O.org_id = E.org_id
@@ -110,8 +111,8 @@
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
     			<input type="submit" title="Save" value="💾" id="new_personSubmit">
 	    		<?php if(isset($data)) { ?>
-	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
 		    		<input type="button" title="Delete" value="🗑️️" onclick="deletePersonRq()">
+	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
 			    <?php } ?>
 			</span>
 				<?php include 'fragments/person-fragment.php' ?>
@@ -214,6 +215,7 @@
 		                data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
 		                data-title="<?php echo $row['title']?>"
 		                data-type="<?php echo $row['role']; ?>"
+            		    data-notes="<?php echo $row['notes']; ?>"
 		                data-created="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
 		                >
 		            </a>

@@ -109,8 +109,8 @@
     			<input type="button" title="Edit" value="✏️">
     			<input type="submit" title="Save" value="💾" id="new_organizationSubmit">
 	    		<?php if(isset($data)) { ?>
-	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
 		    		<input type="button" title="Delete" value="🗑️️" onclick="deleteOrgRq()">
+	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
 			    <?php } ?>
 			</span>
 			    
