@@ -80,6 +80,7 @@
                         END) AS grades_taught,
                         R.type AS type,
                         COALESCE(R.notes,'') AS notes,
+                        R.enrollment_id,
                         R.type AS type
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O

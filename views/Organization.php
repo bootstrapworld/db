@@ -106,7 +106,7 @@
 			<!-- Organization Form -->
 			<form id="new_organization" novalidate action="../actions/OrganizationActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
 			<span class="buttons">
-    			<input type="button" title="Edit" value="✏️">
+    			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
     			<input type="submit" title="Save" value="💾" id="new_organizationSubmit">
 	    		<?php if(isset($data)) { ?>
 		    		<input type="button" title="Delete" value="🗑️️" onclick="deleteOrgRq()">
