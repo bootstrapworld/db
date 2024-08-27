@@ -16,7 +16,7 @@
 	</span>
 
 	<span class="formInput">
-		<?php echo generateDropDown("type", "type", $orgTypeOpts, $data["type"], false) ?>
+		<?php echo generateDropDown("type", "type", $orgTypeOpts, $data["type"], true) ?>
 		<label for="state">Type</label>
 	</span>
 
@@ -67,7 +67,7 @@
 	<span class="formInput">
 		<input id="parent_org_name" name="parent_org_name"
 			placeholder="Is there a parent organization/district?" validator="alpha"
-			class="dropdown" datatype="organization"  target="parent_id"
+			class="dropdown" datatype="organization"  target="parent_id" addnew="yes"
 			value="<?php echo $data["parent_name"] ?>" 
 			type="text" size="70" maxlength="70" ignore="yes" />
 		<label for="parent_org_name">Parent Organization (e.g. district)</label>

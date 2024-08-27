@@ -48,6 +48,14 @@
 			const urlValue = baseURL + `/views/Events.php`;
 			window.location = urlValue;
 		}
+		
+		function markDirty() {
+		    console.log('attendance checkbox changed! _DBglobal_isDirty is "true";');
+		    document.getElementById('update_attendance').style.boxShadow = "red 5px 5px 20px";
+		    window._DBglobal_isDirty = true;    
+		}
+		window._DBglobal_isDirty = false;
+		
 	</script>
 		<?php
 
@@ -57,7 +65,7 @@
 		if(isset($_GET["event_id"])) {
 
             $sql = "SELECT *, 
-            		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
+            		    COALESCE(email_preferred, email_professional, email_google) AS email,
                         O.name AS employer_name,
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         JSON_VALUE(attendance, '$.total') AS days_attended,
@@ -70,17 +78,20 @@
                         	WHEN 'Elementary & Middle School' THEN 'E&MS'
                          	ELSE 'Unknown'
                         END) AS grades_taught,
-                        R.type AS type
-                    FROM `Enrollments` AS R, `People` AS P , `Organizations` AS O
+                        R.type AS type,
+                        COALESCE(R.notes,'') AS notes
+                    FROM `Enrollments` AS R, `People` AS P
+                    LEFT JOIN `Organizations` AS O
+                    ON P.employer_id = O.org_id
                     WHERE R.person_id = P.person_id 
-                    AND O.org_id = P.employer_id
                     AND (R.type = 'Participant' OR R.type = 'Make-up')
                     AND event_id = ".$_REQUEST["event_id"];
 			$participants = $mysqli->query($sql);
 
             $sql = "SELECT *, 
-            		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
-                        O.org_id, O.name AS employer_name
+            		    COALESCE(email_preferred, email_professional, email_google) AS email,
+                        O.org_id, O.name AS employer_name,
+                        COALESCE(R.notes,'') AS notes
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON O.org_id = P.employer_id
@@ -89,8 +100,9 @@
                     AND event_id = ".$_REQUEST["event_id"];
 			$facilitators = $mysqli->query($sql);
             $sql = "SELECT *, 
-            		    COALESCE(NULLIF(email_preferred,''), NULLIF(email_professional,''), email_google) AS email,
-                        O.org_id, O.name AS employer_name
+            		    COALESCE(email_preferred, email_professional, email_google) AS email,
+                        O.org_id, O.name AS employer_name,
+                        COALESCE(R.notes,'') AS notes
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON O.org_id = P.employer_id
@@ -177,7 +189,7 @@
 
 				<span class="formInput">
 					<input id="org_name" name="org_name"
-						placeholder="CSforAll" validator="alpha"
+						placeholder="CSforAll" validator="alpha" addnew="yes"
 						class="dropdown" datatype="organization"  target="org_id"
 						value="<?php echo $data["name"] ?>" 
 						type="text" size="70" maxlength="70" ignore="yes" />
@@ -226,58 +238,6 @@
 				
                 <p/>	
                 
-<?php if($data) { ?>
-				<b>Facilitators (<?php echo mysqli_num_rows($facilitators); ?>)</b><p/>
-	            <table class="smart">
-	                <thead>
-	                    <tr>
-	                        <th>Name</th>
-	                        <th>Email</th>
-	                        <th>Employer</th>
-	                   </tr>
-	                </thead>
-	                <tbody>
-	           <?php
-    			if(mysqli_num_rows($facilitators)) {
-	               	while($row = mysqli_fetch_assoc($facilitators)) {
-	           ?>
-	                    <tr>
-		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
-		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
-		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
-	                    </tr>
-	           <?php 
-	                }
-    			}
-	           ?>
-	                </tbody>
-                </table>
-
-                <p/>
-
-				<b>Admins (<?php echo mysqli_num_rows($admins); ?>)</b><p/>
-	            <table class="smart">
-	                <thead>
-	                    <tr>
-	                        <th>Name</th>
-	                        <th>Email</th>
-	                        <th>Employer</th>
-	                   </tr>
-	                </thead>
-	                <tbody>
-	           <?php
-	           	while($row = mysqli_fetch_assoc($admins)) {
-	           ?>
-	                    <tr>
-		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
-		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
-		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
-	                    </tr>
-	           <?php } ?>
-	                </tbody>
-                </table>
-<?php } ?>
-
 			</fieldset>
 		</form>
 		<script>
@@ -320,13 +280,100 @@ if($data) {
 ?>
 
 
-        <h2>Participants (<?php echo count($participants); ?>)</h2>
+        <h2>People</h2>
 		        
-		<input type="button" onmouseup="addEnrollment(this);" value="+ Add a Participant"
+		<input type="button" onmouseup="addEnrollment(this);" value="+ Add a Facilitator, Admin, or Participant"
 		    data-event_id="<?php echo $data['event_id']; ?>"
 		    data-title="<?php echo $data['title']; ?>"
 		/>
 		</p>
+
+<?php if($data) { ?>
+				<b>Facilitators (<?php echo mysqli_num_rows($facilitators); ?>)</b><p/>
+	            <table class="smart">
+	                <thead>
+	                    <tr>
+	                        <th></th>
+	                        <th>Name</th>
+	                        <th>Email</th>
+	                        <th>Employer</th>
+	                   </tr>
+	                </thead>
+	                <tbody>
+	           <?php
+    			if(mysqli_num_rows($facilitators)) {
+	               	while($row = mysqli_fetch_assoc($facilitators)) {
+	           ?>
+	                    <tr>
+        		            <td class="controls">
+            		            <input type="hidden" name="enrollment_id" value="<?php echo $row['enrollment_id']; ?>"/>
+            		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
+            		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
+            		                data-event_id="<?php echo $data['event_id']; ?>"
+            		                data-person_id="<?php echo $row['person_id']; ?>"
+            		                data-name="<?php echo $row['name']; ?>"
+            		                data-title="<?php echo $data['title']?>"
+            		                data-type="<?php echo $row['type']; ?>"
+            		                data-created="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
+            		                data-notes="<?php echo $row['notes']; ?>"
+            		                >
+            		            </a>
+            		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
+            		        </td>
+		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
+		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
+		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
+	                    </tr>
+	           <?php 
+	                }
+    			}
+	           ?>
+	                </tbody>
+                </table>
+
+                <p/>
+
+				<b>Admins (<?php echo mysqli_num_rows($admins); ?>)</b><p/>
+	            <table class="smart">
+	                <thead>
+	                    <tr>
+            		        <th></th>
+	                        <th>Name</th>
+	                        <th>Email</th>
+	                        <th>Employer</th>
+	                   </tr>
+	                </thead>
+	                <tbody>
+	           <?php
+	           	while($row = mysqli_fetch_assoc($admins)) {
+	           ?>
+	                    <tr>
+        		            <td class="controls">
+            		            <input type="hidden" name="enrollment_id" value="<?php echo $row['enrollment_id']; ?>"/>
+            		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
+            		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
+            		                data-event_id="<?php echo $data['event_id']; ?>"
+            		                data-person_id="<?php echo $row['person_id']; ?>"
+            		                data-name="<?php echo $row['name']; ?>"
+            		                data-title="<?php echo $data['title']?>"
+            		                data-type="<?php echo $row['type']; ?>"
+            		                data-created="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
+            		                data-notes="<?php echo $row['notes']; ?>"
+            		                >
+            		            </a>
+            		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
+            		        </td>
+		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first'].' '.$row['name_last']; ?></a></td>
+		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
+		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
+	                    </tr>
+	           <?php } ?>
+	                </tbody>
+                </table>
+<?php } ?>
+                <p/>
+		
+		<b>Participants (<?php echo count($participants); ?>)</b><p/>
 	<form id="updateAttendanceForm" novalidate action="../actions/UpdateAttendance.php">
 	    <table class="smart">
 		    <thead>
@@ -337,7 +384,7 @@ if($data) {
 		        <th>Role</th>
 		        <th>Grades</th>
 		        <th>Primary Subject</th>
-		        <th>Employer</th>
+		        <th>Notes</th>
 		        <?php 
 		            if($oldFormat) {
 		                echo "<th>Attendance</th>";
@@ -364,6 +411,7 @@ if($data) {
 		                data-title="<?php echo $data['title']?>"
 		                data-type="<?php echo $row['type']; ?>"
 		                data-created="<?php echo date_format(date_create($row['date']),"Y-m-d"); ?>"
+		                data-notes="<?php echo $row['notes']; ?>"
 		                >
 		            </a>
 		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
@@ -373,14 +421,14 @@ if($data) {
 		        <td><?php echo $row['role'] ?></td>
 		        <td><?php echo $row['grades_taught'] ?></td>
 		        <td><?php echo $row['primary_subject'] ?></td>
-		        <td><a href="Organization.php?org_id=<?php echo $row['employer_id']; ?>"><?php echo $row['employer_name']; ?></a></td>
+		        <td><?php echo $row['notes']; ?></td>
 		        <?php 
 		            if($oldFormat) {
 		                echo "<td>".$row["days_attended"]." out of ".$data["total_days"]." days</td>";
 		            } else {
 		                $days_attended = json_decode(json_decode($row['attendance'], true)['days_attended'], true);
 		                foreach ($dates as $key => $date) {
-                            echo '<td style="text-align: center;"><input type="checkbox" name='.date_format(date_create($date),"Y-m-d");
+                            echo '<td style="text-align: center;"><input type="checkbox" onchange="markDirty()" name='.date_format(date_create($date),"Y-m-d");
                             if($days_attended && in_array($date, $days_attended)) { echo " checked='on'"; }
                             echo '></td>';
                         }    
@@ -394,7 +442,21 @@ if($data) {
 		<input type="Submit" id="update_attendance" value="💾 Save Attendance" style="position: absolute; right: 0; bottom: -35px; margin: 0;" />
 	</form>
 	<script>
+    	window.addEventListener('beforeunload', (event) => {
+    	    // Cancel the event
+    	    if(window._DBglobal_isDirty &&
+    	       !confirm("You have unsaved attendance changes. Are you sure you want to leave the page?")) {
+    	        event.preventDefault();
+    	    }
+    
+            // Chrome requires returnValue to be set
+            event.returnValue = '';
+        });
+
 	    function updateAttendance(submitEvent) {
+	        console.log('setting _DBglobal_isDirty to false;');
+	        window._DBglobal_isDirty = false;
+	        document.getElementById('update_attendance').style.boxShadow = "";
 	        submitEvent.preventDefault();
 	        console.log('updating attendance!', submitEvent);
 	        let attendanceData = {};
@@ -409,7 +471,6 @@ if($data) {
 	        });
 
 	        const data = JSON.stringify(attendanceData);
-	        console.log(data);
 
 	        // append method and JSON-formatted string to post address
 	        const target = event.currentTarget;
@@ -432,6 +493,18 @@ if($data) {
 
 			<!-- Enrollment modal -->
 			<?php include 'fragments/enrollment-fragment.php'; ?>
+			
+			<!-- Organization modal -->
+			<div id="new_organization_modal" class="modal">
+				<form id="new_organization" novalidate action="../actions/OrganizationActions.php">
+					<?php include 'fragments/organization-fragment.php' ?>
+					<input type="submit" id="new_organizationSubmit" value="Submit">
+					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
+				</form>
+				<script>
+					document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
+			</script>
+			</div>
 
 	</div>
 	<script>

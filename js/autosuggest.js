@@ -120,7 +120,7 @@ AutoSuggest.prototype.setSuggestions = function (req){
 /* Build the HTML for the dropdown list */
 AutoSuggest.prototype.createList = function(arr){
 	var pointer = this;
-	//if(!arr || !arr.length) return;
+	if((!arr || !arr.length) && !this.fld.getAttribute('addnew')) return;
 	// get rid of old list and clear the list removal timeout
 	DOM.removeElement(this.idAs);
 	this.killTimeout();
@@ -132,6 +132,7 @@ AutoSuggest.prototype.createList = function(arr){
 	var datatype = this.fld.getAttribute('datatype')
 	var ul = DOM.createElement("ul", {id:"as_ul"});
 	var a  = DOM.createElement("a", { href:"#" }, "Add a new " + datatype, true);
+	if(!this.fld.getAttribute('addnew')) a.style.display = "none";
 	// **** see modal.js to understand this line
 	const target = this.fld.getAttribute('target');
 	let callback = function (id) {document.getElementById(target).value = id;}

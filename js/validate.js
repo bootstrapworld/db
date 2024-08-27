@@ -45,24 +45,7 @@ function validate_zip(value) {
 function validate_date(value) {
 	value = unescape(value);
 	if(value.length==0) return [true, value];
-	if(!isValid(value,date)) return [false, "Dates can only consist of numbers, and \'/\'. For example, 8/2/1980"];
-	var arrayDate = value.split('/'); //split date into month, day, year
-	if(arrayDate.length < 3) return [false, "Date is not formatted correctly. Use mm/dd/yy"];
-	
-	// okay, so at least it parses....
-	var intDay = parseInt(arrayDate[1],10); 
-	var intYear = parseInt(arrayDate[2],10);
-	var intMonth = parseInt(arrayDate[0],10);
-
-	// create a lookup for months
-	var isLeapYear = (intYear % 4 == 0 && (intYear % 100 != 0 || intYear % 400 == 0));
-	var arrayLookup = [31, (isLeapYear? 29:28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-	
-	// check for valid month
-	if(intMonth > 12 || intMonth < 1) return [false, "Month should be between 01 and 12"];		
-	
-	// check for valid day
-	if((intDay < 1) || (intDay > arrayLookup[intMonth-1])) return [false, "There is no day " + intDay +" in this month."];
+	if(!Date.parse(value)) return [false, "This is not a valid date"];
 	else return [true, value];
 }
 

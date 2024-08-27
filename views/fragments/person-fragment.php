@@ -126,7 +126,7 @@
 	<span class="formInput">
 		<input id="employer_name" name="employer_name"
 			placeholder="Which school or organization do you work for?" validator="alpha"
-			class="dropdown" datatype="organization"  target="employer_id"
+			class="dropdown" datatype="organization"  target="employer_id" addnew="yes"
 			value="<?php echo $data["employer_name"] ?>" 
 			type="text" size="70" maxlength="70" ignore="yes" />
 		<label for="employer_name">School or Employer Name</label>

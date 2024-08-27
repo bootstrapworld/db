@@ -240,6 +240,18 @@
 
 			<!-- Enrollment modal -->
 			<?php include 'fragments/enrollment-fragment.php'; ?>
+			
+			<!-- Organization modal -->
+			<div id="new_organization" class="modal">
+				<form id="new_organization_modal" novalidate action="../actions/OrganizationActions.php">
+					<?php include 'fragments/organization-fragment.php' ?>
+					<input type="submit" id="new_organizationSubmit" value="Submit">
+					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
+				</form>
+				<script>
+					document.getElementById('new_organization_modal').onsubmit = (e) => updateRequest(e, updateOrgRp);
+			</script>
+			</div>
 
 	</div>
 </body>

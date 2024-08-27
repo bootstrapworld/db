@@ -14,7 +14,6 @@ SmartTable = function(table){
 	if (head == null) alert('A SmartTable must include a THEAD element');
 	if (body == null) alert('A SmartTable must include a TBODY element');
 	var rows	= body.getElementsByTagName('TR');						// rows in tbody
-	if(rows.length == 0) return;                                        // bail if the table is empty
 	var thead_r	= head.getElementsByTagName('TR');						// rows in thead
 	this.headers = thead_r[thead_r.length-1].querySelectorAll('TD, TH'); // bottom row in thead
 
@@ -67,7 +66,9 @@ SmartTable = function(table){
     controls.innerHTML += "<b>Filter 2:</b>";
 	controls.appendChild(this.filter2Col);
 	controls.innerHTML += filterHTML;
-	table.parentNode.insertBefore(controls,table);
+	
+	// if there's more than one row, show the filtering controls
+	if(rows.length > 1) { table.parentNode.insertBefore(controls, table); }
 
 	// Rebuild the table if any of the selects are changed, or inputs recieve a keyup
 	// Ignore these elements when validating forms
