@@ -92,10 +92,11 @@ function validate(elt, type, value){
 	// is the field required? is it blank? Required + Blank =  Missing
 	required = (elt.getAttribute('required') == "yes")? true : false;
 	blank	 = (value == "")? true: false;
-	
-	// if it's a dropdown, check the value of the ID that should be set - prevents people from writing in random crap
+
+	// if it's a dropdown, make sure the target was set!
 	if(type == "dropdown"){
-		//blank = document.getElementById(elt.getAttribute('datatype')+'_id').value == "";
+	    const targetValue = document.getElementById(elt.getAttribute('target')).value;
+	    blank = !targetValue || (targetValue == undefined)
 	}
 	missing	 = required && blank;
 		
@@ -105,7 +106,7 @@ function validate(elt, type, value){
 	valid = result[0] && (!missing);
 	value = result[1];
 	if(missing) value = "This field cannot be left blank";
-	if(missing && (type == "dropdown")) value="You must select an option from the dropdown list."
+	if(missing && (type == "dropdown")) value="You must select an option from the auto-suggest dropdown list. If you don't see the "+elt.getAttribute('datatype')+" you want, you may need to add it before completing this form."
 	
 	if(!valid) {
 		elt.style.border='solid red 2px';

@@ -9,8 +9,8 @@
 
 	<span class="formInput">
 		<input  id="enrollment_title" name="title" ignore="yes"
-			placeholder="Event title" validator="alphanumbsym"
-			class="dropdown" datatype="event" autocomplete="yes" target="event_id"
+			placeholder="Event title" validator="dropdown"
+			datatype="event" target="event_id"
 			value="<?php echo $data["title"] ?>" 
 			type="text" size="80" maxlength="70" required="yes"/>
 		<label for="name">Event title</label>
@@ -30,9 +30,9 @@
 
 	<span class="formInput">
 		<input  id="enrollment_name" name="name" ignore="yes"
-			placeholder="Contact's name" validator="alpha"
-			class="dropdown" datatype="person" autocomplete="yes" target="enrollment_person_id"
-			value="<?php echo $data["name"] ?>" 
+			placeholder="Contact's name" validator="dropdown"
+			datatype="person" target="enrollment_person_id"
+			value="<?php echo $data["name"] ?>"  autocomplete="none"
 			type="text" size="50" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
 	</span>
@@ -67,7 +67,7 @@ function addEnrollment(elt) {
 	const m = new Modal(elt, 'new_enrollment', (id) => window.location.reload());
     const fields = ["enrollment_id", "event_id", "title", "type", "created", "notes"];
     fields.forEach(f => document.querySelector('#new_enrollment [name="'+f+'"]').value  = '');
-	document.querySelector('#new_enrollment [name="person_id"]').value      = elt.dataset.person_id;
+	document.querySelector('#new_enrollment [name="person_id"]').value      = elt.dataset.person_id || null;
 	document.querySelector('#new_enrollment [name="event_id"]').value       = elt.dataset.event_id || null;
 	document.querySelector('#new_enrollment [name="name"]').value           = elt.dataset.name || null;
 	document.querySelector('#new_enrollment [name="title"]').value          = elt.dataset.title || null;

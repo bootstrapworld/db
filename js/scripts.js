@@ -39,7 +39,8 @@ function attachValidators () {
 				var modalObj = new Modal(inputs[i],inputs[i].getAttribute('contents'), inputs[i].getAttribute('callback'));
 				continue;
 			}
-			if(inputs[i].classList.contains("dropdown")){
+			
+			if(inputs[i].getAttribute('validator') == "dropdown"){
 				const datatype = inputs[i].getAttribute('datatype');
 				const target = inputs[i].getAttribute('target');
 				switch(datatype){
@@ -147,7 +148,7 @@ function expandTable(tableid, datatype, relationships){
 	datatype_name_inpt.setAttribute('name'		,	tableid + '_name');
 	datatype_name_inpt.setAttribute('size'		,	'30');
 	datatype_name_inpt.setAttribute('maxlength'	,	'40');
-	datatype_name_inpt.setAttribute('autocomplete', 'off');
+	datatype_name_inpt.setAttribute('autocomplete', 'none');
 	datatype_name_inpt.setAttribute('datatype'	,	datatype);
 	datatype_name_inpt.className = 'dropdown';
 	

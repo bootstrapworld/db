@@ -169,9 +169,10 @@
 
 				<span class="formInput">
 					<input  id="title" name="title"
-						placeholder="Webinar about stuff..." validator="alphanumbsym" 
+						placeholder="Webinar about stuff..." 
+						validator="dropdown" datatype="event" target="event_id"
 						value="<?php echo $data["title"] ?>"
-						class="dropdown" datatype="event" autocomplete="off"
+						autocomplete="none"
 						type="text" size="60" maxlength="70" required="yes"/>
 					<label for="title">Event Title</label>
 				</span>
@@ -197,8 +198,8 @@
 
 				<span class="formInput">
 					<input id="org_name" name="org_name"
-						placeholder="CSforAll" validator="alpha" addnew="yes"
-						class="dropdown" datatype="organization"  target="org_id"
+						placeholder="CSforAll" validator="dropdown" addnew="yes"
+						datatype="organization"  target="org_id"
 						value="<?php echo $data["name"] ?>" 
 						type="text" size="70" maxlength="70" ignore="yes" />
 					<label for="employer_name">Partner Organization</label>
@@ -501,6 +502,13 @@ if($data) {
 
 			<!-- Enrollment modal -->
 			<?php include 'fragments/enrollment-fragment.php'; ?>
+			<script>
+			    const enrollmentTitle = document.getElementById('enrollment_title');
+			    enrollmentTitle.readOnly = true; 
+			    enrollmentTitle.style.pointerEvents = "none";
+			    enrollmentTitle.tabIndex = -1;
+			    enrollmentTitle.addEventListener('focus', e => e.preventDefault())
+			</script>
 			
 			<!-- Organization modal -->
 			<div id="new_organization_modal" class="modal">

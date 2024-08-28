@@ -8,7 +8,7 @@
 
 	<span class="formInput">
 		<input  id="name_first" name="name_first"
-			placeholder="First Name" validator="alpha"
+			placeholder="First Name"
 			value="<?php echo $data["name_first"] ?>" 
 			type="text" size="40" maxlength="40" required="yes"/>
 		<label for="name_first">First Name</label>
@@ -16,8 +16,8 @@
 
 	<span class="formInput">
 		<input  id="name_last" name="name_last"  
-			placeholder="Last Name" validator="alpha"
-			class="dropdown" datatype="person" 
+			placeholder="Last Name" 
+			validator="dropdown" datatype="person" target = "person_id"
 			value="<?php echo $data["name_last"] ?>" 
 			type="text" size="40" maxlength="40" required="yes"/>
 		<label for="name_last">Last Name</label>
@@ -125,8 +125,8 @@
 
 	<span class="formInput">
 		<input id="employer_name" name="employer_name"
-			placeholder="Which school or organization do you work for?" validator="alpha"
-			class="dropdown" datatype="organization"  target="employer_id" addnew="yes"
+			placeholder="Which school or organization do you work for?" validator="dropdown"
+			datatype="organization"  target="employer_id" addnew="yes"
 			value="<?php echo $data["employer_name"] ?>" 
 			type="text" size="70" maxlength="70" ignore="yes" />
 		<label for="employer_name">School or Employer Name</label>
@@ -200,7 +200,7 @@ function deletePersonRp( rsp ){
 
 // turn off autocomplete if we're already looking at an established person
 if(document.getElementById('person_id').value != "") {
-	document.getElementById('name_last').className = "alpha"
+	document.getElementById('name_last').validator = "alpha"
 }
 
 /***************************************************************************** 

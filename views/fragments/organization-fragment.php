@@ -8,8 +8,8 @@
 
 	<span class="formInput">
 		<input  id="name" name="name"
-			placeholder="Edmund W. Flynn Elementary School" validator="alpha"
-			class="dropdown" datatype="organization" 
+			placeholder="Edmund W. Flynn Elementary School" 
+			validator="dropdown" datatype="organization" target="org_id"
 			value="<?php echo $data["name"] ?>" 
 			type="text" size="50" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
@@ -66,8 +66,8 @@
 
 	<span class="formInput">
 		<input id="parent_org_name" name="parent_org_name"
-			placeholder="Is there a parent organization/district?" validator="alpha"
-			class="dropdown" datatype="organization"  target="parent_id" addnew="yes"
+			placeholder="Is there a parent organization/district?"
+			validator="dropdown" datatype="organization"  target="parent_id" addnew="yes"
 			value="<?php echo $data["parent_name"] ?>" 
 			type="text" size="70" maxlength="70" ignore="yes" />
 		<label for="parent_org_name">Parent Organization (e.g. district)</label>
@@ -115,6 +115,6 @@ function deleteOrgRp( rsp ){
 
 // turn off autocomplete if we're already looking at an established organization
 if(document.getElementById('org_id').value != "") {
-	document.getElementById('name').className = "alpha"
+	document.getElementById('name').validator = "alpha"
 }
 </script>

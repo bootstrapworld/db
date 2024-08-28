@@ -13,8 +13,8 @@
 
 	<span class="formInput">
 		<input  id="name" name="name" ignore="yes"
-			placeholder="Contact's name" validator="alpha"
-			class="dropdown" datatype="person" target="person_id"
+			placeholder="Contact's name" validator="dropdown"
+			datatype="person" target="person_id"
 			value="<?php echo $data["name"] ?>" 
 			type="text" size="30" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
@@ -25,8 +25,8 @@
 	/>
 	<span class="formInput">
 		<input  id="bootstrap_name" name="name" ignore="yes"
-			placeholder="Your name" validator="alpha"
-			class="dropdown" datatype="person" target="bootstrap_id"
+			placeholder="Your name" validator="dropdown"
+			datatype="person" target="bootstrap_id"
 			value="<?php echo $data["bootstrap_name"] ?>" 
 			type="text" size="30" maxlength="70" />
 		<label for="name">Contacted by</label>

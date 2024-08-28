@@ -61,7 +61,7 @@ Modal.prototype.showModal = function(){
 	
 	// set focus on first non-hidden, non-disabled field in the modal form
 	[...this.contents.querySelectorAll('input, select, textarea')]
-	  .find(elt => (elt.type !== "hidden") && (!elt.disabled))
+	  .find(elt => (elt.type !== "hidden") && (!elt.disabled) && (elt.tabIndex > -1))
 	  .focus();
 	
 	// set callback functions for "cancel" and "submit" buttons
