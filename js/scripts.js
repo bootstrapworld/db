@@ -20,29 +20,29 @@ function capitalizeFirstLetter(string) {
 		return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-/* Attach validation calls and dropdowns to INPUT fields */
+/* Attach validation calls and dropdowns to INPUT and SELECT fields */
 function attachValidators () {
 	if (!document.getElementById) return;
-	var forms = document.getElementsByTagName('form');
-	for(f = 0; f < forms.length; f++){
-		var inputs	= forms[f].getElementsByTagName('input');
-		var selects	= forms[f].getElementsByTagName('select');
-		for (var i = 0; i < selects.length; i++) {
-			if(selects[i].getAttribute('required') == "yes") {
-				selects[i].onblur = function (){ 
+	var forms = [...document.getElementsByTagName('form')];
+	forms.forEach(f => {
+		var inputs	= [...f.getElementsByTagName('input')];
+		var selects	= [...f.getElementsByTagName('select')];
+		selects.forEach(select => {
+			if(select.getAttribute('required') == "yes") {
+				select.onblur = function (){ 
 					validate(this, this.getAttribute('validate') || '', this.value); 
 				}
 			}
-		}	
-		for (var i = 0; i < inputs.length; i++) {
-			if(inputs[i].className == "modal"){	
-				var modalObj = new Modal(inputs[i],inputs[i].getAttribute('contents'), inputs[i].getAttribute('callback'));
-				continue;
+		});
+		inputs.forEach(input => {
+			if(input.className == "modal"){	
+				var modalObj = new Modal(input,input.getAttribute('contents'), input.getAttribute('callback'));
+				return;
 			}
 			
-			if(inputs[i].getAttribute('validator') == "dropdown"){
-				const datatype = inputs[i].getAttribute('datatype');
-				const target = inputs[i].getAttribute('target');
+			if(input.getAttribute('validator') == "dropdown"){
+				const datatype = input.getAttribute('datatype');
+				const target = input.getAttribute('target');
 				switch(datatype){
 					case "person":
 						var options = { script:	"../actions/PersonActions.php?method=searchForNames&", varname: "search", json: true,
@@ -64,17 +64,16 @@ function attachValidators () {
 				}
 
 				// set up autosuggest object (see autosuggest.js)
-				inputs[i].setAttribute('script', options.script);
-				var suggestObj = new AutoSuggest(inputs[i].id, options);
-				inputs[i].onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
-
-				continue;
+				input.setAttribute('script', options.script);
+				var suggestObj = new AutoSuggest(input.id, options);
+				input.onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
+                return;
 			} 
-			if(["text", "date"].includes(inputs[i].type)){
-				inputs[i].onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
-			} else continue;
-		}
-	}
+			if(["text", "date"].includes(input.type)){
+				input.onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
+			}
+		});
+	});
 };
 
 // Given a form submission event, validate the form and
@@ -113,6 +112,8 @@ function setInfoFromDropDown(fieldID, obj, target, datatype) {
 		window.location.search = searchParams.toString();		
 	}
 }
+
+/*
 
 // add a new row, with a dropdown of types, hidden ID field, dropdown input and phone/address cells
 function expandTable(tableid, datatype, relationships){	
@@ -201,7 +202,7 @@ function expandTable(tableid, datatype, relationships){
 	attachValidators();
 	unique++;
 }
-
+*/
 
 const pioneers = [
 	// on web these display 3 to a row. in workbook they display 5 to a row.
