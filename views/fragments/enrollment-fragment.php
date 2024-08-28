@@ -10,7 +10,7 @@
 	<span class="formInput">
 		<input  id="enrollment_title" name="title" ignore="yes"
 			placeholder="Event title" validator="dropdown"
-			datatype="event" target="event_id"
+			datatype="event" target="enrollment_event_id"
 			value="<?php echo $data["title"] ?>" 
 			type="text" size="80" maxlength="70" required="yes"/>
 		<label for="name">Event title</label>
@@ -32,7 +32,7 @@
 		<input  id="enrollment_name" name="name" ignore="yes"
 			placeholder="Contact's name" validator="dropdown"
 			datatype="person" target="enrollment_person_id"
-			value="<?php echo $data["name"] ?>"
+			value="<?php echo $data["name"] ?>"  autocomplete="none"
 			type="text" size="50" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
 	</span>
@@ -49,7 +49,7 @@
 	</span>
 </fieldset>
 <input type="submit" id="new_enrollmentSubmit" value="💾 Save" >
-<input type="button" id="new_enrollmentCancel" value="❌ Cancel "class="modalCancel">
+<input type="button" id="new_enrollmentCancel" value="↩️ Cancel "class="modalCancel">
 </form>
 </div>
 

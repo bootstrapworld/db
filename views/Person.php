@@ -112,7 +112,7 @@
     			<input type="submit" title="Save" value="💾" id="new_personSubmit">
 	    		<?php if(isset($data)) { ?>
 		    		<input type="button" title="Delete" value="🗑️️" onclick="deletePersonRq()">
-	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
+	    		    <input type="button" title="Cancel" value="↩️" onclick="window.location.reload()">
 			    <?php } ?>
 			</span>
 				<?php include 'fragments/person-fragment.php' ?>

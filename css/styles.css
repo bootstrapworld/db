@@ -69,14 +69,14 @@ nav a:focus {
 
 /* Define our elements */
 br{	clear: left;}
-h1{	font-size:	30px; margin:	10px 0px 0px 0px;}
+h1{	font-size:	30px; margin:	10px 0px 0px 0px; display: inline-block; }
 h2{	text-decoration: underline; margin: 10px 0px; }
 h3{	font-style:	italic; padding: 0px; margin:	10px 10px 0px 10px;}
 
 /* Edit and Delete buttons */
 .editButton:after   { content: '✏️' ; }
 .deleteButton:after { content: '❌'; }
-.editButton, .deleteButton { margin: 0 5px; text-decoration: none !important; }
+.editButton, .deleteButton  { margin: 0 5px; text-decoration: none !important; }
 .editButton:hover, .deleteButton:hover { background: lightgray; }
 .editButton img, .deleteButton img { display: none; }
 
@@ -215,15 +215,14 @@ form.locked :not(.smartTableControls)>select {
   text-indent: 1px;
   border-bottom: solid 1px black;
 }
-form.locked .instructions, form.locked .buttons input[title=Save], form.locked .buttons input[title=Delete] { display: none; } 
-form.unlocked .buttons input[title=Edit] { display: none; } 
+form.locked .instructions, form.locked .buttons [title=Save], form.locked .buttons [title=Delete], form.locked .buttons [title=Duplicate] { display: none; } 
+form.unlocked .buttons [title=Edit] { display: none; } 
 
-form.locked input[title=Save] { display: none; }
-form.locked input[title=Cancel] { display: none; }
-form.locked input[title=Delete] { display: none; }
-form .buttons { position: absolute; right: 1em; top: 1em; }
-form .buttons * { width: 32px; height: 32px; }
-form .buttons *:first-child { margin-right: 5px;}
+form.locked [title=Save] { display: none; }
+form.locked [title=Cancel] { display: none; }
+form.locked [title=Delete] { display: none; }
+form .buttons { position: absolute; right: 1em; top: 1em; display:flex; align-items: center; }
+form .buttons>* { width: 32px; height: 32px; margin: 0; padding: 0; margin-right: 5px;}
 /* *********** CALENDAR STYLES *********** */
 /* the table (within the div) that holds the date picker calendar */
 .dpTable {

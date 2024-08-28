@@ -56,6 +56,22 @@
 		}
 		window._DBglobal_isDirty = false;
 		
+		function duplicateEventRq() {
+		    const id = document.getElementById('event_id').value;
+			if(confirm("Are you sure you want to duplicate Event ID# " + id + ", and all the associated enrollments?")){
+				var request = new XMLHttpRequest();
+				// if the request is successful, execute the callback
+				request.onreadystatechange = function() {
+					if (request.readyState == 4 && request.status == 200) {
+						window.location = "Event.php?event_id="+request.responseText;
+					}
+				}; 
+				const data = JSON.stringify({event_id:id});
+				request.open('POST', "../actions/EventActions.php?method=duplicateEvent&data="+data);
+				request.send();
+			}
+		}
+		
 	</script>
 		<?php
 
@@ -96,6 +112,7 @@
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         O.org_id, O.name AS employer_name,
                         COALESCE(R.notes,'') AS notes,
+                        R.enrollment_id,
                         R.type AS type
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
@@ -110,6 +127,7 @@
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         O.org_id, O.name AS employer_name,
                         COALESCE(R.notes,'') AS notes,
+                        R.enrollment_id,
                         R.type AS type
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
@@ -142,7 +160,7 @@
     </nav>
     
     <div id="content">
-		<h1><?php echo $title ?></h1>
+		<h1><?php echo $title ?></h1> 
 		<form id="new_event" novalidate action="../actions/EventActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
 			<?php 
 					if($_GET["event_id"] && !$data) {
@@ -154,8 +172,9 @@
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
     			<input type="submit" title="Save" value="💾">
 	    		<?php if(isset($data)) { ?>
+	    		    <button title="Duplicate" onclick="duplicateEventRq()" ><img src="../images/copyIcon-black.png" style="width: 16px; height: 16px;"></button>
 		    		<input type="button" title="Delete" value="🗑️️" onclick="deleteEventRq()">
-	    		    <input type="button" title="Cancel" value="❌" onclick="window.location.reload()">
+	    		    <input type="button" title="Cancel" value="↩️" onclick="window.location.reload()">
 			    <?php } ?>
 			</span>
 
@@ -170,8 +189,9 @@
 				<span class="formInput">
 					<input  id="title" name="title"
 						placeholder="Webinar about stuff..." 
-						validator="dropdown" datatype="event" target="event_id"
+						validator="alphanumbsym" 
 						value="<?php echo $data["title"] ?>"
+						autocomplete="none"
 						type="text" size="60" maxlength="70" required="yes"/>
 					<label for="title">Event Title</label>
 				</span>
