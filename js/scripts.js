@@ -6,7 +6,7 @@ var baseURL = 'https://bootstrapworld.org/data/'
 
 // generate DOM from JSON, fix IE6, attach validators to fields, make draggable items draggable
 window.onload = function () {
-	attachValidators();
+	setTimeout(attachValidators, 500);
 	if(typeof(SmartTable) !== "undefined") initializeSmartTables();
 	// build error dialog
 	if(!document.getElementById('Err')){ 
@@ -43,6 +43,7 @@ function attachValidators () {
 			if(input.getAttribute('validator') == "dropdown"){
 				const datatype = input.getAttribute('datatype');
 				const target = input.getAttribute('target');
+				input.addEventListener('focus', e => e.srcElement.autocomplete='none'); // chrome hack to turn off autocomplete
 				switch(datatype){
 					case "person":
 						var options = { script:	"../actions/PersonActions.php?method=searchForNames&", varname: "search", json: true,

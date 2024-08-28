@@ -172,7 +172,6 @@
 						placeholder="Webinar about stuff..." 
 						validator="dropdown" datatype="event" target="event_id"
 						value="<?php echo $data["title"] ?>"
-						autocomplete="none"
 						type="text" size="60" maxlength="70" required="yes"/>
 					<label for="title">Event Title</label>
 				</span>

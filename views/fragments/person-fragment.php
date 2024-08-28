@@ -8,7 +8,7 @@
 
 	<span class="formInput">
 		<input  id="name_first" name="name_first"
-			placeholder="First Name"
+			placeholder="First Name" validator="alpha"
 			value="<?php echo $data["name_first"] ?>" 
 			type="text" size="40" maxlength="40" required="yes"/>
 		<label for="name_first">First Name</label>

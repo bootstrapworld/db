@@ -106,7 +106,7 @@
 				}
 			?>
 			<!-- Person form -->
-			<form id="new_person" novalidate action="../actions/PersonActions.php"  class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
+			<form id="new_person" novalidate action="../actions/PersonActions.php"  class="<?php echo empty($data)? "unlocked" : "locked"; ?>" >
 			<span class="buttons">
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
     			<input type="submit" title="Save" value="💾" id="new_personSubmit">

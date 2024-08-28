@@ -32,7 +32,7 @@
 		<input  id="enrollment_name" name="name" ignore="yes"
 			placeholder="Contact's name" validator="dropdown"
 			datatype="person" target="enrollment_person_id"
-			value="<?php echo $data["name"] ?>"  autocomplete="none"
+			value="<?php echo $data["name"] ?>"
 			type="text" size="50" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
 	</span>
