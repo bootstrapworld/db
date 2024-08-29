@@ -85,8 +85,9 @@ function updateOrgRp( orgId ){
 				console.log('returning', orgId,'from updateOrgRp');
 				return orgId; 
 		} else {
-			const urlValue = baseURL + `/views/Organization.php?org_id=${orgId}`;
-			window.location = urlValue;
+		    if(orgId > 0)  window.location = baseURL + `/views/Organization.php?org_id=${orgId}`;
+			else if(orgId == 0) window.location.reload();
+			else throw "Impossible result came back from OrganizationAction.php:"+orgId;
 		}
 	}
 }	

@@ -171,8 +171,9 @@ function updatePersonRp( personId ){
 				console.log('returning', personId,'from updatePersonRp');
 				return personId; 
 		} else {
-			const urlValue = baseURL + `/views/Person.php?person_id=${personId}`;
-			window.location = urlValue;
+		    if(personId > 0)  window.location = baseURL + `/views/Person.php?person_id=${personId}`;
+			else if(personId == 0) window.location.reload();
+			else throw "Impossible result came back from PersonAction.php:"+personId;
 		}
 	}
 }	

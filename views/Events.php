@@ -24,6 +24,7 @@
 	    tbody tr:hover { background: #ccc; }
 	    td, th { padding: 4px 2px; font-size: 12px; }
 	    tr.past { color: grey; }
+	    tr.past a { color: #77f !important; }
 	    input[type=button] {margin: 10px 0; }
 	</style>
    <?php
@@ -32,7 +33,7 @@
 
 	$mysqli = openDB_Connection();
 	
-	$sql = "SELECT E2.event_id, E2.type, E2.org_id, E2.name, curriculum, start, end, location, participants, 
+	$sql = "SELECT E2.event_id, E2.type, curriculum, location, E2.org_id, E2.name, curriculum, start, end, participants, 
 	               GROUP_CONCAT(DISTINCT CONCAT(
                        '<a href=\"Person.php?person_id=', FacNames.person_id, '\">',
                        FacNames.name_first,
@@ -78,12 +79,11 @@
 	    <table class="smart">
 		    <thead>
 		    <tr>
-		        <th>Curriculum</th>
-		        <th>Type</th>
 		        <th>Year</th>
-		        <th>When</th>
-		        <th>Where</th>
-		        <th>Partner Org</th>
+		        <th style="text-align: center;">Type</th>
+		        <th style="text-align: center;">Title</th>
+		        <th style="display:none;">Partner Org</th>
+		        <th style="text-align: center;">When</th>
 		        <th>Facilitators</th>
 		        <th>Participants</th>
 		    </tr>
@@ -92,18 +92,30 @@
 		<?php 
     		//print_r($data);
 		    $now = new DateTime("now", new DateTimeZone("America/New_York"));
+		    $secondsInADay = 60*60*24;
 		    while($row = mysqli_fetch_assoc($events)) { 
 		       $start = date_create($row['start']);
 		       $end   = date_create($row['end']);
-		       $isPast = $now->getTimestamp() > $start->getTimestamp();
+		       $isPast = round($now->getTimestamp() / $secondsInADay) > round($start->getTimestamp() / $secondsInADay);
+		       $location = $row['location'];
+
 		  ?>
 		    <tr <?php echo $isPast? 'class="past"' : ''; ?>>
-		        <td><?php echo $row['curriculum']; ?></td>
-		        <td style="text-align:center;"><?php echo $row['type']; ?></td>
 		        <td><?php echo date_format($start,"Y"); ?></td>
-		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><span style="width:0; overflow:hidden; display:inline-block; margin:0;"><?php echo date_format($start,"Y / m / d"); ?></span><?php echo date_format($start,"M jS"); ?> - <?php echo date_format($end,"M jS"); ?></a></td>
-		        <td><?php echo $row['location']; ?></td>
-		        <td><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
+		        <td style="text-align: center;"><?php echo $row['type']; ?></td>
+		        <td style="text-align:center;">
+		            <a href="Event.php?event_id=<?php echo $row['event_id']; ?>">
+		            <?php 
+		                echo $row['curriculum']; 
+		                echo " (".(str_starts_with($location,'http')? 'virtual' : $location).")" ; 
+		                if($row['name']) { echo " - ".$row['name']; }
+		            ?>
+		            </a>
+		        </td>
+		        <td style="display:none;"><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
+		        <td style="text-align: center;">
+		            <span style="width:0; overflow:hidden; display:inline-block; margin:0;"><?php echo $start->getTimestamp(); ?></span>
+		            <?php echo date_format($start,"M jS"); if($row['start'] !== $row['end']) { echo " - ".date_format($end,"M jS"); } ?></td>
 		        <td><?php echo $row['facilitators']; ?></td>
 		        <td style="text-align: center;"><?php echo $row['participants']; ?></td>
 		    </tr>

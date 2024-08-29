@@ -22,9 +22,9 @@
 	<script type="text/javascript">
 		function updateEventRp( eventId ){
 			if ( eventId ){
-				alert( "Update successful." );
-				const urlValue = baseURL + `/views/Event.php?event_id=${eventId}`;
-				window.location = urlValue;
+		        if(eventId > 0)  window.location = baseURL + `/views/Event.php?event_id=${eventId}`;
+			    else if(eventId == 0) window.location.reload();
+			    else throw "Impossible result came back from EventAction.php:"+eventId;
 			}
 		}
 
