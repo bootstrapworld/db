@@ -48,6 +48,8 @@
 			window.location = urlValue;
 		}
 		
+		
+		<!--- local code --->
 		function markDirty() {
 		    console.log('attendance checkbox changed! _DBglobal_isDirty is "true";');
 		    document.getElementById('update_attendance').style.boxShadow = "red 5px 5px 20px";
@@ -55,7 +57,8 @@
 		}
 		window._DBglobal_isDirty = false;
 		
-		function duplicateEventRq() {
+		function duplicateEventRq(e) {
+		    console.log(e);
 		    const id = document.getElementById('event_id').value;
 			if(confirm("Are you sure you want to duplicate Event ID# " + id + ", and all the associated enrollments?")){
 				var request = new XMLHttpRequest();
@@ -69,6 +72,12 @@
 				request.open('POST', "../actions/EventActions.php?method=duplicateEvent&data="+data);
 				request.send();
 			}
+		}
+		
+		function updateEndDate() {
+		    const startDateElt = document.getElementById('start');
+		    const endDateElt   = document.getElementById('end');
+		    if(!endDateElt.value) endDateElt.value = startDateElt.value;
 		}
 		
 	</script>
@@ -159,7 +168,10 @@
     </nav>
     
     <div id="content">
-		<h1><?php echo $title ?></h1> 
+		<span style="display:flex; align-items:center;">
+		    <h1><?php echo $title ?></h1> 
+		    <button title="Duplicate" onclick="duplicateEventRq()" style="margin-top:10px; margin-left: 10px;"><img src="../images/copyIcon-black.png" style="width: 16px; height: 16px;"></button>
+		</span>
 		<form id="new_event" novalidate action="../actions/EventActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
 			<?php 
 					if($_GET["event_id"] && !$data) {
@@ -171,7 +183,6 @@
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
     			<?php if(isset($data)) { ?>
     			    <input type="button" title="Delete" value="🗑️️" onclick="deleteEventRq()">
-	    		    <button title="Duplicate" onclick="duplicateEventRq()" ><img src="../images/copyIcon-black.png" style="width: 16px; height: 16px;"></button>
     			 <?php } ?>
     			<input type="submit" title="Save" value="💾">
 	    		<?php if(isset($data)) { ?>
@@ -236,6 +247,7 @@
 				
 				<span class="formInput">
 					<input  id="end" name="end" 
+					onfocus="updateEndDate()"
 					placeholder="End Date" validator="date" 
 					value="<?php echo $data["end"] ?>" 
 					type="date" size="30" maxlength="30"  required="yes" />

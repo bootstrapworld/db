@@ -48,8 +48,8 @@
 		$mysqli = openDB_Connection();
 		try {
 		    $mysqli->begin_transaction();
-		    $sql  =  "INSERT INTO Events (event_id, type, title, webpage_url, location, start, end, price,org_id, curriculum) 
-	                            SELECT NULL AS event_id, type, title, webpage_url, location, start, end, price,org_id, curriculum 
+		    $sql  =  "INSERT INTO Events (event_id, type, title, webpage_url, location, price,org_id, curriculum) 
+	                            SELECT NULL AS event_id, type, CONCAT('(Copy) ', title) AS title, webpage_url, location, price,org_id, curriculum 
 	                            FROM Events WHERE event_id=".$data['event_id'];
 
             $result = $mysqli->query($sql);

@@ -23,6 +23,7 @@
 	    tbody tr:nth-child(odd) { background: #eee; }
 	    tbody tr:hover { background: #ccc; }
 	    td, th { padding: 4px 2px; font-size: 12px; }
+	    tr.past { color: grey; }
 	    input[type=button] {margin: 10px 0; }
 	</style>
    <?php
@@ -70,7 +71,6 @@
     
     
 	<div id="content">
-    
     <h1>Events</h1>
 
         <input type="button" onclick="addEvent()" value="+ Add an Event"/>
@@ -90,12 +90,14 @@
 		    </thead>
 		    <tbody>
 		<?php 
-		//print_r($data);
+    		//print_r($data);
+		    $now = new DateTime("now", new DateTimeZone("America/New_York"));
 		    while($row = mysqli_fetch_assoc($events)) { 
 		       $start = date_create($row['start']);
 		       $end   = date_create($row['end']);
+		       $isPast = $now->getTimestamp() > $start->getTimestamp();
 		  ?>
-		    <tr>
+		    <tr <?php echo $isPast? 'class="past"' : ''; ?>>
 		        <td><?php echo $row['curriculum']; ?></td>
 		        <td style="text-align:center;"><?php echo $row['type']; ?></td>
 		        <td><?php echo date_format($start,"Y"); ?></td>

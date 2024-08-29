@@ -29,9 +29,7 @@ function attachValidators () {
 		var selects	= [...f.getElementsByTagName('select')];
 		selects.forEach(select => {
 			if(select.getAttribute('required') == "yes") {
-				select.onblur = function (){ 
-					validate(this, this.getAttribute('validate') || '', this.value); 
-				}
+				select.addEventListener('blur', (e) => validate(select, select.getAttribute('validator') || '', select.value)); 
 			}
 		});
 		inputs.forEach(input => {
@@ -67,11 +65,11 @@ function attachValidators () {
 				// set up autosuggest object (see autosuggest.js)
 				input.setAttribute('script', options.script);
 				var suggestObj = new AutoSuggest(input.id, options);
-				input.onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
+				input.addEventListener('blur', (e) => validate(input, input.getAttribute('validator') || '', input.value)); 
                 return;
 			} 
 			if(["text", "date"].includes(input.type)){
-				input.onblur = function () { validate(this, this.getAttribute('validator'), this.value); }
+				input.addEventListener('blur', (e) => validate(input, input.getAttribute('validator') || '', input.value)); 
 			}
 		});
 	});

@@ -43,10 +43,12 @@ function validate_zip(value) {
 }
 
 function validate_date(value) {
+    console.log('checking date');
 	value = unescape(value);
 	if(value.length==0) return [true, value];
 	if(!Date.parse(value)) return [false, "This is not a valid date"];
-	else return [true, value];
+	else console.log('valid date:', value)
+	return [true, value];
 }
 
 function validate_time(value) {
@@ -85,9 +87,11 @@ function showErr(elt, msg){
 function validate(elt, type, value){
 	value = escape(value);
 
-	// don't validate disabled fields
+	// don't validate disabled, readonly, or ignorable fields
 	if(elt.getAttribute('disabled')) return true;
 	if(elt.getAttribute('readonly')) return true;
+	if(elt.getAttribute('ignore')  ) return true;
+
 
 	// is the field required? is it blank? Required + Blank =  Missing
 	required = (elt.getAttribute('required') == "yes")? true : false;
@@ -122,7 +126,7 @@ function validate(elt, type, value){
 
 const numb	= '0123456789.';
 const date	= numb+'/.-';
-const sym   = '#\'\"\,\!\?\$/:-\(\)\[\]\|';
+const sym   = '#\'\"\,\!\?\$/:-\(\)\[\]\|\.=+-';
 const numbsym = numb+sym;
 const lwr		= 'abcdefghijklmnopqrstuvwxyz.- ';
 const upr		= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- ';
