@@ -33,29 +33,25 @@
 
 	$mysqli = openDB_Connection();
 	
-	$sql = "SELECT E2.event_id, E2.type, curriculum, location, E2.org_id, E2.name, curriculum, start, end, participants, 
-	               GROUP_CONCAT(DISTINCT CONCAT(
-                       '<a href=\"Person.php?person_id=', FacNames.person_id, '\">',
-                       FacNames.name_first,
-                   	   '</a>') ORDER BY FacNames.name_first SEPARATOR ', ') AS facilitators
-            FROM (SELECT
-    	            E.event_id, E.curriculum, E.start, E.end, E.location, E.type,
-      		        O.name, O.org_id,
-        	        COUNT(Participants.enrollment_id) AS participants
-                FROM Events AS E
-	            LEFT JOIN Organizations AS O
-                ON O.org_id = E.org_id
-                LEFT JOIN Enrollments AS Participants
-                ON Participants.event_id = E.event_id
-                AND (Participants.type = 'Participant' OR Participants.type = 'Make-up')
-                GROUP BY E.event_id) AS E2
-        LEFT JOIN Enrollments AS Facilitators
-        ON Facilitators.event_id = E2.event_id
-        AND Facilitators.type = 'Facilitator'
-        LEFT JOIN People AS FacNames
-        ON FacNames.person_id = Facilitators.person_id
-		GROUP BY Facilitators.event_id
-		ORDER BY start DESC";
+	$sql = "
+SELECT 
+	E2.event_id, E2.type, curriculum, location, E2.org_id, E2.name, curriculum, start, end, participants, marked_present, 
+    ((DATEDIFF(end, start)+1) * participants) AS max_present,
+	GROUP_CONCAT(DISTINCT CONCAT('<a href=\"Person.php?person_id=', FacNames.person_id, '\">', FacNames.name_first, '</a>') ORDER BY FacNames.name_first SEPARATOR ', ') AS facilitators
+FROM     	
+	(SELECT E.event_id, E.curriculum, E.start, E.end, E.location, E.type, O.name, O.org_id, COUNT(Participants.enrollment_id) AS participants
+     FROM Events AS E
+	 LEFT JOIN Organizations AS O ON O.org_id = E.org_id
+     LEFT JOIN Enrollments AS Participants ON Participants.event_id = E.event_id
+     AND (Participants.type = 'Participant' OR Participants.type = 'Make-up')
+     GROUP BY E.event_id) AS E2
+LEFT JOIN Enrollments AS Facilitators ON Facilitators.event_id = E2.event_id AND Facilitators.type = 'Facilitator'
+LEFT JOIN People AS FacNames ON FacNames.person_id = Facilitators.person_id
+LEFT JOIN (SELECT event_id, IF(JSON_EXTRACT(attendance,'$.total'), SUM(JSON_EXTRACT(attendance,'$.total')), JSON_LENGTH(JSON_ARRAYAGG(attendance))) AS marked_present  FROM Enrollments 
+	 	   WHERE type = 'Participant' AND attendance IS NOT NULL AND attendance != '{\"days_attended\": \"[]\"}' GROUP BY event_id) AS attendance
+ON attendance.event_id = Facilitators.event_id
+GROUP BY Facilitators.event_id
+ORDER BY start DESC";
             
 	  $events = $mysqli->query($sql);
 	  $mysqli->close();
@@ -86,6 +82,7 @@
 		        <th style="text-align: center;">When</th>
 		        <th>Facilitators</th>
 		        <th>Participants</th>
+		        <th>Attendance</th>
 		    </tr>
 		    </thead>
 		    <tbody>
@@ -118,6 +115,7 @@
 		            <?php echo date_format($start,"M jS"); if($row['start'] !== $row['end']) { echo " - ".date_format($end,"M jS"); } ?></td>
 		        <td><?php echo $row['facilitators']; ?></td>
 		        <td style="text-align: center;"><?php echo $row['participants']; ?></td>
+		        <td style="text-align: center;"><?php if($isPast) { echo round(($row['marked_present'] * 100) / $row['max_present'])."%"; } else { echo "N/A"; } ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>
