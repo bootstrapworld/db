@@ -431,7 +431,7 @@ if($data) {
 		                echo "<th>Attendance</th>";
 		            } else {
 		                foreach ($dates as $key => $date) {
-                            echo "<th>".date_format(date_create($date),"M j")."</th>";
+                            echo '<th style="text-align: center;">'.date_format(date_create($date),"M j").'</th>';
                         }
 		            }
 		        ?>
@@ -462,7 +462,7 @@ if($data) {
 		        <td><?php echo $row['role'] ?></td>
 		        <td><?php echo $row['grades_taught'] ?></td>
 		        <td><?php echo $row['primary_subject'] ?></td>
-		        <td><?php echo $row['notes']; ?></td>
+		        <td style="white-space: break-spaces;"><?php echo $row['notes']; ?></td>
 		        <?php 
 		            if($oldFormat) {
 		                echo "<td>".$row["days_attended"]." out of ".$data["total_days"]." days</td>";

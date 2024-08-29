@@ -47,7 +47,7 @@ FROM
      GROUP BY E.event_id) AS E2
 LEFT JOIN Enrollments AS Facilitators ON Facilitators.event_id = E2.event_id AND Facilitators.type = 'Facilitator'
 LEFT JOIN People AS FacNames ON FacNames.person_id = Facilitators.person_id
-LEFT JOIN (SELECT event_id, IF(JSON_EXTRACT(attendance,'$.total'), SUM(JSON_EXTRACT(attendance,'$.total')), JSON_LENGTH(JSON_ARRAYAGG(attendance))) AS marked_present  FROM Enrollments 
+LEFT JOIN (SELECT event_id, IF(JSON_EXTRACT(attendance,'$.total'), SUM(JSON_EXTRACT(attendance,'$.total')), SUM(JSON_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(attendance,'$.days_attended'))))) AS marked_present  FROM Enrollments 
 	 	   WHERE type = 'Participant' AND attendance IS NOT NULL AND attendance != '{\"days_attended\": \"[]\"}' GROUP BY event_id) AS attendance
 ON attendance.event_id = Facilitators.event_id
 GROUP BY Facilitators.event_id
@@ -77,7 +77,7 @@ ORDER BY start DESC";
 		    <tr>
 		        <th>Year</th>
 		        <th style="text-align: center;">Type</th>
-		        <th style="text-align: center;">Title</th>
+		        <th>Title</th>
 		        <th style="display:none;">Partner Org</th>
 		        <th style="text-align: center;">When</th>
 		        <th>Facilitators</th>
@@ -100,7 +100,7 @@ ORDER BY start DESC";
 		    <tr <?php echo $isPast? 'class="past"' : ''; ?>>
 		        <td><?php echo date_format($start,"Y"); ?></td>
 		        <td style="text-align: center;"><?php echo $row['type']; ?></td>
-		        <td style="text-align:center;">
+		        <td>
 		            <a href="Event.php?event_id=<?php echo $row['event_id']; ?>">
 		            <?php 
 		                echo $row['curriculum']; 
@@ -113,7 +113,7 @@ ORDER BY start DESC";
 		        <td style="text-align: center;">
 		            <span style="width:0; overflow:hidden; display:inline-block; margin:0;"><?php echo $start->getTimestamp(); ?></span>
 		            <?php echo date_format($start,"M jS"); if($row['start'] !== $row['end']) { echo " - ".date_format($end,"M jS"); } ?></td>
-		        <td><?php echo $row['facilitators']; ?></td>
+		        <td style="text-align: center;"><?php echo $row['facilitators']; ?></td>
 		        <td style="text-align: center;"><?php echo $row['participants']; ?></td>
 		        <td style="text-align: center;"><?php if($isPast) { echo round(($row['marked_present'] * 100) / $row['max_present'])."%"; } else { echo "N/A"; } ?></td>
 		    </tr>
