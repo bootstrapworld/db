@@ -15,7 +15,6 @@
 	    tbody tr:nth-child(odd) { background: #eee; }
 	    tbody tr:hover { background: #ccc; }
 	    td, th { padding: 4px 2px; font-size: 11px; }
-	    input[type=button] {margin: 10px 0; }
 	</style>
 	<?php
 
@@ -107,9 +106,11 @@
 			<form id="new_organization" novalidate action="../actions/OrganizationActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
 			<span class="buttons">
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
-    			<input type="submit" title="Save" value="💾" id="new_organizationSubmit">
 	    		<?php if(isset($data)) { ?>
 		    		<input type="button" title="Delete" value="🗑️️" onclick="deleteOrgRq()">
+		    	<?php } ?>
+    			<input type="submit" title="Save" value="💾" id="new_organizationSubmit">
+	    		<?php if(isset($data)) { ?>
 	    		    <input type="button" title="Cancel" value="↩️" onclick="window.location.reload()">
 			    <?php } ?>
 			</span>

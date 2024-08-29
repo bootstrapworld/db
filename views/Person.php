@@ -109,9 +109,11 @@
 			<form id="new_person" novalidate action="../actions/PersonActions.php"  class="<?php echo empty($data)? "unlocked" : "locked"; ?>" >
 			<span class="buttons">
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
-    			<input type="submit" title="Save" value="💾" id="new_personSubmit">
 	    		<?php if(isset($data)) { ?>
 		    		<input type="button" title="Delete" value="🗑️️" onclick="deletePersonRq()">
+			    <?php } ?>
+    			<input type="submit" title="Save" value="💾" id="new_personSubmit">
+	    		<?php if(isset($data)) { ?>
 	    		    <input type="button" title="Cancel" value="↩️" onclick="window.location.reload()">
 			    <?php } ?>
 			</span>

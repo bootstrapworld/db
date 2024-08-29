@@ -44,7 +44,6 @@
 			}
 		}
 		function deleteEventRp( rsp ){
-			alert("Deleted ID#: " + rsp );
 			const urlValue = baseURL + `/views/Events.php`;
 			window.location = urlValue;
 		}
@@ -170,10 +169,12 @@
 			
 			<span class="buttons">
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
+    			<?php if(isset($data)) { ?>
+    			    <input type="button" title="Delete" value="🗑️️" onclick="deleteEventRq()">
+	    		    <button title="Duplicate" onclick="duplicateEventRq()" ><img src="../images/copyIcon-black.png" style="width: 16px; height: 16px;"></button>
+    			 <?php } ?>
     			<input type="submit" title="Save" value="💾">
 	    		<?php if(isset($data)) { ?>
-	    		    <button title="Duplicate" onclick="duplicateEventRq()" ><img src="../images/copyIcon-black.png" style="width: 16px; height: 16px;"></button>
-		    		<input type="button" title="Delete" value="🗑️️" onclick="deleteEventRq()">
 	    		    <input type="button" title="Cancel" value="↩️" onclick="window.location.reload()">
 			    <?php } ?>
 			</span>
