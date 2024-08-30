@@ -51,14 +51,12 @@
 		
 		<!--- local code --->
 		function markDirty() {
-		    console.log('attendance checkbox changed! _DBglobal_isDirty is "true";');
 		    document.getElementById('update_attendance').style.boxShadow = "red 5px 5px 20px";
 		    window._DBglobal_isDirty = true;    
 		}
 		window._DBglobal_isDirty = false;
 		
 		function duplicateEventRq(e) {
-		    console.log(e);
 		    const id = document.getElementById('event_id').value;
 			if(confirm("Are you sure you want to duplicate Event ID# " + id + ", and all the associated enrollments?")){
 				var request = new XMLHttpRequest();
@@ -495,11 +493,9 @@ if($data) {
         });
 
 	    function updateAttendance(submitEvent) {
-	        console.log('setting _DBglobal_isDirty to false;');
 	        window._DBglobal_isDirty = false;
 	        document.getElementById('update_attendance').style.boxShadow = "";
 	        submitEvent.preventDefault();
-	        console.log('updating attendance!', submitEvent);
 	        let attendanceData = {};
 	        const formData = new FormData(submitEvent.target);
 	        

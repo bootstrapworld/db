@@ -57,7 +57,7 @@
 				O.org_id AS employer_id,
 				IF(LENGTH(O.name) > 0, CONCAT(' at ', O.name), '') AS employer_name,
                 E.event_id,
-                IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop,
+                IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum, ' (',E.start,')')) AS recent_workshop,
                 R.type AS recent_workshop_role,
                 C.type AS comm_type,
                 C.date AS recent_contact, 
@@ -70,6 +70,7 @@
             ON R.person_id = P.person_id
             LEFT JOIN Events AS E 
             ON E.event_id = R.event_id
+            AND E.type = 'Training'
             LEFT JOIN Communications AS C
             ON C.person_id = P.person_id
             LEFT JOIN (SELECT person_id, COALESCE(CONCAT(name_first, ' ', name_last,' '),'') AS bootstrap_name FROM People) AS BP
@@ -118,9 +119,14 @@
 		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?></a>
 		        </td>
 		        <td><?php echo $row['location']; ?></td>
-		        <td style="text-align:center" title="(<?php echo $row['bootstrap_name']; ?>via <?php echo $row['comm_type']; ?>)
-		        
-<?php echo $row['comm_notes']; ?>" ><?php echo $row['recent_contact']; ?></td>
+		        <td style="text-align:center" data-data="<?php echo $row['recent_contact']; ?>"
+title="(<?php echo $row['bootstrap_name']; ?>via <?php echo $row['comm_type']; ?>)
+
+<?php echo $row['comm_notes']; ?>" 
+                    
+		        >
+                    <?php if($row['recent_contact']) echo date_format(date_create($row['recent_contact']), "M jS, Y");?>
+                </td>
 		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop_role']; ?> - <?php echo $row['recent_workshop']; ?></a></td>
 		    </tr>
 		<?php } ?>

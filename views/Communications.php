@@ -53,7 +53,8 @@
             AND E.type = 'Training'
             WHERE 
 	            C.person_id = P.person_id
-                ORDER BY C.date DESC";
+            GROUP BY C.person_id
+            ORDER BY C.date DESC";
             
 	  $comms = $mysqli->query($sql);
 	  $mysqli->close();

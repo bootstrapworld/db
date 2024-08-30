@@ -50,7 +50,7 @@ LEFT JOIN People AS FacNames ON FacNames.person_id = Facilitators.person_id
 LEFT JOIN (SELECT event_id, IF(JSON_EXTRACT(attendance,'$.total'), SUM(JSON_EXTRACT(attendance,'$.total')), SUM(JSON_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(attendance,'$.days_attended'))))) AS marked_present  FROM Enrollments 
 	 	   WHERE type = 'Participant' AND attendance IS NOT NULL AND attendance != '{\"days_attended\": \"[]\"}' GROUP BY event_id) AS attendance
     ON attendance.event_id = Facilitators.event_id
-GROUP BY Facilitators.event_id
+GROUP BY E2.event_id
 ORDER BY start DESC";
             
 	  $events = $mysqli->query($sql);
@@ -110,8 +110,7 @@ ORDER BY start DESC";
 		            </a>
 		        </td>
 		        <td style="display:none;"><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
-		        <td style="text-align: center;">
-		            <span style="width:0; overflow:hidden; display:inline-block; margin:0;"><?php echo $start->getTimestamp(); ?></span>
+		        <td style="text-align: center;" data-data="<?php echo date_format($start,"m/j/Y") ?>">
 		            <?php echo date_format($start,"M jS"); if($row['start'] !== $row['end']) { echo " - ".date_format($end,"M jS"); } ?></td>
 		        <td style="text-align: center;"><?php echo $row['facilitators']; ?></td>
 		        <td style="text-align: center;"><?php echo $row['participants']; ?></td>
