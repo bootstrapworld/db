@@ -37,12 +37,20 @@
 	            C.communication_id, C.person_id, C.type, C.notes, C.date, C.bootstrap_id,
 	            CONCAT(P.name_first, ' ', P.name_last) AS name,
 				COALESCE(NULLIF(P.email_preferred,''), NULLIF(P.email_professional,''), P.email_google) AS email,
-				CONCAT(BP.name_first, ' ', BP.name_last) AS bootstrap_name
+				CONCAT(BP.name_first, ' ', BP.name_last) AS bootstrap_name,
+                E.event_id, E.org_id AS partner_id, CONCAT('(', E.name,')') AS partner_name,
+                IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop
 	        FROM 
                 People AS P,
 	            Communications AS C
             LEFT JOIN People AS BP
             ON C.bootstrap_id = BP.person_id
+            LEFT JOIN Enrollments AS R
+            ON R.person_id = C.person_id
+            AND R.type = 'Participant'
+            LEFT JOIN (SELECT E.event_id, E.curriculum, E.start, E.org_id, E.type, O.name FROM Events AS E LEFT JOIN Organizations AS O ON E.org_id=O.org_id) AS E
+            ON E.event_id = R.event_id
+            AND E.type = 'Training'
             WHERE 
 	            C.person_id = P.person_id
                 ORDER BY C.date DESC";
@@ -70,6 +78,7 @@
 		        <th></th>
 		        <th>Name</th>
 		        <th>Last Name</th>
+		        <th style="text-align:center;">Recent Workshop</th>
 		        <th>Contacted By</th>
 		        <th>Date</th>
 		        <th>Logged Communication</th>
@@ -96,6 +105,10 @@
 		            <a class="deleteButton" href="#" onmouseup="deleteCommRq(<?php echo $row['communication_id']; ?>)"></a>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_last']; ?></a></td>
+		        <td style="text-align:center;">
+		            <a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop']; ?></a><br/>
+		            <a href="Organization.php?org_id=<?php echo $row['partner_id']; ?>"><?php echo $row['partner_name']; ?></a>
+		        </td>
 		        <td><a href="Person.php?person_id=<?php echo $row['bootstrap_id']; ?>"><?php echo $row['bootstrap_name']; ?></a></td>
 		        <td><?php echo $row['date']; ?></td>
 		        <td style="max-width: 5in; white-space: normal;"><?php echo $row['notes']; ?></td>
