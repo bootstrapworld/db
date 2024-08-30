@@ -24,7 +24,6 @@ SmartTable = function(table){
 
 	// build column headers menu
 	const colMenu = document.createElement('select');
-	colMenu.options[0] = new Option('Select a column:', '-1' , false, false);
 	this.sortCol = '-1';
 	this.headers.forEach( (header, i) => {
 		var datatype = getDatatype(rows, i);
@@ -36,7 +35,7 @@ SmartTable = function(table){
 		sortLink.classList.add('nosort');
 		header.innerHTML = '';
 		header.appendChild(sortLink);
-		colMenu.options[i+1] = new Option(colName, i, false, false);
+		colMenu.options[i] = new Option(colName, i, false, false);
 		if(datatype == "email") { 
 		    var emailButton = document.createElement('a');
 		    header.appendChild(emailButton);
@@ -69,6 +68,10 @@ SmartTable = function(table){
 	
 	// if there's more than one row, show the filtering controls
 	if(rows.length > 1) { table.parentNode.insertBefore(controls, table); }
+	
+	// preselect the first two columns
+	this.controls.querySelector('.filter1Col').value = "0";
+	this.controls.querySelector('.filter2Col').value = "1";
 
 	// Rebuild the table if any of the selects are changed, or inputs recieve a keyup
 	// Ignore these elements when validating forms
@@ -79,6 +82,7 @@ SmartTable = function(table){
     });
 
 	this.hiddenRows = {};
+	this.rebuildTable();
 };
 
 SmartTable.prototype.copyEmails = function(idx) {
@@ -99,7 +103,6 @@ function matches(needle, haystack) {
 }
 
 SmartTable.prototype.rebuildTable = function (e) {
-    const trigger = e.srcElement;
     const filter1Col  = this.controls.querySelector('.filter1Col');
     const filter2Col  = this.controls.querySelector('.filter2Col');
     const filter1Type = this.controls.querySelector('.filter1Col+.filterOpts select');
@@ -108,33 +111,29 @@ SmartTable.prototype.rebuildTable = function (e) {
     const filter2Inpt = this.controls.querySelector('.filter2Col+.filterOpts input')
 
     // if it was a changed filterType, set the class name, then reset the filter inputs and return
-    if(trigger.nodeName == 'SELECT') {
-        let isDate;
-        [...trigger.nextElementSibling.querySelectorAll('input')].forEach(inpt => inpt.value = null);
-        if(filter1Col.value !== "-1") {
-            const datatype1 = this.headers[filter1Col.value].getAttribute('datatype');
-            filter1Inpt.setAttribute('type', datatype1);
-            filter1Type.setAttribute('datatype', datatype1);
-        }
-        if(filter2Col.value !== "-1") {
-            const datatype2 = this.headers[filter2Col.value].getAttribute('datatype');
-            filter2Inpt.setAttribute('type', datatype2);
-            filter2Type.setAttribute('datatype', datatype2);
-        }
-        return;
-    }
-
+    //[...trigger.nextElementSibling.querySelectorAll('input')].forEach(inpt => inpt.value = null);
+    //if(filter1Col.value !== "-1") {
+        const datatype1 = this.headers[filter1Col.value].getAttribute('datatype');
+        filter1Inpt.setAttribute('type', datatype1);
+        filter1Type.setAttribute('datatype', datatype1);
+    //}
+    //if(filter2Col.value !== "-1") {
+        const datatype2 = this.headers[filter2Col.value].getAttribute('datatype');
+        filter2Inpt.setAttribute('type', datatype2);
+        filter2Type.setAttribute('datatype', datatype2);
+    //}
+    
     //  build filters
 	let filters = [];
-    if(filter1Col.value !== "-1") {
-        const filter1 = filter1Inpt.value.toLowerCase();
+    const filter1 = filter1Inpt.value.toLowerCase();
+    const filter2 = filter2Inpt.value.toLowerCase();
+    if(filter1) {
         if(     filter1Type.value == 'contains'   ) { filters.push({idx: filter1Col.value, fn: v => matches(filter1, v)   }) }
         else if(filter1Type.value == 'lessThan'   ) { filters.push({idx: filter1Col.value, fn: v => v < filter1           }) }
         else if(filter1Type.value == 'greaterThan') { filters.push({idx: filter1Col.value, fn: v => v > filter1           }) }
     }
     
-    if(filter2Col.value !== "-1") {
-        const filter2 = filter2Inpt.value.toLowerCase();
+    if(filter2) {
         if(     filter1Type.value == 'contains'   ) { filters.push({idx: filter2Col.value, fn: v => matches(filter2, v)   }) }
         else if(filter2Type.value == 'lessThan'   ) { filters.push({idx: filter2Col.value, fn: v => v < filter2           }) }
         else if(filter2Type.value == 'greaterThan') { filters.push({idx: filter2Col.value, fn: v => v > filter2           }) }
@@ -226,18 +225,20 @@ SmartTable.prototype.filterBy = function(filters) {
 
 /* Use RegExps to guess datatypes */
 function getDatatype(rows, idx){
+    
     if(rows.length == 0) return "text";
     // USE A FOR LOOP SO WE CAN BREAK EARLY!
 	for(i=0; i < rows.length; i++){							// loop through the column
 		var td = rows[i].cells[idx];						// get the text data out of each cell
 		if(td == undefined) continue;						// if the cell doesn't exist (colspan > 1), keep looking
-		var data = td.innerText || td.textContent || '';
+		// check the private 'data' field first, then search raw HTML
+		var data = (td.dataset && td.dataset['data']) || td.innerText || td.textContent || '';
 		if(data !== '') break;								// once you get data, stop looking
 	}
 	var regExp_Currency	=/^[�$���]/;
 	var regExp_Number	=/^(\-)?[0-9]+(\.[0-9]*)?$/;
 	var regExp_Email = /^\S+@\S+\.\S+$/;
-	if(!isNaN(Date.parse(data)))				return "date";
+	if((data.length > 4) && !isNaN(Date.parse(data)))	return "date";
 	if(data.search(regExp_Email)    != -1)      return "email";
 	if(data.search(regExp_Number)   != -1)		return "numeric"
 	if(data.search(regExp_Currency) != -1)		return "currency";
