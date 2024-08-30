@@ -127,14 +127,14 @@ SmartTable.prototype.rebuildTable = function (e) {
     //  build filters
 	let filters = [];
     if(filter1Col.value !== "-1") {
-        const filter1 = filter1Inpt.value;
+        const filter1 = filter1Inpt.value.toLowerCase();
         if(     filter1Type.value == 'contains'   ) { filters.push({idx: filter1Col.value, fn: v => matches(filter1, v)   }) }
         else if(filter1Type.value == 'lessThan'   ) { filters.push({idx: filter1Col.value, fn: v => v < filter1           }) }
         else if(filter1Type.value == 'greaterThan') { filters.push({idx: filter1Col.value, fn: v => v > filter1           }) }
     }
     
     if(filter2Col.value !== "-1") {
-        const filter2 = filter2Inpt.value;
+        const filter2 = filter2Inpt.value.toLowerCase();
         if(     filter1Type.value == 'contains'   ) { filters.push({idx: filter2Col.value, fn: v => matches(filter2, v)   }) }
         else if(filter2Type.value == 'lessThan'   ) { filters.push({idx: filter2Col.value, fn: v => v < filter2           }) }
         else if(filter2Type.value == 'greaterThan') { filters.push({idx: filter2Col.value, fn: v => v > filter2           }) }
@@ -169,7 +169,7 @@ SmartTable.prototype.sortBy = function(sortCol){
 			var compare = function (a,b) { return (parseFloat(a+0) > parseFloat(b+0))? 1 : -1;}
 			break;
 	 	default: // default to text comparison 
-			var compare = function (a,b) { return (a.toLowerCase() > b.toLowerCase())? 1 : -1;}
+			var compare = function (a,b) { console.log(a,b); return (a.toLowerCase() > b.toLowerCase())? 1 : -1;}
 	} 
 	
 	// build an associative array of rapidly sortable keys (look inside non-text nodes)
@@ -210,7 +210,6 @@ SmartTable.prototype.filterBy = function(filters) {
 	tbody.style.display='none';		        // hide the body so our magic can happen without repainting
 
     filters.forEach( ({idx, fn}) => {
-        const datatype = this.headers[idx].getAttribute('datatype');
         rows.forEach((r, i) => {
             if(this.hiddenRows[i]) { return; } // skip hidden rows
             const cell = rows[i].cells[idx];
