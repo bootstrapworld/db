@@ -166,10 +166,10 @@ SmartTable.prototype.sortBy = function(sortCol){
 			var compare = function (a,b) {	return (parseFloat(a.substring(1, a.length)) > parseFloat(b.substring(1, b.length)))? 1 : -1;}
 			break;
 		case "numeric": 
-			var compare = function (a,b) { return (parseFloat(a+0) > parseFloat(b+0))? 1 : -1;}
+			var compare = function (a,b) { return (parseFloat(a+0) >= parseFloat(b+0))? 1 : -1;}
 			break;
 	 	default: // default to text comparison 
-			var compare = function (a,b) { return (a.toLowerCase() > b.toLowerCase())? 1 : -1;}
+			var compare = function (a,b) { return (a.toLowerCase() >= b.toLowerCase())? 1 : -1;}
 	} 
 	
 	// build an associative array of rapidly sortable keys (look inside non-text nodes)
