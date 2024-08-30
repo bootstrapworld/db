@@ -49,7 +49,7 @@ LEFT JOIN Enrollments AS Facilitators ON Facilitators.event_id = E2.event_id AND
 LEFT JOIN People AS FacNames ON FacNames.person_id = Facilitators.person_id
 LEFT JOIN (SELECT event_id, IF(JSON_EXTRACT(attendance,'$.total'), SUM(JSON_EXTRACT(attendance,'$.total')), SUM(JSON_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(attendance,'$.days_attended'))))) AS marked_present  FROM Enrollments 
 	 	   WHERE type = 'Participant' AND attendance IS NOT NULL AND attendance != '{\"days_attended\": \"[]\"}' GROUP BY event_id) AS attendance
-ON attendance.event_id = Facilitators.event_id
+    ON attendance.event_id = Facilitators.event_id
 GROUP BY Facilitators.event_id
 ORDER BY start DESC";
             
@@ -115,7 +115,7 @@ ORDER BY start DESC";
 		            <?php echo date_format($start,"M jS"); if($row['start'] !== $row['end']) { echo " - ".date_format($end,"M jS"); } ?></td>
 		        <td style="text-align: center;"><?php echo $row['facilitators']; ?></td>
 		        <td style="text-align: center;"><?php echo $row['participants']; ?></td>
-		        <td style="text-align: center;"><?php if($isPast) { echo round(($row['marked_present'] * 100) / $row['max_present'])."%"; } else { echo "N/A"; } ?></td>
+		        <td style="text-align: center;"><?php if($isPast && !is_null($row['marked_present'])) { echo round(($row['marked_present'] * 100) / $row['max_present'])."%"; } else { echo "N/A"; } ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>

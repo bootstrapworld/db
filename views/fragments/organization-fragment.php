@@ -9,7 +9,7 @@
 	<span class="formInput">
 		<input  id="name" name="name"
 			placeholder="Edmund W. Flynn Elementary School" 
-			validator="dropdown" datatype="organization" target="org_id"
+			validator="alphanum" datatype="organization" target="org_id"
 			value="<?php echo $data["name"] ?>" 
 			type="text" size="50" maxlength="70" required="yes"/>
 		<label for="name">Name</label>
@@ -99,7 +99,7 @@ function deleteOrgRq(){
 		// if the request is successful, execute the callback
 		request.onreadystatechange = function() {
 			if (request.readyState == 4 && request.status == 200) {
-				deleteRp(request.responseText);
+				deleteOrgRp(request.responseText);
 			}
 		}; 
 		const data = JSON.stringify({org_id:id});

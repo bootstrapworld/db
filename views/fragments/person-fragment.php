@@ -17,7 +17,7 @@
 	<span class="formInput">
 		<input  id="name_last" name="name_last"  
 			placeholder="Last Name" 
-			validator="dropdown" datatype="person" target = "person_id"
+			validator="alpha" datatype="person" target = "person_id"
 			value="<?php echo $data["name_last"] ?>" 
 			type="text" size="40" maxlength="40" required="yes"/>
 		<label for="name_last">Last Name</label>
