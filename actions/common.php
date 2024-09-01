@@ -40,6 +40,7 @@ $data = json_decode($_REQUEST["data"], true);
 if($method == "update") { update($data); }
 if($method == "delete") { delete($data); }
 if($method == "searchForNames") { searchForNames($data); }
+if($method == "findPossibleDuplicates") { findPossibleDuplicates($_REQUEST["name"]); }
 	
 function quoteOrNull($value) {
 	if (trim($value) === '') return 'NULL';
