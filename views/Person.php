@@ -70,7 +70,7 @@
                 ON O.org_id = E.org_id
                 WHERE R.event_id = E.event_id
                 AND R.person_id =".$_REQUEST["person_id"]."
-                ORDER BY start ASC";
+                ORDER BY start DESC";
 	  $events = $mysqli->query($sql);
 
 	  $sql =   "SELECT C.communication_id, C.person_id, C.type, C.notes, C.date, BP.bootstrap_name
