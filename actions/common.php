@@ -36,11 +36,12 @@ $registrationFields = array(
 
 $method = $_REQUEST["method"];
 $data = json_decode($_REQUEST["data"], true);
+if($method == "update")             { update($data); }
+if($method == "delete")             { delete($data); }
+if($method == "searchForNames")     { searchForNames($data); }
+if($method == "mergeContacts")      { mergeContacts(json_decode($_REQUEST["ids"]), $_REQUEST["dest"]); }
+if($method == "findPossibleDuplicates") { findPossibleDuplicates($_REQUEST["name_first"], $_REQUEST["name_last"]); }
 
-if($method == "update") { update($data); }
-if($method == "delete") { delete($data); }
-if($method == "searchForNames") { searchForNames($data); }
-if($method == "findPossibleDuplicates") { findPossibleDuplicates($_REQUEST["name"]); }
 	
 function quoteOrNull($value) {
 	if (trim($value) === '') return 'NULL';

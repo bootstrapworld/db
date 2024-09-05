@@ -1,7 +1,7 @@
 if (typeof(Modal) == "undefined") Modal = {}
 
 /* Initialize a Modal Object 
-Modal contain:
+Modals contain:
 - a "show button" which opens the modal
 - the id of the DOM element that it contains
 	-> this DOM element *must* have a button called id+"Submit"
@@ -15,7 +15,7 @@ Modal = function(showButton, id, callback){
 	this.id				= id;
 	this.callback		= callback;
 	this.contents		= document.getElementById(id);
-	showButton.onclick = function (){ pointer.showModal(); return false;}	
+	if(showButton) showButton.onclick = function (){ pointer.showModal(); return false;}	
 }
 
 // ensure that all DOM elements are in place
@@ -67,7 +67,8 @@ Modal.prototype.showModal = function(){
 	// set callback functions for "cancel" and "submit" buttons
 	var cancel = document.getElementById(this.id + "Cancel");
 	var submit = document.getElementById(this.id + "Submit");
-	cancel.onclick = () => pointer.hideModal();
+	console.log(this.id + "Submit", submit)
+	cancel.onclick = () => { pointer.hideModal(); return false; }
 	const oldOnSubmit = this.contents.onsubmit;
 	this.contents.onsubmit = (e) => {
 		result = oldOnSubmit(e).then(id => {
