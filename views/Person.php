@@ -549,6 +549,10 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
             <script>
             
             function waitForDuplicateModal(possibleDuplicates) {
+                const currentID = document.getElementById('person_id').value;
+                console.log(currentID, possibleDuplicates)
+                possibleDuplicates = possibleDuplicates.filter(pd => Number(pd.id) != currentID); // make sure the possibility duplicates do not include the currentID
+                
             	const tbody = document.getElementById('duplicatePeople');
             	tbody.innerHTML = null; // reset the table body before showing
                 possibleDuplicates.forEach( ({id, fullname, email, location, role}) => { 
