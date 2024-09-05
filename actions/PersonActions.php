@@ -51,6 +51,7 @@
     
     function mergeContacts($ids, $dest){
         $mysqli = openDB_Connection();
+        $ids = array_diff($ids, [$dest]); // remove the destination id from the other ids
 		try {
 		    $mysqli->begin_transaction();
 		    
@@ -58,7 +59,7 @@
 		    $sql  =  "UPDATE People AS merged
 INNER JOIN
 (SELECT 
-    	person_id, 
+    	1 AS dummy_grouping,
     	MIN(created) AS created, 
     	COALESCE(MAX(name_first), FIRST_VALUE(name_first) OVER (ORDER BY person_id DESC)) AS name_first, 
     	COALESCE(MAX(name_last), FIRST_VALUE(name_last) OVER (ORDER BY person_id DESC)) AS name_last, 
@@ -85,32 +86,32 @@ INNER JOIN
 	    GROUP_CONCAT(other_credentials) AS other_credentials, 
 	    BIT_OR(do_not_contact) AS do_not_contact 
     FROM People 
-	WHERE person_id IN (".implode(', ', array_values($ids)).") 
-    GROUP BY People.person_id) AS combined
+	WHERE person_id IN (".implode(', ', array_values($ids)).", ".$dest.") 
+    GROUP BY dummy_grouping) AS combined
 SET 
-	merged.created 			= combined.created, 
-	merged.name_first 		= combined.name_first, 
-	merged.name_last 		= combined.name_last, 
-	merged.name_preferred 	= combined.name_preferred, 
-	merged.prounouns 		= combined.prounouns, 
-	merged.email_preferred 	= combined.email_preferred, 
+	merged.created = combined.created, 
+	merged.name_first = combined.name_first, 
+	merged.name_last = combined.name_last, 
+	merged.name_preferred = combined.name_preferred, 
+	merged.prounouns = combined.prounouns, 
+	merged.email_preferred = combined.email_preferred, 
 	merged.email_professional = combined.email_professional, 
-	merged.email_google 	= combined.email_google, 
-	merged.role 			= combined.role, 
-	merged.employer_id 		= combined.employer_id, 
-	merged.home_phone 		= combined.home_phone, 
-	merged.cell_phone 		= combined.cell_phone, 
-	merged.home_address 	= combined.home_address, 
-	merged.home_address2	= combined.home_address2, 
-	merged.city 			= combined.city, 
-	merged.state 			= combined.state, 
-	merged.zip 				= combined.zip, 
-	merged.grades_taught	= combined.grades_taught, 
-	merged.primary_subject 	= combined.primary_subject, 
-	merged.race 			= combined.race, 
-	merged.do_not_contact 	= combined.do_not_contact,
-	merged.reason 			= combined.reason
+	merged.email_google = combined.email_google, 
+	merged.role = combined.role, 
+	merged.employer_id = combined.employer_id, 
+	merged.home_phone = combined.home_phone, 
+	merged.cell_phone = combined.cell_phone, 
+	merged.home_address = combined.home_address, 
+	merged.home_address2 = combined.home_address2, 
+	merged.city = combined.city, 
+	merged.state = combined.state, 
+	merged.zip = combined.zip, 
+	merged.grades_taught = combined.grades_taught, 
+	merged.primary_subject = combined.primary_subject, 
+	merged.race = combined.race, 
 	merged.prior_years_coding = combined.prior_years_coding, 
+	merged.do_not_contact = combined.do_not_contact,
+	merged.reason = combined.reason
 WHERE merged.person_id=".$dest;
 
             $mergePeople = $mysqli->query($sql);
