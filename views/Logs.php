@@ -48,6 +48,7 @@
 	?>
 </head>
 <body>
+	<?php echo $header_nav?>
 	<div id="content">
 		<h1>Add a Log</h1>
 			<!-- Log form -->

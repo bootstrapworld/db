@@ -13,6 +13,14 @@ function openDB_Connection() {
 		return $mysqli;
 }
 
+$header_nav = '<nav id="header">
+        <a href="People.php">People</a>
+        <a href="Organizations.php">Organizations</a>
+        <a href="Events.php">Events</a>
+        <a href="Communications.php">Communications</a>
+        <a href="Instruments.php">Instruments</a>
+    </nav>';
+
 // Taken from https://idealdeisurvey.stanford.edu/frequently-asked-questions/survey-definitions
 $raceOpts = ["American Indian or Alaska Native", 
 						"Asian or Asian American",
@@ -23,6 +31,8 @@ $raceOpts = ["American Indian or Alaska Native",
 						"White or European",
 						"More than one race",
 						"Prefer not to say"];
+
+$instrumentTypeOpts = ['Teacher Pre-test','Teacher Post-test','Student Pre-test','Student Post-test'];
 
 $gradeOpts = ["Pre-K",
 						"Elementary",

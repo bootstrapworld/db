@@ -90,12 +90,7 @@
 	<title><?php echo $title ?></title>
 </head>
 <body>
-    <nav id="header">
-        <a href="People.php">People</a>
-        <a href="Organizations.php">Organizations</a>
-        <a href="Events.php">Events</a>
-        <a href="Communications.php">Communications</a>
-    </nav>
+	<?php echo $header_nav?>
     
 	<div id="content">
 		<h1><?php echo $title; ?></h1>
@@ -524,7 +519,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
                     This person may already be in the database! You can: <p/>
                     <ul>
                         <li><b>Cancel</b> to go back to editing this contact</li>
-                        <li><b>Add as New</b> if you are sure this a new person</li>
+                        <li><b>Proceed</b> if you are sure this NOT a duplicate</li>
                         <li><b>Merge with Selected Contacts</b> to combine this information with potential matches into a new contact, and delete the others.</li>
                     </ul>  
                 </i>	
@@ -542,7 +537,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
         	    </table>
             </fieldset>
             <input type="button" id="resolveDuplicatesCancel"    value="↩️ Cancel "class="modalCancel">
-            <input type="button" id="resolveDuplicatesAddAnyway" value="💾 Add as New Contact" >
+            <input type="button" id="resolveDuplicatesAddAnyway" value="💾 Proceed" >
             <input type="button" id="resolveDuplicatesMerge"     value="🔆 Merge with Selected Contacts">
             </form>
             </div>
