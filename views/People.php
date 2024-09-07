@@ -118,9 +118,7 @@ title="(<?php echo $row['bootstrap_name']; ?>via <?php echo $row['comm_type']; ?
 
 <?php echo $row['comm_notes']; ?>" 
                     
-		        >
-                    <?php if($row['recent_contact']) echo date_format(date_create($row['recent_contact']), "M jS, Y");?>
-                </td>
+		        ><?php if($row['recent_contact']) echo date_format(date_create($row['recent_contact']), "M jS, Y");?></td>
 		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop_role']; ?> - <?php echo $row['recent_workshop']; ?></a></td>
 		    </tr>
 		<?php } ?>

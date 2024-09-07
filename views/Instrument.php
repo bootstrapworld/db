@@ -145,7 +145,7 @@
 
 <?php if($data) {  ?>
 
-        <h2>Submissions</h2>
+        <h2><?php echo $data['submissions']; ?> Submissions</h2>
 		</p>
 	            <table class="smart">
 	                <thead>
@@ -175,9 +175,9 @@
             		            <a class="deleteButton" href="#" onmouseup="deleteSubmissionRq(<?php echo $row['submission_id']; ?>)"></a>
             		        </td>
             		        <td><?php echo $row['instructor_code']; ?></td>
-            		        <td><?php echo date_format(date_create($row['submitted']),"Y/m/d"); ?></td>
-            		        <td><?php echo date_format(date_create($row['updated']),"Y/m/d"); ?></td>
-		                    <td style="white-space: pre-wrap;"><?php echo json_encode(json_decode($data['form_data']), JSON_PRETTY_PRINT); ?></td>
+            		        <td><?php echo date_format(date_create($row['submitted']),"M j, Y g:ia"); ?></td>
+            		        <td><?php echo date_format(date_create($row['updated']),  "M j, Y g:ia"); ?></td>
+		                    <td style="white-space: pre-wrap;"><?php echo json_encode(json_decode($row['form_data']), JSON_PRETTY_PRINT); ?></td>
 	                    </tr>
 	           <?php  
 	                } 
