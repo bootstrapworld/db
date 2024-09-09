@@ -31,14 +31,17 @@
         $MAX_DIST = max([strlen($name) / 4, 5]);
         $possible = Array();
 
-        // get all People
-		$mysqli = openDB_Connection();
-        $result = $mysqli->query("
-        SELECT person_id AS id, REPLACE(LOWER(CONCAT(name_first,name_last)), ' ','') AS name, 
+        // get all People with names that sound like this one
+        $sql = "SELECT person_id AS id, REPLACE(LOWER(CONCAT(name_first,name_last)), ' ','') AS name, 
         (SOUNDEX(name_first) = SOUNDEX('".$first."')) AND (SOUNDEX(name_last) = SOUNDEX('".$last."')) AS sounds_like,
         CONCAT(name_first, ' ', name_last) AS fullname, email_preferred AS email, CONCAT(city, ' ', state) AS location, role
-        FROM People WHERE person_id != ".$person_id);
+        FROM People ";
+        
+        // if it's someone already in the DB, make sure we don't return them as a duplicate of themselves! :P
+        if($person_id) $sql .= "WHERE person_id != ".$person_id;
 
+		$mysqli = openDB_Connection();
+        $result = $mysqli->query($sql);
         $rows = $result->fetch_all(MYSQLI_ASSOC);
 
         // for each Organization, check that the names are identical or sound alike, then that the levenshtein distance is below our threshold

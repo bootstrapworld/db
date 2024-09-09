@@ -44,6 +44,7 @@
 			$sql = "SELECT *, 
 			            COALESCE(NULLIF(email_preferred,''), 
 			            NULLIF(email_professional,''), email_google) AS email,
+			            do_not_contact,
 			            IF(ISNULL(E.curriculum), '', CONCAT(E.curriculum,' (',E.start,')')) AS recent_workshop
 			        FROM Organizations AS O, People AS P
 			        LEFT JOIN Enrollments AS R
@@ -150,7 +151,7 @@
     		    <tr>
     		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first']; ?></a></td>
     		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_last']; ?></a></td>
-    		        <td><a href="mailto:<?php echo $row['email']; ?>"><?php echo $row['email']; ?></a></td>
+    		        <td <?php if($row['do_not_contact'] == 1) echo "data-dnc=1"; ?> ><a href="mailto:<?php echo $row['email']; ?>"><?php echo $row['email']; ?></a></td>
     		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?></td>
     		        <td><?php echo $row['recent_contact']; ?></td>
     		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop']; ?></a></td>

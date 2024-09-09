@@ -42,6 +42,7 @@
 				email_professional,
 				role,
 				employer_id,
+				do_not_contact,
 				CONCAT(IF(LENGTH(P.city)=0, '', CONCAT(P.city, ', ')), UPPER(P.state) ) AS location,
 				(CASE grades_taught
                 	WHEN 'High School' THEN 'HS'
@@ -109,7 +110,7 @@
 		    <tr>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_last']; ?></a></td>
-		        <td><a href="mailto:<?php echo $row['email']; ?>"><?php echo $row['email']; ?></a></td>
+		        <td <?php if($row['do_not_contact'] == 1) echo "data-dnc=1"; ?> ><a href="mailto:<?php echo $row['email']; ?>"><?php echo $row['email']; ?></a></td>
 		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?></a>
 		        </td>
 		        <td><?php echo $row['location']; ?></td>

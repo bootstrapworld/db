@@ -248,8 +248,11 @@ SmartTable.prototype.copyEmails = function(idx) {
 	var tbody	= this.table.getElementsByTagName('tbody')[0];
 	var rows	= tbody.getElementsByTagName('tr');
 	[...rows].forEach( (r, i) => {
-	    if(this.hiddenRows[i]) return;
-	    email = [...r.cells][idx].firstChild.innerHTML;
+	    if(this.hiddenRows[i]) return;  // skip hidden rows
+	    const cell = [...r.cells][idx];
+	    console.log(cell, cell.dataset['dnc']);
+	    if(cell.dataset['dnc']) return; // skip contacts set to "do not contact"
+	    const email = cell.firstChild.innerHTML;
 	    if(email.search(/^\S+@\S+\.\S+$/) != -1) emails.push(email);
 	});
 	navigator.clipboard.writeText(emails.join(', '));

@@ -571,8 +571,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
             function waitForDuplicateModal(possibleDuplicates) {
                 const currentID = document.getElementById('person_id').value;
                 console.log(currentID, possibleDuplicates)
-                possibleDuplicates = possibleDuplicates.filter(pd => Number(pd.id) != currentID); // make sure the possibility duplicates do not include the currentID
-                
+
             	const tbody = document.getElementById('duplicatePeople');
             	tbody.innerHTML = null; // reset the table body before showing
                 possibleDuplicates.forEach( ({id, fullname, email, location, role}) => { 
@@ -627,6 +626,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
             	//      1) A number, representing the merged_id of the new contact
             	//      2) true, meaning the user is ok proceeding with a new contact 
             	const possibleDuplicates = JSON.parse(duplicateResponseJSON);
+
             	console.log('possible duplicates:', possibleDuplicates);
             	const duplicateIds = (possibleDuplicates.length < 1) || await waitForDuplicateModal(possibleDuplicates);
             	

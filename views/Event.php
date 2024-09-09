@@ -89,6 +89,7 @@
             $sql = "SELECT 
                         P.person_id, 
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
+            		    do_not_contact,
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         JSON_VALUE(attendance, '$.total') AS days_attended,
                         attendance AS attendance,
@@ -115,6 +116,7 @@
             $sql = "SELECT 
                         P.person_id,
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
+            		    do_not_contact,
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         O.org_id, O.name AS employer_name,
                         COALESCE(R.notes,'') AS notes,
@@ -130,6 +132,7 @@
             $sql = "SELECT 
                         P.person_id,
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
+            		    do_not_contact,
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         O.org_id, O.name AS employer_name,
                         COALESCE(R.notes,'') AS notes,
@@ -354,7 +357,7 @@ if($data) {
             		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
             		        </td>
             		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
-		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
+		                    <td <?php if($row['do_not_contact'] == 1) echo "data-dnc=1"; ?> ><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
 	                    </tr>
 	           <?php 
@@ -397,7 +400,7 @@ if($data) {
             		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
             		        </td>
 		                    <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
-		                    <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
+		                    <td <?php if($row['do_not_contact'] == 1) echo "data-dnc=1"; ?> ><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		                    <td><a href="Organization.php?org_id=<?php echo $row['org_id'] ?>"><?php echo $row['employer_name'] ?></a></td>
 	                    </tr>
 	           <?php } ?>
@@ -450,7 +453,7 @@ if($data) {
 		            <a class="deleteButton" href="#" onmouseup="deleteEnrollmentRq(<?php echo $row['enrollment_id']; ?>)"></a>
 		        </td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
-		        <td><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
+		        <td <?php if($row['do_not_contact'] == 1) echo "data-dnc=1"; ?> ><a href="mailto:<?php echo $row['email'] ?>"><?php echo $row['email'] ?></a></td>
 		        <td><?php echo $row['role'] ?></td>
 		        <td><?php echo $row['grades_taught'] ?></td>
 		        <td><?php echo $row['primary_subject'] ?></td>
