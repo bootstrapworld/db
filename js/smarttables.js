@@ -267,7 +267,7 @@ SmartTable.prototype.exportToCSV = function() {
     const csv_string = rows.map( (r, i) => {
         if(this.hiddenRows[i]) { return ''; }                       // skip hidden rows
         const cells = [...r.querySelectorAll('th, td')];            // grab all the cells
-        return cells.map( elt => elt.textContent.trim()).join(',');
+        return cells.map( elt => '"'+elt.textContent.trim()+'"').join(',');
          
     }).join('\n');
     console.log(csv_string);

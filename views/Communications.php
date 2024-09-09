@@ -36,6 +36,7 @@
 	$sql = "SELECT 
 	            C.communication_id, C.person_id, C.type, C.notes, C.date, C.bootstrap_id,
 	            CONCAT(P.name_first, ' ', P.name_last) AS name,
+	            P.name_last,
 				COALESCE(NULLIF(P.email_preferred,''), NULLIF(P.email_professional,''), P.email_google) AS email,
 				CONCAT(BP.name_first, ' ', BP.name_last) AS bootstrap_name,
                 E.event_id, E.org_id AS partner_id, CONCAT('(', E.name,')') AS partner_name,
