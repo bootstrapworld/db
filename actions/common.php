@@ -40,7 +40,7 @@ if($method == "update")             { update($data); }
 if($method == "delete")             { delete($data); }
 if($method == "searchForNames")     { searchForNames($data); }
 if($method == "mergeContacts")      { mergeContacts(json_decode($_REQUEST["ids"]), $_REQUEST["dest"]); }
-if($method == "findPossibleDuplicates") { findPossibleDuplicates($_REQUEST["name_first"], $_REQUEST["name_last"]); }
+if($method == "findPossibleDuplicates") { findPossibleDuplicates($_REQUEST["name_first"], $_REQUEST["name_last"], $_REQUEST["person_id"]); }
 
 	
 function quoteOrNull($value) {
@@ -77,10 +77,12 @@ function genericInsertOrUpdate($table, $data) {
 				VALUES (".implode(', ', $values).") 
 				ON DUPLICATE KEY UPDATE $updateFields";
 
-
 		$result = $mysqli->query($sql);
 		if($result){
-			echo $mysqli->insert_id;
+		    $id = $mysqli->insert_id;
+		    // attempts to update a record with identical data result in NO INSERT, so we need
+		    // to detect this and return the original id instead (quotes removed)
+			echo $id? $id : str_replace("'", "", $values[0]);
 		} else {
 			echo "ERROR: Sorry $sql. ". $mysqli->error;
 		}

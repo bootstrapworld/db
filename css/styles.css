@@ -206,6 +206,7 @@ div.modal legend{ background: white; }
 input.dropdown { font-size: 12px; }
 
 form.locked :not(.buttons, .smartTableControls)>input, form.locked textarea { border: none; pointer-events: none; resize: none; border-bottom: solid 1px black; }
+form.locked input[type=checkbox] { opacity: 0.5; }
 form.locked *::-webkit-input-placeholder { visibility: hidden; }
 form.locked :not(.smartTableControls)>select {
     border: none;

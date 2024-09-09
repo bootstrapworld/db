@@ -34,6 +34,8 @@ $raceOpts = ["American Indian or Alaska Native",
 
 $instrumentTypeOpts = ['Teacher Pre-test','Teacher Post-test','Student Pre-test','Student Post-test'];
 
+$pronounOpts = ['Prefer not to respond', 'He, him, his','She, her, hers', 'Non-binary', 'They, them, theirs', 'Ze, zir, zirs'];
+
 $gradeOpts = ["Pre-K",
 						"Elementary",
 						"Middle School",

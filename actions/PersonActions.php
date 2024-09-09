@@ -26,7 +26,7 @@
 		$mysqli -> close();
 	}
 
-    function findPossibleDuplicates($first, $last) {
+    function findPossibleDuplicates($first, $last, $person_id) {
         $name = str_replace(' ', '', strtolower($first.$last));
         $MAX_DIST = max([strlen($name) / 4, 5]);
         $possible = Array();
@@ -37,7 +37,7 @@
         SELECT person_id AS id, REPLACE(LOWER(CONCAT(name_first,name_last)), ' ','') AS name, 
         (SOUNDEX(name_first) = SOUNDEX('".$first."')) AND (SOUNDEX(name_last) = SOUNDEX('".$last."')) AS sounds_like,
         CONCAT(name_first, ' ', name_last) AS fullname, email_preferred AS email, CONCAT(city, ' ', state) AS location, role
-        FROM People");
+        FROM People WHERE person_id != ".$person_id);
 
         $rows = $result->fetch_all(MYSQLI_ASSOC);
 

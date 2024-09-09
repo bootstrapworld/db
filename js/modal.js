@@ -65,11 +65,11 @@ Modal.prototype.showModal = function(){
 	  .focus();
 	
 	// set callback functions for "cancel" and "submit" buttons
-	var cancel = document.getElementById(this.id + "Cancel");
-	var submit = document.getElementById(this.id + "Submit");
+	var cancel = this.contents.querySelector("[id$=Cancel]");
+	var submit = this.contents.querySelector("[id$=Submit]");
 	console.log(this.id + "Submit", submit)
 	cancel.onclick = () => { pointer.hideModal(); return false; }
-	const oldOnSubmit = this.contents.onsubmit;
+	const oldOnSubmit = this.contents.nodeName == "form"? this.contents : this.contents.querySelector('form').onsubmit;
 	this.contents.onsubmit = (e) => {
 		result = oldOnSubmit(e).then(id => {
 			console.log('got result', id, 'in outer submit handler')

@@ -30,6 +30,7 @@
 	
 	$sql = "SELECT
 							person_id,
+							prounouns,
 							name_first,
 							name_last,
 							email_preferred,
@@ -52,7 +53,9 @@
 							O.name AS employer_name,
 							O.city AS org_city,
 							O.state AS org_state,
-							O.zip AS org_zip
+							O.zip AS org_zip,
+							do_not_contact,
+							reason
 						FROM People AS P
 						LEFT JOIN Organizations AS O
 						ON P.employer_id=O.org_id
@@ -121,6 +124,11 @@
 	                />
 
 	                <span class="formInput">
+	                	<?php echo generateDropDown("prounouns", "prounouns", $pronounOpts, $data["prounouns"], false) ?>
+	            		<label for="state">Pronouns</label>
+	                </span>
+
+	                <span class="formInput">
 	                    <input  id="name_first" name="name_first"
     	                        placeholder="First Name" validator="alpha"
 			                    value="<?php echo $data["name_first"] ?>" 
@@ -167,7 +175,7 @@
 			             <input id="home_address" name="home_address" 
 	                			placeholder="Home Address" validator="alphanum" 
 	                			value="<?php echo $data["home_address"] ?>" 
-	                			type="text" size="50" maxlength="30" />
+	                			type="text" size="100" maxlength="100" />
 			              <label for="home_address">Street Address</label>
 	                </span>
 	                <p/>
@@ -176,7 +184,7 @@
 	               		<input  id="person_city" name="city" 
 				                placeholder="Home City" validator="alpha" 
 				                value="<?php echo $data["person_city"] ?>" 
-				                type="text" size="25" maxlength="30" required="yes"/>
+				                type="text" size="40" maxlength="50" required="yes"/>
 			            <label for="city">City</label>
 	                </span>
 
@@ -189,7 +197,7 @@
 	               		<input  id="person_zip" name="zip" 
 	                			placeholder="ZIP code" validator="zip" 
 				                value="<?php echo $data["person_zip"] ?>"  
-				                type="text" size="10" maxlength="10" />
+				                type="text" size="20" maxlength="20" />
 			            <label for="zip">ZIP Code</label>
 		            </span>
 	            	<p/>
@@ -198,7 +206,7 @@
 	               		<input  id="home_phone" name="home_phone"
 				                placeholder="Home Phone" validator="phone" 
 				                value="<?php echo $data["home_phone"] ?>"  
-				                type="text" size="14" maxlength="20" />
+				                type="text" size="20" maxlength="20" />
 			            <label for="home_phone">Home Phone</label>
 	                </span>
 
@@ -206,7 +214,7 @@
 	               		<input  id="work_phone" name="work_phone" 
 				                placeholder="Work Phone" validator="phone" 
 				                value="<?php echo $data["work_phone"] ?>"  
-				                type="text" size="14" maxlength="20" />
+				                type="text" size="20" maxlength="20" />
 			            <label for="work_phone">Work Phone</label>
 		            </span>
 
@@ -214,39 +222,19 @@
 	               		<input  id="cell_phone" name="cell_phone" 
 				                placeholder="Cell Phone" validator="phone" 
 				                value="<?php echo $data["cell_phone"] ?>"  
-				                type="text" size="14" maxlength="20" />		
+				                type="text" size="20" maxlength="20" />		
 			            <label for="cell_phone">Cell Phone</label>
 	                </span>
 	                <p/>
-
-	               	<span class="formInput">
-			            <?php echo generateDropDown("race", "race", $raceOpts, $data["race"], true); ?>
-		                <label for="race">Race</label>
-	                </span>
 
 	            	<span class="formInput">
 	                	<input  id="prior_years_coding" name="prior_years_coding" 
 				                placeholder="# years coding" validator="num" 
 				                value="<?php echo $data["prior_years_coding"] ?>"  
-				                type="text" size="30" maxlength="3" />
-			            <label for="prior_years_coding"># Years Coding Experience</label>
+				                type="text" size="15" maxlength="3" />
+			            <label for="prior_years_coding">Coding for # Years</label>
 	                </span>
-	                <p/>
-
-	                <input type="hidden" id="employer_id"	name="employer_id"
-   			               value="<?php echo $data["employer_id"] ?>" 
-		            />
-
-	               	<span class="formInput">
-	                	<input id="employer_name" name="employer_name"
-				                placeholder="Which school or organization do you work for?" validator="dropdown"
-				                datatype="organization"  target="employer_id" addnew="yes"
-				                value="<?php echo $data["employer_name"] ?>" 
-				                type="text" size="70" maxlength="70" ignore="yes" />
-			            <label for="employer_name">School or Employer Name</label>
-	                </span>
-	                <p/>
-
+	                
 	               	<span class="formInput">
 			            <?php echo generateDropDown("role", "role", $roleOpts, $data["role"], true) ?>
 			            <label for="role">Role</label>
@@ -261,16 +249,53 @@
 	               		<?php echo generateDropDown("primary_subject", "primary_subject", $subjectOpts, $data["primary_subject"], false); ?>
 	               		<label for="primary_subject">Current primary subject</label>
 	               	</span>
+	                <p/>
+
+	                <input type="hidden" id="employer_id"	name="employer_id"
+   			               value="<?php echo $data["employer_id"] ?>" 
+		            />
+
+	               	<span class="formInput">
+			            <?php echo generateDropDown("race", "race", $raceOpts, $data["race"], true); ?>
+		                <label for="race">Race</label>
+	                </span>
+
+	               	<span class="formInput">
+	                	<input id="employer_name" name="employer_name"
+				                placeholder="Which school or organization do you work for?" validator="dropdown"
+				                datatype="organization"  target="employer_id" addnew="yes"
+				                value="<?php echo $data["employer_name"] ?>" 
+				                type="text" size="70" maxlength="70" ignore="yes" />
+			            <label for="employer_name">School or Employer Name</label>
+	                </span>
+	                <p/>
+
 	               	<p/>
 
 	               	<span class="formInput">
 	               		<textarea   id="other_credentials" name="other_credentials"
 			    	                placeholder="Are you licensed by a State or other organization (e.g. NYS Math 7-12, etc)? Do you hold a degree in Education (e.g. MS Ed Mathematics, Secondary Science, etc)? Do you belong to a Professional Organization? (e.g. Math for America Fellow, NCTM, etc)? Something else?" 
 			                        validator="alphanumbsym"
-			                        cols="70" rows="4" maxlength="1000"/><?php echo $data["other_credentials"] ?></textarea>
+			                        cols="70" maxlength="1000"/><?php echo $data["other_credentials"] ?></textarea>
 		                <label for="other_credentials">Other Credentials</label>
 	                </span>
 	                <p/>
+	                
+	            	<span class="formInput">
+	            	    <select id="do_not_contact" name="do_not_contact">
+                            <option value="0" <?php if($data["do_not_contact"]==0) echo 'selected="yes"' ?>>OK to Contact</option>
+                            <option value="1" <?php if($data["do_not_contact"]==1) echo 'selected="yes"' ?>>Do Not Contact</option>
+	            	    </select>
+			            <label for="reason">Do Not Contact</label>
+	                </span>
+	            	<span class="formInput">
+	                	<input  id="reason" name="reason" 
+				                placeholder="Why should this person not be contacted?" validator="alphanumbsym" 
+				                value="<?php echo $data["reason"] ?>"  
+				                type="text" size="70" maxlength="100-" />
+			            <label for="reason">Reason</label>
+	                </span>
+	                
 	               </fieldset>
 
 <script>
@@ -594,7 +619,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
             			resolve(this.responseText);
             		};
             		xhr.onerror = reject;
-            		xhr.open('POST', `../actions/PersonActions.php?method=findPossibleDuplicates&name_first=${formObject['name_first']}&name_last=${formObject['name_last']}`);
+            		xhr.open('POST', `../actions/PersonActions.php?method=findPossibleDuplicates&name_first=${formObject['name_first']}&name_last=${formObject['name_last']}&person_id=${formObject['person_id']}`);
             		xhr.send();
             	});
             	
