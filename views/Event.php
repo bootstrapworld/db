@@ -464,9 +464,11 @@ if($data) {
 		            } else {
 		                $days_attended = json_decode(json_decode($row['attendance'], true)['days_attended'], true);
 		                foreach ($dates as $key => $date) {
+		                    $present = $days_attended && in_array($date, $days_attended);
                             echo '<td style="text-align: center;"><input type="checkbox" onchange="markDirty()" name='.date_format(date_create($date),"Y-m-d");
-                            if($days_attended && in_array($date, $days_attended)) { echo " checked='on'"; }
-                            echo '></td>';
+                            if($present) { echo " checked='on'"; }
+                            echo '>';
+                            echo '<span style="visibility:hidden; display: inline-block; width:0; margin: 0;">'.($present? "P" : "A").'</span></td>';
                         }    
 		            }
 		        ?>

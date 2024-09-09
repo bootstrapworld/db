@@ -59,6 +59,7 @@ SmartTable = function(table){
 	    <input class="filter" size="20" />
 	</span>`;
 
+    controls.innerHTML += '<a href="#" class="exportCSV"></a>';
     controls.innerHTML += "<b>Filter 1:</b>";
 	controls.appendChild(this.filter1Col);
 	controls.innerHTML += filterHTML;
@@ -80,6 +81,9 @@ SmartTable = function(table){
         elt.addEventListener('change', e => { clearTimeout(this.buildThrottle); this.buildThrottle = setTimeout(() =>  this.rebuildTable(e), DELAY) }); 
         elt.addEventListener('keyup',  e => { clearTimeout(this.buildThrottle); this.buildThrottle = setTimeout(() =>  this.rebuildTable(e), DELAY) }); 
     });
+    
+    // Add export eventlistener
+    controls.querySelector('.exportCSV').addEventListener('click', e => this.exportToCSV());
 
 	this.hiddenRows = {};
 	this.rebuildTable();
@@ -250,7 +254,6 @@ SmartTable.prototype.copyEmails = function(idx) {
 	[...rows].forEach( (r, i) => {
 	    if(this.hiddenRows[i]) return;  // skip hidden rows
 	    const cell = [...r.cells][idx];
-	    console.log(cell, cell.dataset['dnc']);
 	    if(cell.dataset['dnc']) return; // skip contacts set to "do not contact"
 	    const email = cell.firstChild.innerHTML;
 	    if(email.search(/^\S+@\S+\.\S+$/) != -1) emails.push(email);
@@ -259,6 +262,27 @@ SmartTable.prototype.copyEmails = function(idx) {
 	console.log('copied '+ emails.join(', '));
 };
 
+SmartTable.prototype.exportToCSV = function() {
+    const rows = [...this.table.querySelectorAll('tr')];
+    const csv_string = rows.map( (r, i) => {
+        if(this.hiddenRows[i]) { return ''; }                       // skip hidden rows
+        const cells = [...r.querySelectorAll('th, td')];            // grab all the cells
+        return cells.map( elt => elt.textContent.trim()).join(',');
+         
+    }).join('\n');
+    console.log(csv_string);
+    // Download it
+    var filename = 'export_' + document.querySelector('h1').textContent + '_' + new Date().toLocaleDateString() + '.csv';
+    var link = document.createElement('a');
+    link.style.display = 'none';
+    link.setAttribute('target', '_blank');
+    link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string));
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+};
 
 /* Find all tables with the appropriate class, and initialize SmartTables for all of them */
 function initializeSmartTables() { [...document.querySelectorAll('table.smart')].forEach(t => new SmartTable(t)); }
