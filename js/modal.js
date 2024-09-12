@@ -10,6 +10,9 @@ Modals contain:
 */
 Modal = function(showButton, id, callback){
     console.log('modal called with id=',id)
+    const contents = document.getElementById(id);
+    console.log(contents);
+    if(!contents.querySelector('form')) { console.error('Modal was given an ID for a node that does not contain a FORM element'); } 
 	pointer				= this;
 	this.showButton		= showButton;
 	this.id				= id;
@@ -67,10 +70,17 @@ Modal.prototype.showModal = function(){
 	// set callback functions for "cancel" and "submit" buttons
 	var cancel = this.contents.querySelector("[id$=Cancel]");
 	var submit = this.contents.querySelector("[id$=Submit]");
-	console.log(this.id + "Submit", submit)
+
+    // cancel hides the modal and returns false
 	cancel.onclick = () => { pointer.hideModal(); return false; }
+	
+	// grab the existing submit event
 	const oldOnSubmit = this.contents.nodeName == "form"? this.contents : this.contents.querySelector('form').onsubmit;
-	this.contents.onsubmit = (e) => {
+	console.log('old submit handler', oldOnSubmit)
+	
+	// wrap it in something that submits, then hides the modal and passes the result to the callback function
+	this.contents.querySelector('form').onsubmit = (e) => {
+	    console.log('new submit is being called')
 		result = oldOnSubmit(e).then(id => {
 			console.log('got result', id, 'in outer submit handler')
 			if(id) this.hideModal();

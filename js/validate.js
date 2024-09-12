@@ -43,7 +43,6 @@ function validate_zip(value) {
 }
 
 function validate_date(value) {
-    console.log('checking date');
 	value = unescape(value);
 	if(value.length==0) return [true, value];
 	if(!Date.parse(value)) return [false, "This is not a valid date"];

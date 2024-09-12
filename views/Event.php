@@ -318,7 +318,7 @@ if($data) {
 
         <h2>People</h2>
 		        
-		<input type="button" onmouseup="addEnrollment(this);" value="+ Add a Facilitator, Admin, or Participant"
+		<input type="button" onmouseup="addOrEditEnrollment(this);" value="+ Add a Facilitator, Admin, or Participant"
 		    data-event_id="<?php echo $data['event_id']; ?>"
 		    data-title="<?php echo $data['title']; ?>"
 		/>
@@ -343,7 +343,7 @@ if($data) {
 	                    <tr>
         		            <td class="controls">
             		            <input type="hidden" name="enrollment_id" value="<?php echo $row['enrollment_id']; ?>"/>
-            		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
+            		            <a class="editButton" href="#" onmouseup="addOrEditEnrollment(this);" 
             		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
             		                data-event_id="<?php echo $data['event_id']; ?>"
             		                data-person_id="<?php echo $row['person_id']; ?>"
@@ -386,7 +386,7 @@ if($data) {
 	                    <tr>
         		            <td class="controls">
             		            <input type="hidden" name="enrollment_id" value="<?php echo $row['enrollment_id']; ?>"/>
-            		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
+            		            <a class="editButton" href="#" onmouseup="addOrEditEnrollment(this);" 
             		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
             		                data-event_id="<?php echo $data['event_id']; ?>"
             		                data-person_id="<?php echo $row['person_id']; ?>"
@@ -439,7 +439,7 @@ if($data) {
 		    <tr>
 		        <td class="controls">
 		            <input type="hidden" name="enrollment_id" value="<?php echo $row['enrollment_id']; ?>"/>
-		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
+		            <a class="editButton" href="#" onmouseup="addOrEditEnrollment(this);" 
 		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
 		                data-event_id="<?php echo $data['event_id']; ?>"
 		                data-person_id="<?php echo $row['person_id']; ?>"

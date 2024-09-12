@@ -142,7 +142,7 @@ AutoSuggest.prototype.createList = function(arr){
 		console.log('building Autosuggest OUTSIDE a modal');
 	}
 	
-	var modalObj = new Modal(a, 'new_'+datatype, callback);
+	if(this.fld.getAttribute('addnew')) new Modal(a, 'new_'+datatype, callback);
 	var li = DOM.createElement(  "li", {}, a, true);
 	ul.appendChild(li);
 

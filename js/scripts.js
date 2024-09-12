@@ -87,7 +87,7 @@ function updateRequest(e, callback) {
 	const data = JSON.stringify(formObject);
 
 	// append method and JSON-formatted string to post address
-	const target = event.currentTarget;
+	const target = event.target;
 	target.action += '?method=update&data='+data; 
 
 	return new Promise(function(resolve, reject) {
@@ -104,6 +104,7 @@ function updateRequest(e, callback) {
 // If there's a target
 function setInfoFromDropDown(fieldID, obj, target, datatype) {
 	if(target) { 
+	    console.log('got response from dropdown modal', obj, target);
 		document.getElementById(target).value = obj.id; 
 	} else {
 		var searchParams = new URLSearchParams(window.location.search);

@@ -1,5 +1,5 @@
-<div id="newenrollment" class="modal">
-<form id="new_enrollment" novalidate action="../actions/EnrollmentActions.php">
+<div id="new_enrollment" class="modal">
+<form novalidate action="../actions/EnrollmentActions.php">
 <fieldset>
 	<legend>Event Enrollment</legend>
 	
@@ -54,27 +54,14 @@
 </div>
 
 <script>
-document.getElementById('new_enrollment').onsubmit = (e) => updateRequest(e, updateEnrollmentRp);
+document.getElementById('new_enrollment').querySelector('form').onsubmit = (e) => updateRequest(e, updateEnrollmentRp);
 					
-function editEnrollment(elt) {
+function addOrEditEnrollment(elt) {
     const m = new Modal(elt, 'new_enrollment', (id) => window.location.reload());
     const fields = ["enrollment_id", "person_id", "name", "event_id", "title", "type", "created", "notes"];
     console.log(elt.dataset.created || "<?php echo date("Y-m-d") ?>");
-    fields.forEach(f => document.querySelector('#new_enrollment [name="'+f+'"]').value  = elt.dataset[f]);
-	m.showModal();
-}
-function addEnrollment(elt) {
-	const m = new Modal(elt, 'new_enrollment', (id) => window.location.reload());
-    const fields = ["enrollment_id", "event_id", "title", "type", "created", "notes"];
-    fields.forEach(f => document.querySelector('#new_enrollment [name="'+f+'"]').value  = '');
-	document.querySelector('#new_enrollment [name="person_id"]').value      = elt.dataset.person_id || null;
-	document.querySelector('#new_enrollment [name="event_id"]').value       = elt.dataset.event_id || null;
-	document.querySelector('#new_enrollment [name="name"]').value           = elt.dataset.name || null;
-	document.querySelector('#new_enrollment [name="title"]').value          = elt.dataset.title || null;
-	document.querySelector('#new_enrollment [name="type"]').value           = elt.dataset.type || null;
+    fields.forEach(f => document.querySelector('#new_enrollment [name="'+f+'"]').value  = elt.dataset[f] || null);
 	document.querySelector('#new_enrollment [name="created"]').value        = elt.dataset.type || "<?php echo date("Y-m-d") ?>";
-	document.querySelector('#new_enrollment [name="notes"]').value          = elt.dataset.notes || null;
-	m.showModal();
 }
 
 

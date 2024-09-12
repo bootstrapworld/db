@@ -251,16 +251,13 @@
 	               	</span>
 	                <p/>
 
-	                <input type="hidden" id="employer_id"	name="employer_id"
-   			               value="<?php echo $data["employer_id"] ?>" 
-		            />
-
 	               	<span class="formInput">
 			            <?php echo generateDropDown("race", "race", $raceOpts, $data["race"], true); ?>
 		                <label for="race">Race</label>
 	                </span>
 
 	               	<span class="formInput">
+	                    <input type="hidden" id="employer_id"	name="employer_id" value="<?php echo $data["employer_id"] ?>"  />
 	                	<input id="employer_name" name="employer_name"
 				                placeholder="Which school or organization do you work for?" validator="dropdown"
 				                datatype="organization"  target="employer_id" addnew="yes"
@@ -526,7 +523,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
 					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
 				</form>
 				<script>
-					document.getElementById('new_organization_modal').onsubmit = (e) => updateRequest(e, updateOrgRp);
+					document.getElementById('new_organization_modal').onsubmit = (e) => {e.preventDefault(); updateRequest(e, updateOrgRp);}
 			</script>
 			</div>
 			
@@ -604,7 +601,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
             // send the validated JSON to the form's "action", using
             // the form's "method". Then pass the response to the callback
             async function updatePersonRq(e, callback) {
-            	console.log('updatePersonRq', e)
+            	console.log('updatePersonRq', e, e.target.action)
             	// validate the form and convert to JSON
                 formObject = validateSubmission(e);
             	if(!formObject) return false;

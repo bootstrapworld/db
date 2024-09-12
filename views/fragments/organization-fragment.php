@@ -79,6 +79,7 @@
 // - if we're inside a modal
 // - if we're not, rewrite the URL to switch to edit the record
 function updateOrgRp( orgId ){
+	console.log('returning', orgId,'from updateOrgRp');
 	if ( orgId ){
 		const wrapper = document.getElementById('new_organization').parentNode;
 		if(wrapper.classList.contains("modal")) {
