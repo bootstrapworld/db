@@ -98,7 +98,7 @@
 						}
 				?>
 			<!-- Organization Form -->
-			<form id="new_organization" novalidate action="../actions/OrganizationActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
+			<form id="new_child_organization" novalidate action="../actions/OrganizationActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
 			<span class="buttons">
     			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
 	    		<?php if(isset($data)) { ?>
@@ -114,19 +114,19 @@
 					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
 			</form>
 			<script>
-				document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
+				document.getElementById('new_child_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
 			</script>
 
 			<!-- Organization modal -->
-			<div id="neworganization" class="modal">
-				<form id="new_organization_modal" novalidate action="../actions/OrganizationActions.php">
+			<div id="new_organization" class="modal">
+				<form novalidate action="../actions/OrganizationActions.php">
 					<?php include 'fragments/organization-fragment.php' ?>
 					<input type="submit" id="new_organizationSubmit" value="Submit">
 					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
 				</form>
 				<script>
-					document.getElementById('new_organization_modal').onsubmit = (e) => updateRequest(e, updateOrgRp);
-			</script>
+					document.getElementById('new_organization').onsubmit = (e) => updateRequest(e, updateOrgRp);
+			    </script>
 			</div>
 
 

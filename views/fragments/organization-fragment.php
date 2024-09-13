@@ -100,7 +100,8 @@ function deleteOrgRq(){
 		// if the request is successful, execute the callback
 		request.onreadystatechange = function() {
 			if (request.readyState == 4 && request.status == 200) {
-				deleteOrgRp(request.responseText);
+				console.log('deleteOrgRq returned', request.responseText);
+	            window.location = baseURL + `/views/Organizations.php`;
 			}
 		}; 
 		const data = JSON.stringify({org_id:id});
@@ -108,12 +109,6 @@ function deleteOrgRq(){
 		request.send();
 	}
 }
-function deleteOrgRp( rsp ){
-	alert("Deleted ID#: " + rsp );
-	const urlValue = baseURL + `/views/Organizations.php`;
-	window.location = urlValue;
-}
-
 
 // turn off autocomplete if we're already looking at an established organization
 if(document.getElementById('org_id').value != "") {

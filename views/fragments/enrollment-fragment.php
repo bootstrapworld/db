@@ -59,10 +59,12 @@ async function addOrEditEnrollment(elt) {
     const fields = ["enrollment_id", "person_id", "name", "event_id", "title", "type", "created", "notes"];
     fields.forEach(f => form.querySelector('[name="'+f+'"]').value  = elt.dataset[f] || null);
 	form.querySelector('[name="created"]').value = elt.dataset.type || "<?php echo date("Y-m-d") ?>";
-	const resp = await waitForModal(elt, 'new_enrollment', updateRequest);
-	if((typeof resp == "boolean") && !resp) { return; } // false comes from canceling the modal: "do nothing"
-	else if(!isNaN(resp)) window.location.reload();     // number comes from a successful insert/update: "reload"
-	else console.error(resp);                           // anything else is an error
+	const resp = await waitForModal(elt, 'new_enrollment', updateRequest2);
+	switch(typeof resp) {
+	    case "boolean": return;
+	    case "object":  window.location.reload();
+	    default:        console.error(resp);
+	}
 }
 
 function deleteEnrollmentRq(enrollmentId){

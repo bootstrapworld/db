@@ -1,5 +1,18 @@
 if (typeof(Autosuggest) == "undefined") Autosuggest = {}
 
+async function modalAddition(showButton, modalEltId, dropdownFieldId, callback) {
+    console.log('starting modalAddition. result will be passed to', callback);
+    const result = await waitForModal(showButton, modalEltId, updateRequest2);
+    console.log(result, typeof result, !isNaN(result));
+    switch(typeof result) {
+        case "boolean": return;
+        case "object":
+    	    console.log('modal returned', result, '. Passing to callback');
+    	    return callback(dropdownFieldId, {id: result.response, name: decodeURI(result.name)}); 
+    	default: console.error(result);
+    }
+}
+
 /* takes a FieldID and a Parameter Object */
 AutoSuggest = function (fldID, param){
 	// no DOM - give up!
@@ -135,14 +148,18 @@ AutoSuggest.prototype.createList = function(arr){
 	if(!this.fld.getAttribute('addnew')) a.style.display = "none";
 	// **** see modal.js to understand this line
 	const target = this.fld.getAttribute('target');
-	let callback = function (id) {document.getElementById(target).value = id;}
+	//let callback = function (id) {document.getElementById(target).value = id;}
 	if(document.getElementById('modalWindow') && document.getElementById('modalWindow').contains(this.fld)) {
 		console.log('building Autosuggest INSIDE a modal');
 	} else {
 		console.log('building Autosuggest OUTSIDE a modal');
 	}
 	
-	if(this.fld.getAttribute('addnew')) new Modal(a, 'new_'+datatype, callback);
+	// if it's possible to add a new item, prepare an async Modal call and assign it to the link's click event
+	if(this.fld.getAttribute('addnew')) {
+	    a.addEventListener('click', (e) => modalAddition(a, 'new_'+datatype, this.fld.id, this.oP.callback));
+	}
+	
 	var li = DOM.createElement(  "li", {}, a, true);
 	ul.appendChild(li);
 
@@ -232,15 +249,15 @@ AutoSuggest.prototype.clearHighlight = function(){
 }
 
 /* Value is selected: set input field and remove dropdown */
-AutoSuggest.prototype.setHighlightedValue = function (){
-	if (this.iHighlighted) {
-		obj = this.aSuggestions[ this.iHighlighted - 2]
-		this.sInput = this.fld.value = obj.value;
+AutoSuggest.prototype.setHighlightedValue = function (id = false){
+	if (id || this.iHighlighted) {
+		obj = id || this.aSuggestions[ this.iHighlighted - 2]
+		this.sInput = this.fld.value = id || obj.value;
 		this.fld.focus();
 		// move cursor to end of input (safari)
 		if (this.fld.selectionStart) this.fld.setSelectionRange(this.sInput.length, this.sInput.length);
 		this.clearSuggestions();
-		if (typeof(this.oP.callback) == "function") this.oP.callback(this.fld.id, this.aSuggestions[this.iHighlighted - 2] );
+		if (typeof(this.oP.callback) == "function") this.oP.callback(this.fld.id, id || this.aSuggestions[this.iHighlighted - 2] );
 	}
 }
 

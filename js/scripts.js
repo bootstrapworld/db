@@ -78,6 +78,33 @@ function attachValidators () {
 // Given a form submission event, validate the form and
 // send the validated JSON to the form's "action", using
 // the form's "method". Then pass the response to the callback
+function updateRequest2(e, callback) {
+	console.log('processing updateRequest', e)
+	// validate the form and convert to JSON
+	formObject = validateSubmission(e);
+	if(!formObject) return false;
+	console.log('validated!', formObject);
+	const data = JSON.stringify(formObject);
+
+	// append method and JSON-formatted string to post address
+	const target = event.target;
+	target.action += '?method=update&data='+data; 
+
+	return new Promise(function(resolve, reject) {
+		var xhr = new XMLHttpRequest();
+		xhr.onload = function() {
+		    formObject.response = this.responseText; 
+			resolve(formObject);
+		};
+		xhr.onerror = reject;
+		xhr.open(target.method, target.action);
+		xhr.send();
+	}).then(callback);
+}
+
+// Given a form submission event, validate the form and
+// send the validated JSON to the form's "action", using
+// the form's "method". Then pass the response to the callback
 function updateRequest(e, callback) {
 	console.log('processing updateRequest', e)
 	// validate the form and convert to JSON
@@ -102,10 +129,12 @@ function updateRequest(e, callback) {
 }
 
 // If there's a target
-function setInfoFromDropDown(fieldID, obj, target, datatype) {
-	if(target) { 
-	    console.log('got response from dropdown modal', obj, target);
-		document.getElementById(target).value = obj.id; 
+function setInfoFromDropDown(fieldID, obj, targetId, datatype) {
+    console.log('setInfoFromDropDown called with', fieldID, obj, targetId, datatype);
+	if(targetId) { 
+	    console.log('got response from dropdown modal', obj, targetId);
+		document.getElementById(fieldID).value = obj.name; 
+		document.getElementById(targetId).value = obj.id; 
 	} else {
 		var searchParams = new URLSearchParams(window.location.search);
 		searchParams.set(datatype+"_id", obj.id);

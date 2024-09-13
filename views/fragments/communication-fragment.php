@@ -62,10 +62,12 @@ async function addOrEditComm(elt) {
     const fields = ['communication_id', 'person_id', 'name', 'bootstrap_id', 'bootstrap_name', 'type', 'date', 'notes'];
     fields.forEach(f => form.querySelector('[name="'+f+'"]').value = elt.dataset[f] || '');
 	form.querySelector('#date').value = elt.dataset['date'] || "<?php echo date("Y-m-d") ?>";
-	const resp = await waitForModal(elt, 'new_communication', updateRequest);
-	if((typeof resp == "boolean") && !resp) { return; } // false comes from canceling the modal: "do nothing"
-	else if(!isNaN(resp)) window.location.reload();     // number comes from a successful insert/update: "reload"
-	else console.error(resp);                           // anything else is an error
+	const resp = await waitForModal(elt, 'new_communication', updateRequest2);
+	switch (typeof resp) {
+	    case "boolean": return;
+	    case "object":  window.location.reload();
+	    default:        console.error(resp);
+	}
 }
 
 function deleteCommRq(id){
