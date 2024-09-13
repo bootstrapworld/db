@@ -54,31 +54,16 @@
 </div>
 
 <script>
-document.getElementById('new_enrollment').querySelector('form').onsubmit = (e) => updateRequest(e, updateEnrollmentRp);
-					
-function addOrEditEnrollment(elt) {
-    const m = new Modal(elt, 'new_enrollment', (id) => window.location.reload());
+async function addOrEditEnrollment(elt) {
+    const form = document.getElementById('new_enrollment');
     const fields = ["enrollment_id", "person_id", "name", "event_id", "title", "type", "created", "notes"];
-    console.log(elt.dataset.created || "<?php echo date("Y-m-d") ?>");
-    fields.forEach(f => document.querySelector('#new_enrollment [name="'+f+'"]').value  = elt.dataset[f] || null);
-	document.querySelector('#new_enrollment [name="created"]').value        = elt.dataset.type || "<?php echo date("Y-m-d") ?>";
+    fields.forEach(f => form.querySelector('[name="'+f+'"]').value  = elt.dataset[f] || null);
+	form.querySelector('[name="created"]').value = elt.dataset.type || "<?php echo date("Y-m-d") ?>";
+	const resp = await waitForModal(elt, 'new_enrollment', updateRequest);
+	if((typeof resp == "boolean") && !resp) { return; } // false comes from canceling the modal: "do nothing"
+	else if(!isNaN(resp)) window.location.reload();     // number comes from a successful insert/update: "reload"
+	else console.error(resp);                           // anything else is an error
 }
-
-
-// Once we know the DB update was successful:
-// - if we're inside a modal
-// - if we're not, rewrite the URL to switch to edit the record
-function updateEnrollmentRp( enrollmentId ){
-	if ( enrollmentId ){
-		const wrapper = document.getElementById('new_enrollment').parentNode;
-		if(wrapper.classList.contains("modal")) {
-				console.log('returning', enrollmentId,' from updateEnrollmentRp');
-				return enrollmentId; 
-		} else {
-			window.location.reload();
-		}
-	}
-}	
 
 function deleteEnrollmentRq(enrollmentId){
 	if(confirm("Are you sure you want to remove Enrollment ID# " + enrollmentId + " permanently?")){
@@ -86,15 +71,15 @@ function deleteEnrollmentRq(enrollmentId){
 		// if the request is successful, execute the callback
 		request.onreadystatechange = function() {
 			if (request.readyState == 4 && request.status == 200) {
-				deleteEnrollmentRp(request.responseText);
+			    const resp = request.responseText;
+            	console.log('got @'+resp+'@', typeof resp, !isNaN(resp));
+	            if((typeof resp == "boolean") && !resp) { return; } // false comes from a cancelled action: "do nothing"
+	            else window.location.reload();                      // number comes from a successful insert/update: "reload"
 			}
 		}; 
 		const data = JSON.stringify({enrollment_id:enrollmentId});
 		request.open('POST', "../actions/EnrollmentActions.php?method=delete&data="+data);
 		request.send();
 	}
-}
-function deleteEnrollmentRp( rsp ){
-	window.location.reload();
 }
 </script>

@@ -452,7 +452,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
 
 		<h2>Events (<?php echo mysqli_num_rows($events); ?>)</h2>
 		        
-		<input type="button" onmouseup="addEnrollment(this);" value="+ Add an Entry"
+		<input type="button" onmouseup="addOrEditEnrollment(this);" value="+ Add an Entry"
 		    data-person_id="<?php echo $data['person_id']; ?>"
 		    data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
 		/>
@@ -480,7 +480,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
 		?>
 		    <tr>
 		        <td class="controls">
-		            <a class="editButton" href="#" onmouseup="editEnrollment(this);" 
+		            <a class="editButton" href="#" onmouseup="addOrEditEnrollment(this);" 
 		                data-enrollment_id="<?php echo $row['enrollment_id']; ?>"
 		                data-event_id="<?php echo $row['event_id']; ?>"
 		                data-person_id="<?php echo $data['person_id']; ?>"

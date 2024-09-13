@@ -24,7 +24,7 @@
 		   value="<?php echo $data["bootstrap_id"] ?>" 
 	/>
 	<span class="formInput">
-		<input  id="bootstrap_name" name="name" ignore="yes"
+		<input  id="bootstrap_name" name="bootstrap_name" ignore="yes"
 			placeholder="Your name" validator="dropdown"
 			datatype="person" target="bootstrap_id"
 			value="<?php echo $data["bootstrap_name"] ?>" 
@@ -57,28 +57,16 @@
 </div>
 
 <script>
-document.getElementById('new_communication').querySelector('form').onsubmit = (e) => updateRequest(e, updateCommRp);
-
-function addOrEditComm(elt) {
-    const m = new Modal(elt, 'new_communication', (id) => console.log(id));
+async function addOrEditComm(elt) {
     const form = document.getElementById('new_communication');
     const fields = ['communication_id', 'person_id', 'name', 'bootstrap_id', 'bootstrap_name', 'type', 'date', 'notes'];
-    fields.forEach(f => form.querySelector('#'+f).value = elt.dataset[f] || '');
+    fields.forEach(f => form.querySelector('[name="'+f+'"]').value = elt.dataset[f] || '');
 	form.querySelector('#date').value = elt.dataset['date'] || "<?php echo date("Y-m-d") ?>";
-	m.showModal();
+	const resp = await waitForModal(elt, 'new_communication', updateRequest);
+	if((typeof resp == "boolean") && !resp) { return; } // false comes from canceling the modal: "do nothing"
+	else if(!isNaN(resp)) window.location.reload();     // number comes from a successful insert/update: "reload"
+	else console.error(resp);                           // anything else is an error
 }
-
-// Once we know the DB update was successful:
-// - if we're inside a modal
-// - if we're not, rewrite the URL to switch to edit the record
-function updateCommRp( commId ){
-	if ( commId ){
-		return commId; 
-		window.location.reload();
-	} else {
-        console.error('An error occurred while submitting a communication:', commId);
-	}
-}	
 
 function deleteCommRq(id){
 	if(confirm("Are you sure you want to remove Communication ID# " + id + " permanently?")){
@@ -86,15 +74,15 @@ function deleteCommRq(id){
 		// if the request is successful, execute the callback
 		request.onreadystatechange = function() {
 			if (request.readyState == 4 && request.status == 200) {
-				deleteCommRp(request.responseText);
+			    const resp = request.responseText;
+            	console.log('got @'+resp+'@', typeof resp, !isNaN(resp));
+	            if((typeof resp == "boolean") && !resp) { return; } // false comes from a cancelled action: "do nothing"
+	            else window.location.reload();                      // number comes from a successful insert/update: "reload"
 			}
 		}; 
 		const data = JSON.stringify({comm_id:id});
 		request.open('POST', "../actions/CommunicationActions.php?method=delete&data="+data);
 		request.send();
 	}
-}
-function deleteCommRp( rsp ){
-	window.location.reload();
 }
 </script>

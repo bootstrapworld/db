@@ -1,5 +1,21 @@
 if (typeof(Modal) == "undefined") Modal = {}
 
+async function waitForModal(showButton, eltID, submitHandler) {
+    const elt = document.getElementById(eltID);
+    const form = elt.querySelector('form');
+    return new Promise(resolve => {
+        const modalObj = new Modal(showButton, eltID, response => resolve(response))
+        form.querySelector('[id$=Cancel]').onclick = (e) => { modalObj.hideModal(); resolve(false); }
+        form.onsubmit = async (e) => { 
+            e.preventDefault();                             // kill the event so we can do it ourselves
+            const res = await submitHandler(e, r => r);     // make the request, wait for the response, and just hand it back
+            modalObj.hideModal();                           // hide the modal
+            resolve(res);                                   // resolve the promise, passing back the response
+        }
+        modalObj.showModal();
+    });
+}
+
 /* Initialize a Modal Object 
 Modals contain:
 - a "show button" which opens the modal
