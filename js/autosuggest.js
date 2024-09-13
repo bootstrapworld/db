@@ -2,6 +2,11 @@ if (typeof(Autosuggest) == "undefined") Autosuggest = {}
 
 async function modalAddition(showButton, modalEltId, dropdownFieldId, callback) {
     console.log('starting modalAddition. result will be passed to', callback);
+    const modalElt = document.getElementById(modalEltId);
+    [...modalElt.querySelectorAll('input:not([type="button"], [type="submit"]), select')].forEach( elt => {
+       elt.value = null;
+       delete elt.checked;
+    });
     const result = await waitForModal(showButton, modalEltId, updateRequest2);
     console.log(result, typeof result, !isNaN(result));
     switch(typeof result) {

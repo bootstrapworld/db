@@ -538,8 +538,8 @@ if($data) {
 			</script>
 			
 			<!-- Organization modal -->
-			<div id="new_organization_modal" class="modal">
-				<form id="new_organization" novalidate action="../actions/OrganizationActions.php">
+			<div id="new_organization" class="modal">
+				<form novalidate action="../actions/OrganizationActions.php">
 					<?php include 'fragments/organization-fragment.php' ?>
 					<input type="submit" id="new_organizationSubmit" value="Submit">
 					<input type="button" id="new_organizationCancel" class="modalCancel" value="Cancel" />
