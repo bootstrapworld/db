@@ -1,5 +1,5 @@
-<div id="newcommunication" class="modal">
-	<form id="new_communication" novalidate action="../actions/CommunicationActions.php">
+<div id="new_communication" class="modal">
+<form novalidate action="../actions/CommunicationActions.php">
 <fieldset>
 	<legend>Communication Information</legend>
 	
@@ -40,7 +40,7 @@
 	<span class="formInput">
 		<input  id="date" name="date" 
 			validator="date" 
-			value="<?php echo $data["date"] ?>" 
+			value="<?php date("Y-m-d") ?>" 
 			type="date"  required="yes" />
 		<label for="date">Date</label>
 	</span>
@@ -51,47 +51,32 @@
 		<label for="notes">Notes</label>
 	</span>
 </fieldset>
-<input type="submit" id="new_communicationSubmit" value="💾 Save" onclick="window.location.reload()">
+<input type="submit" id="new_communicationSubmit" value="💾 Save" >
 <input type="button" id="new_communicationCancel" value="↩️ Cancel "class="modalCancel">
 </form>
 </div>
 
 <script>
-document.getElementById('new_communication').onsubmit = (e) => updateRequest(e, updateCommRp);
+document.getElementById('new_communication').querySelector('form').onsubmit = (e) => updateRequest(e, updateCommRp);
 
-function editComm(elt) {
+function addOrEditComm(elt) {
     const m = new Modal(elt, 'new_communication', (id) => console.log(id));
-	document.getElementById('communication_id').value   = elt.dataset.communication_id;
-	document.getElementById('person_id').value          = elt.dataset.person_id;
-	document.getElementById('name').value               = elt.dataset.name;
-	document.getElementById('bootstrap_id').value       = elt.dataset.bootstrap_id;
-	document.getElementById('bootstrap_name').value     = elt.dataset.bootstrap_name;
-	document.getElementById('type').value               = elt.dataset.type;
-	document.getElementById('date').value               = elt.dataset.date;
-	document.getElementById('notes').value              = elt.dataset.notes;
+    const form = document.getElementById('new_communication');
+    const fields = ['communication_id', 'person_id', 'name', 'bootstrap_id', 'bootstrap_name', 'type', 'date', 'notes'];
+    fields.forEach(f => form.querySelector('#'+f).value = elt.dataset[f] || '');
+	form.querySelector('#date').value = elt.dataset['date'] || "<?php echo date("Y-m-d") ?>";
 	m.showModal();
 }
-function addComm(elt) {
-	const m = new Modal(elt, 'new_communication', (id) => console.log(id));
-	document.getElementById('person_id').value  = elt.dataset.person_id || '';
-	document.getElementById('name').value       = elt.dataset.name || '';
-	document.getElementById('date').value       = "<?php echo date("m/d/Y") ?>";
-	m.showModal();
-}
-
 
 // Once we know the DB update was successful:
 // - if we're inside a modal
 // - if we're not, rewrite the URL to switch to edit the record
 function updateCommRp( commId ){
 	if ( commId ){
-		const wrapper = document.getElementById('new_communication').parentNode;
-		if(wrapper.classList.contains("modal")) {
-				console.log('returning', commId,'from updateCommRp');
-				return commId; 
-		} else {
-			window.location.reload();
-		}
+		return commId; 
+		window.location.reload();
+	} else {
+        console.error('An error occurred while submitting a communication:', commId);
 	}
 }	
 

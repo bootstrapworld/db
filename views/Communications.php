@@ -67,7 +67,7 @@
 	<div id="content">
 		<h1>Communications</h1>
 
-        <input type="button" onclick="addComm(this)" value="+ Add a Communication"/>
+        <input type="button" onclick="addOrEditComm(this)" value="+ Add a Communication"/>
 
 	    <table class="smart">
 		    <thead>
@@ -88,7 +88,7 @@
 		  ?>
 		    <tr>
 		        <td class="controls">
-		            <a class="editButton" href="#" onmouseup="editComm(this);" 
+		            <a class="editButton" href="#" onmouseup="addOrEditComm(this);" 
 		                data-communication_id="<?php echo $row['communication_id']; ?>"
 		                data-person_id="<?php echo $row['person_id']; ?>"
 		                data-name="<?php echo $row['name']; ?>"

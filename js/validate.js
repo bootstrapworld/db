@@ -196,6 +196,7 @@ function validateSubmission(submitEvent){
 	    (elt.getAttribute("ignore") !== "yes") &&
 		    ((elt.nodeName == "SELECT") || (elt.type == "hidden") || 
 		     (elt.type == "checkbox") ||
+		     (elt.nodeName == "TEXTAREA") ||
 		     ((elt.type == "text") && (elt.classname !== "modal"))));
 		     
 	// validate every one of them
