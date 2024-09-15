@@ -303,18 +303,13 @@ function deletePersonRq(){
 		// if the request is successful, execute the callback
 		request.onreadystatechange = function() {
       if (request.readyState == 4 && request.status == 200) {
-        deletePersonRp(request.responseText);
+        window.location = baseURL + `/views/People.php`;
       }
   	}; 
 		const data = JSON.stringify({person_id:id});
 		request.open('POST', "../actions/PersonActions.php?method=delete&data="+data);
 		request.send();
 	}
-}
-function deletePersonRp( rsp ){
-	alert("Deleted ID#: " + rsp );
-	const urlValue = baseURL + `/views/People.php`;
-	window.location = urlValue;
 }
 
 function editEnrollment(elt) {

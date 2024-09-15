@@ -1,6 +1,5 @@
 // remove all invalid chars. If what's left is a number, reformat or else return error
 function validate_phone(value){
-	value = unescape(value);
 	if (value.length == 0) return [true, ""];
 	var FmtStr = "";
 	for (var i = 0;  i != value.length; i++){
@@ -12,7 +11,6 @@ function validate_phone(value){
 	}
 
 function validate_json(value) {
-    value = unescape(value);
     try {
         JSON.parse(value);
     } catch (e) {
@@ -22,28 +20,24 @@ function validate_json(value) {
 }
 
 function validate_url(value) {
-	value = unescape(value);
 	var objRegExp  = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
 	test = objRegExp.test(value) || (value == "");
 	return [test, (test)? value : "This URL is not valid (did you forget the https://?"];
 }
 
 function validate_email(value) {
-	value = unescape(value);
 	var objRegExp  = /^[a-z0-9]([a-z0-9_\-\.]*)@([a-z0-9_\-\.]*)(\.[a-z]{2,3}(\.[a-z]{2}){0,2})$/i;
 	test = objRegExp.test(value) || (value == "");
 	return [test, (test)? value : "This email address is not valid"];
 }
 
 function validate_zip(value) {
-	value = unescape(value);
 	var objRegExp  = /(^\d{5}$)|(^\d{5}-\d{4}$)/;
 	test = objRegExp.test(value) || (value == "");
 	return [test, (test)? value : "Zip codes must contain 5 numbers."];
 }
 
 function validate_date(value) {
-	value = unescape(value);
 	if(value.length==0) return [true, value];
 	if(!Date.parse(value)) return [false, "This is not a valid date"];
 	else console.log('valid date:', value)
@@ -51,7 +45,6 @@ function validate_date(value) {
 }
 
 function validate_time(value) {
-	value = unescape(value);
 	if(value=="") return [true, value];
 	value = value.toLowerCase();
 	matchArray = value.split(':');
@@ -84,7 +77,6 @@ function showErr(elt, msg){
 
 /* validate the input, and display error msg or correct the field if necessary */
 function validate(elt, type, value){
-	value = escape(value);
 	let valid = true;
 	
 	// is the field required? is it blank? Required + Blank =  Missing
@@ -92,7 +84,7 @@ function validate(elt, type, value){
 	blank	 = (value == "")? true: false;
 
 	// if it's a dropdown, make sure the target was set!
-	if(elt.getAttribute('validator') == "dropdown"){
+	if(elt.getAttribute('validator') == "dropdown") {
 	    const targetValue = document.getElementById(elt.getAttribute('target')).value;
 	    blank = !targetValue;
 	    // if it's a valid selection and there's a value in the target, we're good
@@ -147,40 +139,32 @@ function isValid(parm, val) {
 }
 // for items with no class
 function validate_(value) { 
-	value = unescape(value);
 	return [true, value];}
 
 // for autosuggest dropdowns
 function validate_dropdown(value){
-	value = unescape(value);
 	return [true, value];
 }
 
 function validate_num(value) {
-	value = unescape(value);
 	return isValid(value,numb)? [true, value] : [false, "Please use only numbers"];
 }
 function validate_numsym(value) {
-	value = unescape(value);
 	return isValid(value,numbsym)? [true, value] : [false, "Please use only numbers and symbols"];
 }
 function validate_lower(value) {
 	return isValid(value,lwr)? [true, value] : [false, "Please use only lowercase letters"];
 }
 function validate_upper(value) {
-	value = unescape(value);
 	return isValid(value,upr)? [true, value] : [false, "Please use only uppercase letters"];
 }
 function validate_alpha(value) {
-	value = unescape(value);
 	return isValid(value,alphasym)? [true, value] : [false, "Please use only letters, dashes, spaces, and periods"];
 }
 function validate_alphanum(value) {
-	value = unescape(value);
 	return isValid(value,alphasym+numbsym)? [true, value] : [false, "Please use only letter, dashes, spaces, periods, and numbers"];
 }
 function validate_alphanumbsym(value) {
-	value = unescape(value);
 	return isValid(value,alphanumbsym)? [true, value] : [false, "You may be using punctuation that is not supported in this form"];
 }
 // convert str to camel case
