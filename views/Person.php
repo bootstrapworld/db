@@ -262,7 +262,7 @@
 				                placeholder="Which school or organization do you work for?" validator="dropdown"
 				                datatype="organization"  target="employer_id" addnew="yes"
 				                value="<?php echo $data["employer_name"] ?>" 
-				                type="text" size="70" maxlength="70" ignore="yes" />
+				                type="search" size="70" maxlength="70" ignore="yes" />
 			            <label for="employer_name">School or Employer Name</label>
 	                </span>
 	                <p/>

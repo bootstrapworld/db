@@ -13,7 +13,7 @@ async function modalAddition(showButton, modalEltId, dropdownFieldId, callback) 
         case "boolean": return;
         case "object":
     	    console.log('modal returned', result, '. Passing to callback');
-    	    return callback(dropdownFieldId, {id: result.response, name: decodeURI(result.name)}); 
+    	    return callback(dropdownFieldId, {id: result.response, name: result.name}); 
     	default: console.error(result);
     }
 }
@@ -153,12 +153,6 @@ AutoSuggest.prototype.createList = function(arr){
 	if(!this.fld.getAttribute('addnew')) a.style.display = "none";
 	// **** see modal.js to understand this line
 	const target = this.fld.getAttribute('target');
-	//let callback = function (id) {document.getElementById(target).value = id;}
-	if(document.getElementById('modalWindow') && document.getElementById('modalWindow').contains(this.fld)) {
-		console.log('building Autosuggest INSIDE a modal');
-	} else {
-		console.log('building Autosuggest OUTSIDE a modal');
-	}
 	
 	// if it's possible to add a new item, prepare an async Modal call and assign it to the link's click event
 	if(this.fld.getAttribute('addnew')) {

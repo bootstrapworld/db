@@ -108,10 +108,10 @@ function setInfoFromDropDown(fieldID, obj, targetId, datatype) {
 		
 		// set the target elts' value
 		document.getElementById(targetId).value = obj.id;
-	    
+	
 	    // set the elt's value and originalValue, save valid selection, and restore color
-		field.value = obj.value || obj.name; 
-		field.setAttribute('originalValue', obj.value || obj.name);
+		field.value = obj.value || obj.name;
+		field.setAttribute('originalValue', field.value);
 		field.style.color = 'black';
 		
 		// blur
