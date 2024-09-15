@@ -51,14 +51,14 @@ function attachValidators () {
 				    elt.autocomplete='none'
 				}); 
 				
-				// INPUT- for each character typed, change opacity and validity if the value is different from the original
+				// INPUT- for each character typed, change color and validity if the value is different from the original
 				input.addEventListener('input', e => { 
 				    const elt = e.srcElement;
 				    if((elt.getAttribute('originalValue') !== elt.value)) {
-				        elt.style.opacity = 0.5;
+				        elt.style.color = 'gray';
 				        elt.removeAttribute('validSelection');
 				    } else {
-				        elt.style.opacity = 1;    
+				        elt.style.color = 'black';
 				        elt.setAttribute('validSelection', true);
 				    }
 				});
@@ -109,10 +109,10 @@ function setInfoFromDropDown(fieldID, obj, targetId, datatype) {
 		// set the target elts' value
 		document.getElementById(targetId).value = obj.id;
 	    
-	    // set the elt's value and originalValue, save valid selection, and restore opacity
+	    // set the elt's value and originalValue, save valid selection, and restore color
 		field.value = obj.value || obj.name; 
 		field.setAttribute('originalValue', obj.value || obj.name);
-		field.style.opacity = 1;
+		field.style.color = 'black';
 		
 		// blur
 		field.setAttribute('validSelection', true);
