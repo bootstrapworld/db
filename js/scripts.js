@@ -33,15 +33,47 @@ function attachValidators () {
 			}
 		});
 		inputs.forEach(input => {
-			if(input.className == "modal"){	
-				var modalObj = new Modal(input,input.getAttribute('contents'), input.getAttribute('callback'));
-				return;
+		    // validate all text and date boxes
+			if(["text", "date"].includes(input.type)){
+				input.addEventListener('blur', (e) => validate(input, input.getAttribute('validator') || '', input.value)); 
 			}
 			
+			// If it's a dropdown, set up event handlers and AutoSuggest dropdown objects
 			if(input.getAttribute('validator') == "dropdown"){
 				const datatype = input.getAttribute('datatype');
 				const target = input.getAttribute('target');
-				input.addEventListener('focus', e => e.srcElement.autocomplete='none'); // chrome hack to turn off autocomplete
+				
+				// FOCUS - when focused, copy the original value and assume the selection is valid
+				input.addEventListener('focus', e => { 
+				    const elt = e.srcElement;
+				    elt.setAttribute('originalValue', elt.value);
+				    elt.setAttribute('validSelection', true);
+				    elt.autocomplete='none'
+				}); 
+				
+				// INPUT- for each character typed, change opacity and validity if the value is different from the original
+				input.addEventListener('input', e => { 
+				    const elt = e.srcElement;
+				    if((elt.getAttribute('originalValue') !== elt.value)) {
+				        elt.style.opacity = 0.5;
+				        elt.removeAttribute('validSelection');
+				    } else {
+				        elt.style.opacity = 1;    
+				        elt.setAttribute('validSelection', true);
+				    }
+				});
+
+				// BLUR - the input is left blank or there's an invalid selection, clear the target
+				input.addEventListener('blur', (e) => {
+				    const elt = e.srcElement;
+				    // if it's empty or not a valid selection, set the target to empty
+				    if(!elt.value || !elt.getAttribute('validSelection')) {  elt.value = document.getElementById(target).value = ''; }
+				    
+				    // reset validSelection and perform validation
+				    elt.removeAttribute('validSelection');
+				    const check = validate(input, input.getAttribute('validator') || '', input.value);
+				}); 
+				
 				switch(datatype){
 					case "person":
 						var options = { script:	"../actions/PersonActions.php?method=searchForNames&", varname: "search", json: true,
@@ -63,17 +95,34 @@ function attachValidators () {
 				}
 
 				// set up autosuggest object (see autosuggest.js)
-				input.setAttribute('script', options.script);
 				var suggestObj = new AutoSuggest(input.id, options);
-				input.addEventListener('blur', (e) => validate(input, input.getAttribute('validator') || '', input.value)); 
-                return;
 			} 
-			if(["text", "date"].includes(input.type)){
-				input.addEventListener('blur', (e) => validate(input, input.getAttribute('validator') || '', input.value)); 
-			}
 		});
 	});
 };
+
+function setInfoFromDropDown(fieldID, obj, targetId, datatype) {
+	if(targetId) { 
+	    console.log('got response from dropdown modal', obj, targetId);
+	    const field = document.getElementById(fieldID);
+		
+		// set the target elts' value
+		document.getElementById(targetId).value = obj.id;
+	    
+	    // set the elt's value and originalValue, save valid selection, and restore opacity
+		field.value = obj.value || obj.name; 
+		field.setAttribute('originalValue', obj.value || obj.name);
+		field.style.opacity = 1;
+		
+		// blur
+		field.setAttribute('validSelection', true);
+		document.getElementById(fieldID).blur();
+	} else {
+		var searchParams = new URLSearchParams(window.location.search);
+		searchParams.set(datatype+"_id", obj.id);
+		window.location.search = searchParams.toString();		
+	}
+}
 
 // Given a form submission event, validate the form and
 // send the validated JSON to the form's "action", using
@@ -126,20 +175,6 @@ function updateRequest(e, callback) {
 		xhr.open(target.method, target.action);
 		xhr.send();
 	}).then(callback);
-}
-
-// If there's a target
-function setInfoFromDropDown(fieldID, obj, targetId, datatype) {
-    console.log('setInfoFromDropDown called with', fieldID, obj, targetId, datatype);
-	if(targetId) { 
-	    console.log('got response from dropdown modal', obj, targetId);
-		document.getElementById(fieldID).value = obj.name; 
-		document.getElementById(targetId).value = obj.id; 
-	} else {
-		var searchParams = new URLSearchParams(window.location.search);
-		searchParams.set(datatype+"_id", obj.id);
-		window.location.search = searchParams.toString();		
-	}
 }
 
 /*

@@ -85,31 +85,36 @@ function showErr(elt, msg){
 /* validate the input, and display error msg or correct the field if necessary */
 function validate(elt, type, value){
 	value = escape(value);
-
-	// don't validate disabled, readonly, or ignorable fields
-	if(elt.getAttribute('disabled')) return true;
-	if(elt.getAttribute('readonly')) return true;
-	if(elt.getAttribute('ignore')  ) return true;
-
-
+	let valid = true;
+	
 	// is the field required? is it blank? Required + Blank =  Missing
 	required = (elt.getAttribute('required') == "yes")? true : false;
 	blank	 = (value == "")? true: false;
 
 	// if it's a dropdown, make sure the target was set!
-	if(type == "dropdown"){
+	if(elt.getAttribute('validator') == "dropdown"){
 	    const targetValue = document.getElementById(elt.getAttribute('target')).value;
-	    blank = !targetValue || (targetValue == undefined)
+	    blank = !targetValue;
+	    // if it's a valid selection and there's a value in the target, we're good
+	    if(blank && required) {
+	        value="You must select an option from the auto-suggest dropdown list. If you don't see the "+elt.getAttribute('datatype')+" you want, you may need to add it before completing this form."
+	        valid = false;
+	    }
+	} else {
+	    missing	 = required && blank;
+
+	    // don't validate disabled, readonly, or ignorable fields
+	    if(elt.getAttribute('disabled')) return true;
+	    if(elt.getAttribute('readonly')) return true;
+	    if(elt.getAttribute('ignore')  ) return true;
+
+	    // call validate
+	    if(debug > 3) alert("calling validate_" + type + "("+value+")");
+	    result = eval("validate_" + type + "(\'" + value + "\')");
+	    valid = result[0] && (!missing);
+	    value = result[1];
+	    if(missing) value = "This field cannot be left blank";
 	}
-	missing	 = required && blank;
-		
-	// call validate
-	if(debug > 3) alert("calling validate_" + type + "("+value+")");
-	result = eval("validate_" + type + "(\'" + value + "\')");
-	valid = result[0] && (!missing);
-	value = result[1];
-	if(missing) value = "This field cannot be left blank";
-	if(missing && (type == "dropdown")) value="You must select an option from the auto-suggest dropdown list. If you don't see the "+elt.getAttribute('datatype')+" you want, you may need to add it before completing this form."
 	
 	if(!valid) {
 		elt.style.border='solid red 2px';
