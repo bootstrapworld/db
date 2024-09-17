@@ -83,26 +83,9 @@ Modal.prototype.showModal = function(){
 	  .find(elt => (elt.type !== "hidden") && (!elt.disabled) && (elt.tabIndex > -1))
 	  .focus();
 	
-	// set callback functions for "cancel" and "submit" buttons
-	var cancel = this.contents.querySelector("[id$=Cancel]");
-	var submit = this.contents.querySelector("[id$=Submit]");
-
     // cancel hides the modal and returns false
+	var cancel = this.contents.querySelector("[id$=Cancel]");
 	cancel.onclick = () => { pointer.hideModal(); return false; }
-	
-	// grab the existing submit event
-	const oldOnSubmit = this.contents.nodeName == "form"? this.contents : this.contents.querySelector('form').onsubmit;
-	console.log('old submit handler', oldOnSubmit)
-	
-	// wrap it in something that submits, then hides the modal and passes the result to the callback function
-	this.contents.querySelector('form').onsubmit = (e) => {
-	    console.log('new submit is being called')
-		result = oldOnSubmit(e).then(id => {
-			console.log('got result', id, 'in outer submit handler')
-			if(id) this.hideModal();
-			this.callback(id); // pass the result to the callback
-		});
-	}
 }
 
 Modal.prototype.hideModal = function(){

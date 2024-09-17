@@ -18,6 +18,7 @@ $header_nav = '<nav id="header">
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
         <a href="Communications.php">Communications</a>
+        <a href="Classes.php">Classes</a>
         <a href="Instruments.php">Instruments</a>
     </nav>';
 
@@ -44,6 +45,10 @@ $gradeOpts = ["Pre-K",
 						"Middle & High School",
 						"K-12",
 						"Other"];
+						
+$classTypeOpts = ["Regular", "Honors", "AP", "Remedial"];
+
+$computerAccessOpts = ["Regular", "Honors", "AP", "Remedial"];
 
 $roleOpts = ["Teacher",
 						"Teacher Support",
@@ -85,6 +90,10 @@ $currOpts = ["Algebra",
 	"Physics", 
 	"Reactive", 
 	"History/SS"];
+	
+$modelOpts = ["Dedicated Course","Dedicated Unit Within Existing Course","Lessons Sprinkled Throughout Course"];
+
+$implStatusOpts = ["Implementing","Not implementing yet, but will this school year","Will not implement this school year, but will next year","Will not implement","Unknown"];
 
 $eventTypeOpts = ["Presentation","Coaching","Training","Meetup","Panel","AYW"];
 

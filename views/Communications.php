@@ -54,7 +54,7 @@
             AND E.type = 'Training'
             WHERE 
 	            C.person_id = P.person_id
-            GROUP BY C.person_id
+            GROUP BY C.communication_id
             ORDER BY C.date DESC";
             
 	  $comms = $mysqli->query($sql);

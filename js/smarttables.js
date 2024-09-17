@@ -124,7 +124,7 @@ SmartTable.prototype.rebuildTable = function (e) {
     }
     
     if(filter2) {
-        if(     filter1Type.value == 'contains'   ) { filterConfigs.push({idx: filter2Col.value, fn: v => filter2.every(n => v.includes(n))  }) }
+        if(     filter2Type.value == 'contains'   ) { filterConfigs.push({idx: filter2Col.value, fn: v => filter2.every(n => v.includes(n))  }) }
         else if(filter2Type.value == 'lessThan'   ) { filterConfigs.push({idx: filter2Col.value, fn: v => v < filter2           }) }
         else if(filter2Type.value == 'greaterThan') { filterConfigs.push({idx: filter2Col.value, fn: v => v > filter2           }) }
     }
