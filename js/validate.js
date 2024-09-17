@@ -79,6 +79,9 @@ function showErr(elt, msg){
 function validate(elt, type, value){
 	let valid = true;
 	
+	// rewrite value: trim outside whitespace, and escape newlines and tabs
+	value = value.trim().replace(/\n/g, "\\\\n").replace(/\r/g, "\\\\r").replace(/\t/g, "\\\\t");
+
 	// is the field required? is it blank? Required + Blank =  Missing
 	required = (elt.getAttribute('required') == "yes")? true : false;
 	blank	 = (value == "")? true: false;
@@ -101,7 +104,7 @@ function validate(elt, type, value){
 	    if(elt.getAttribute('ignore')  ) return true;
 
 	    // call validate
-	    if(debug > 3) alert("calling validate_" + type + "("+escape(value)+")");
+	    if(debug > 3) alert("calling validate_" + type + "("+value+")");
 	    result = eval("validate_" + type + "(`" + value + "`)");
 	    valid = result[0] && (!missing);
 	    value = result[1];
