@@ -56,10 +56,10 @@ SmartTable = function(table){
 	        <option value="greaterThan">></options>
 	        <option value="lessThan"><</options>
 	    </select>
-	    <input class="filter" size="20" />
+	    <input class="filter" size="10" />
 	</span>`;
 
-    controls.innerHTML += '<a href="#" class="exportCSV"></a>';
+    controls.innerHTML += '<a href="#" class="exportCSV" title="Download Rows as CSV"></a>';
     controls.innerHTML += "<b>Filter 1:</b>";
 	controls.appendChild(this.filter1Col);
 	controls.innerHTML += filterHTML;
