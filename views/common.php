@@ -46,7 +46,7 @@ $gradeOpts = ["Pre-K",
 						"K-12",
 						"Other"];
 						
-$computerAccessOpts = ["Regular", "Honors", "AP", "Remedial"];
+$computerAccessOpts = ['1-to-1','1-to-1 (iPads)','Some computer access','Little computer access','BYOD','No computer access'];
 
 $roleOpts = ["Teacher",
 						"Teacher Support",

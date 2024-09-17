@@ -37,7 +37,6 @@
 
 	$mysqli = openDB_Connection();
 	
-	
 	$sql = "SELECT *, SUM(num_students) AS num_students
 	        FROM 
                 Implementations AS I,
@@ -49,6 +48,21 @@
             GROUP BY I.person_id";
             
 	  $classes = $mysqli->query($sql);
+	  
+	  $sql = "SELECT 1 AS X,
+	            SUM(num_students) AS num_students,
+	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_iep')       AS DECIMAL(2,2)))  AS pct_iep,
+	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_girls')     AS DECIMAL(2,2)))  AS pct_girls,
+	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_non_binary') AS DECIMAL(2,2))) AS pct_non_binary,
+	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_black')     AS DECIMAL(2,2)))  AS pct_black,
+	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_latino')    AS DECIMAL(2,2)))  AS pct_latino,
+	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_asian')     AS DECIMAL(2,2)))  AS pct_asian,
+	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_islander')  AS DECIMAL(2,2)))  AS pct_islander
+	        FROM 
+                Implementations AS I
+            GROUP BY X";
+            
+	  $summary = $mysqli->query($sql);;
 	  $mysqli->close();
 	?>
 </head>

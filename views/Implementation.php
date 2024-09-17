@@ -12,7 +12,9 @@
 	<script type="text/javascript" src="../js/modal.js"></script>
 	<script type="text/javascript" src="../js/smarttables.js"></script>
 	<script type="text/javascript" src="../js/scripts.js"></script>	
-
+	
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
 	<style>
 	    td, th { padding: 5px; }
 	    table { border: 1px solid black; }
@@ -20,7 +22,36 @@
 	        width: 75px;
 	    }
 	</style>
+
+<?php
+    include 'common.php';
+	$mysqli = openDB_Connection();
+	//{"pct_iep":"0.8", "pct_girls":"0.45", "pct_non_binary":"0.1", "pct_black":"0.2", "pct_latino":"0.1", "pct_asian":"0.1", "pct_islander":"0.03"}
+	$sql = "SELECT *, 
+	            SUM(num_students) AS num_students,
+	            CAST(JSON_EXTRACT(demographics_json, '$.pct_iep')       AS DECIMAL(2,2))  AS pct_iep,
+	            CAST(JSON_EXTRACT(demographics_json, '$.pct_girls')     AS DECIMAL(2,2))  AS pct_girls,
+	            -- num_students * (1 - (pct_girls + pct_non_binary))       AS DECIMAL(2,2))  AS pct_boys,
+	            CAST(JSON_EXTRACT(demographics_json, '$.pct_non_binary') AS DECIMAL(2,2)) AS pct_non_binary,
+	            CAST(JSON_EXTRACT(demographics_json, '$.pct_black')     AS DECIMAL(2,2))  AS pct_black,
+	            CAST(JSON_EXTRACT(demographics_json, '$.pct_latino')    AS DECIMAL(2,2))  AS pct_latino,
+	            CAST(JSON_EXTRACT(demographics_json, '$.pct_asian')     AS DECIMAL(2,2))  AS pct_asian,
+	            CAST(JSON_EXTRACT(demographics_json, '$.pct_islander')  AS DECIMAL(2,2))  AS pct_islander
+	        FROM 
+                Implementations AS I,
+	            People AS P
+	        LEFT JOIN Organizations AS O
+	        ON O.org_id = P.employer_id
+            WHERE 
+	            I.person_id = P.person_id
+	        AND I.implementation_id=".$_REQUEST['implementation_id'];
+	$result = $mysqli->query($sql);
+	$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
+	$mysqli->close();
 	
+	$title = isset($_GET["implementation_id"])? $data["course_name"] : "New Course";
+?>
+
 	<!--- AJAX calls --->
 	<script type="text/javascript">
 		function updateImplementationRp( resp ){
@@ -50,35 +81,59 @@
 			const urlValue = baseURL + `/views/Classes.php`;
 			window.location = urlValue;
 		}
+		
+		function drawCharts() {
+		    drawGenderChart();
+		    drawEthnicityChart() 
+		}
+		
+		function drawGenderChart() {
+		    const num_students  = Number(document.getElementById('num_students').value);
+		    const pct_girls     = Number(document.getElementById('pct_girls').value);
+		    const pct_non_binary= Number(document.getElementById('pct_non_binary').value);
+		    const pct_boys      = 1 - (pct_girls + pct_non_binary);
+            const data = google.visualization.arrayToDataTable([
+                ['Gender', '#Students', {type:'string', role:'tooltip'}],
+                ['Boys', pct_boys, String(Math.round(num_students * pct_boys)) + " male students"],
+                ['Girls', pct_girls, String(Math.round(num_students * pct_girls)) + " female students"],
+                ['Non Binary', pct_non_binary, String(Math.round(num_students * pct_non_binary)) + " non-binary students"],
+            ]); 
+  
+            var options = {
+                title: 'Gender',
+                legend: 'none',
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('genderChart'));
+            chart.draw(data, options);
+        }
+        
+		function drawEthnicityChart() {
+		    const num_students  = Number(document.getElementById('num_students').value);
+		    const pct_black     = Number(document.getElementById('pct_black').value);
+		    const pct_latino    = Number(document.getElementById('pct_latino').value);
+		    const pct_asian     = Number(document.getElementById('pct_asian').value);
+		    const pct_islander  = Number(document.getElementById('pct_islander').value);
+		    const pct_white     = (1 - (pct_black + pct_latino + pct_asian + pct_islander));
+            const data = google.visualization.arrayToDataTable([
+                ['Ethnicty', '#Students', {type:'string', role:'tooltip'}],
+                ['White', pct_white, String(Math.round(num_students * pct_white)) + " white students"],
+                ['Black', pct_black, String(Math.round(num_students * pct_black)) + " female students"],
+                ['Latino', pct_latino, String(Math.round(num_students * pct_latino)) + " latino students"],
+                ['Asian', pct_asian, String(Math.round(num_students * pct_asian)) + " asian students"],
+                ['Pacific Islander', pct_islander, String(Math.round(num_students * pct_islander)) + " islander students"],
+            ]); 
+  
+            var options = {
+                title: 'Ethnicity',
+                legend: 'none',
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('ethnicityChart'));
+            chart.draw(data, options);
+        }
 	</script>
 	
-<?php
-    include 'common.php';
-	$mysqli = openDB_Connection();
-	//{"pct_iep":"0.8", "pct_girls":"0.45", "pct_non_binary":"0.1", "pct_black":"0.2", "pct_latino":"0.1", "pct_asian":"0.1", "pct_islander":"0.03"}
-	$sql = "SELECT *, 
-	            SUM(num_students) AS num_students,
-	            CAST(JSON_EXTRACT(demographics_json, '$.pct_iep')       AS DECIMAL(2,2))  AS pct_iep,
-	            CAST(JSON_EXTRACT(demographics_json, '$.pct_girls')     AS DECIMAL(2,2))  AS pct_girls,
-	            CAST(JSON_EXTRACT(demographics_json, '$.pct_non_binary') AS DECIMAL(2,2)) AS pct_non_binary,
-	            CAST(JSON_EXTRACT(demographics_json, '$.pct_black')     AS DECIMAL(2,2))  AS pct_black,
-	            CAST(JSON_EXTRACT(demographics_json, '$.pct_latino')    AS DECIMAL(2,2))  AS pct_latino,
-	            CAST(JSON_EXTRACT(demographics_json, '$.pct_asian')     AS DECIMAL(2,2))  AS pct_asian,
-	            CAST(JSON_EXTRACT(demographics_json, '$.pct_islander')  AS DECIMAL(2,2))  AS pct_islander
-	        FROM 
-                Implementations AS I,
-	            People AS P
-	        LEFT JOIN Organizations AS O
-	        ON O.org_id = P.employer_id
-            WHERE 
-	            I.person_id = P.person_id
-	        AND I.implementation_id=".$_REQUEST['implementation_id'];
-	$result = $mysqli->query($sql);
-	$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
-	$mysqli->close();
-	
-	$title = isset($_GET["implementation_id"])? $data["course_name"] : "New Course";
-?>
 	<title><?php echo $title ?></title>
 </head>
 <body>
@@ -146,7 +201,12 @@
 		<?php echo generateDropDown("model", "model", $modelOpts, $data["model"], true) ?>
 		<label for="name">Implementation Model</label>
 	</span>
-    <br/>
+	
+	<span class="formInput">
+		<?php echo generateDropDown("status", "status", $implStatusOpts, $data["status"], true) ?>
+		<label for="name">Implementation Status</label>
+	</span>
+	<br/>
 
 	<span class="formInput">
 		<input  id="module_theme" name="module_theme"
@@ -182,6 +242,29 @@
     <br/>
 
 	<span class="formInput">
+		<input  id="exams" name="exams" validator="alphanumbsym"
+			placeholder="AP Biology"
+			value="<?php echo $data["exams"] ?>" 
+			type="text" size="80" maxlength="100"/>
+		<label for="name">Standardized Exams</label>
+	</span>
+
+	<span class="formInput">
+		<input  id="standards" name="standards" validator="alphanumbsym"
+			placeholder="NGSS, Iowa..."
+			value="<?php echo $data["standards"] ?>" 
+			type="text" size="80" maxlength="100"/>
+		<label for="name">Relevant Standards</label>
+	</span>
+
+</fieldset>
+
+<fieldset>
+    <legend>Demographics</legend>
+    
+    <div id="genderChart" style="width: 250px; height: 250px; float: right;"></div>
+    <div id="ethnicityChart" style="width: 250px; height: 250px; float: right;"></div>
+	<span class="formInput">
 		<input  id="num_students" name="num_students"
 			placeholder="0" validator="number"
 			value="<?php echo $data["num_students"] ?>" 
@@ -201,6 +284,7 @@
 		<input  id="pct_girls" name="pct_girls"
 			placeholder="0" validator="number"
 			value="<?php echo $data["pct_girls"] ?>" 
+			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Girls</label>
 	</span>
@@ -209,6 +293,7 @@
 		<input  id="pct_non_binary" name="pct_non_binary"
 			placeholder="0" validator="number"
 			value="<?php echo $data["pct_non_binary"] ?>" 
+			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Non Binary</label>
 	</span>
@@ -217,6 +302,7 @@
 		<input  id="pct_black" name="pct_black"
 			placeholder="0" validator="number"
 			value="<?php echo $data["pct_black"] ?>" 
+			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Black</label>
 	</span>
@@ -225,6 +311,7 @@
 		<input  id="pct_latino" name="pct_latino"
 			placeholder="0" validator="number"
 			value="<?php echo $data["pct_latino"] ?>" 
+			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Latino</label>
 	</span>
@@ -233,6 +320,7 @@
 		<input  id="pct_asian" name="pct_asian"
 			placeholder="0" validator="number"
 			value="<?php echo $data["pct_asian"] ?>" 
+			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Asian</label>
 	</span>
@@ -241,35 +329,18 @@
 		<input  id="pct_islander" name="pct_islander"
 			placeholder="0" validator="number"
 			value="<?php echo $data["pct_islander"] ?>" 
+			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Pacific Islander</label>
 	</span>
 	<br/>
-
-	<span class="formInput">
-		<input  id="exams" name="exams" validator="alphanumbsym"
-			placeholder="AP Biology"
-			value="<?php echo $data["exams"] ?>" 
-			type="text" size="80" maxlength="100"/>
-		<label for="name">Standardized Exams</label>
-	</span>
-
-	<span class="formInput">
-		<input  id="standards" name="standards" validator="alphanumbsym"
-			placeholder="NGSS, Iowa..."
-			value="<?php echo $data["standards"] ?>" 
-			type="text" size="80" maxlength="100"/>
-		<label for="name">Relevant Standards</label>
-	</span>
-	
-	<span class="formInput">
-		<?php echo generateDropDown("status", "status", $implStatusOpts, $data["status"], true) ?>
-		<label for="name">Implementation Status</label>
-	</span>
-
 </fieldset>
 <input type="submit" id="new_enrollmentSubmit" value="💾 Save" >
 <input type="button" id="new_enrollmentCancel" value="↩️ Cancel "class="modalCancel">
 </form>
 </body>
+<script>
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
+</script>
 </html>
