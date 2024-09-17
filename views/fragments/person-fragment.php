@@ -199,7 +199,6 @@ function deletePersonRp( rsp ){
 	window.location = urlValue;
 }
 
-// turn off autocomplete if we're already looking at an established person
 if(document.getElementById('person_id').value != "") {
 	document.getElementById('name_last').validator = "alpha"
 }

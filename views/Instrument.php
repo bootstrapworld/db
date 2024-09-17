@@ -116,7 +116,7 @@
 						placeholder="Grade 5 Math assessment..." 
 						validator="alphanumbsym" 
 						value="<?php echo $data["name"] ?>"
-						autocomplete="none"
+						autocomplete="off"
 						type="text" size="60" maxlength="70" required="yes"/>
 					<label for="title">Instrument Name</label>
 				</span>

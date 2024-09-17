@@ -110,7 +110,6 @@ function deleteOrgRq(){
 	}
 }
 
-// turn off autocomplete if we're already looking at an established organization
 if(document.getElementById('org_id').value != "") {
 	document.getElementById('name').validator = "alpha"
 }

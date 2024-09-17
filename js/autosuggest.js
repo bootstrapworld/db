@@ -49,8 +49,9 @@ AutoSuggest = function (fldID, param){
 	var pointer				= this;		
 	this.fld.onkeypress 	= function(ev){ return pointer.onKeyPress(ev); }
 	this.fld.onkeyup 		= function(ev){ return pointer.onKeyUp(ev); }
-	this.fld.setAttribute("autocomplete","off");
-}
+	
+	// turn off autocomplete (Chrome ignores the HTML attribute, so we need to turn it on in response to a user event)
+	this.fld.addEventListener('focus', e => this.fld.setAttribute("autocomplete","off"));}
 
 // ESC clears, return selects
 AutoSuggest.prototype.onKeyPress = function(ev){

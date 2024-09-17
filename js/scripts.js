@@ -48,17 +48,16 @@ function attachValidators () {
 				    const elt = e.srcElement;
 				    elt.setAttribute('originalValue', elt.value);
 				    elt.setAttribute('validSelection', true);
-				    elt.autocomplete='none'
 				}); 
 				
 				// INPUT- for each character typed, change color and validity if the value is different from the original
 				input.addEventListener('input', e => { 
 				    const elt = e.srcElement;
 				    if((elt.getAttribute('originalValue') !== elt.value)) {
-				        elt.style.color = 'gray';
+				        elt.style.background = 'lightgray';
 				        elt.removeAttribute('validSelection');
 				    } else {
-				        elt.style.color = 'black';
+				        elt.style.background = '';
 				        elt.setAttribute('validSelection', true);
 				    }
 				});
@@ -67,7 +66,10 @@ function attachValidators () {
 				input.addEventListener('blur', (e) => {
 				    const elt = e.srcElement;
 				    // if it's empty or not a valid selection, set the target to empty
-				    if(!elt.value || !elt.getAttribute('validSelection')) {  elt.value = document.getElementById(target).value = ''; }
+				    if(!elt.value || !elt.getAttribute('validSelection')) {  
+				    	elt.value = document.getElementById(target).value = ''; 
+				        elt.style.background = '';
+				    }
 				    
 				    // reset validSelection and perform validation
 				    elt.removeAttribute('validSelection');
@@ -112,7 +114,7 @@ function setInfoFromDropDown(fieldID, obj, targetId, datatype) {
 	    // set the elt's value and originalValue, save valid selection, and restore color
 		field.value = obj.value || obj.name;
 		field.setAttribute('originalValue', field.value);
-		field.style.color = 'black';
+        field.style.background = '';
 		
 		// blur
 		field.setAttribute('validSelection', true);
