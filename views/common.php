@@ -18,7 +18,7 @@ $header_nav = '<nav id="header">
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
         <a href="Communications.php">Communications</a>
-        <a href="Classes.php">Classes</a>
+        <a href="Implementations.php">Classes</a>
         <a href="Instruments.php">Instruments</a>
     </nav>';
 
@@ -46,8 +46,6 @@ $gradeOpts = ["Pre-K",
 						"K-12",
 						"Other"];
 						
-$classTypeOpts = ["Regular", "Honors", "AP", "Remedial"];
-
 $computerAccessOpts = ["Regular", "Honors", "AP", "Remedial"];
 
 $roleOpts = ["Teacher",

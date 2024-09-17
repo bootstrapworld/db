@@ -27,6 +27,7 @@
 	    th:nth-child(3), td:nth-child(3) { max-width: 100px; text-overflow: ellipsis; overflow: hidden; }
 	    th:nth-child(7), td:nth-child(7) { text-align: center; }
 	    th:nth-child(8), td:nth-child(8) { text-align: center; }
+	    th:nth-child(9), td:nth-child(9) { text-align: center; }
 	    input[type=button] {margin: 10px 0; }
 	    
 	</style>
@@ -68,6 +69,7 @@
 		        <th>Teacher</th>
 		        <th>Subject</th>
 		        <th>Curriculum</th>
+		        <th>Impl. Model</th>
 		        <th>Est. Start</th>
 		        <th>Students</th>
 		    </tr>
@@ -104,10 +106,11 @@
 		            <a class="deleteButton" href="#" onmouseup="deleteClass(<?php echo $row['implementation_id']; ?>)"></a>
 		        </td>
 		        <td><?php echo $row['status']; ?></td>
-		        <td><?php echo $row['course_name']; ?></td>
+		        <td><a href="Implementation.php?implementation_id=<?php echo $row['implementation_id']; ?>"><?php echo $row['course_name']; ?></a></td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first']." ".$row['name_last']; ?></a></td>
 		        <td><?php echo $row['subject']; ?></td>
 		        <td><?php echo $row['curriculum']; ?></td>
+		        <td><?php echo $row['model']; ?></td>
 		        <td><?php echo $row['start']; ?></td>
 		        <td><?php echo $row['num_students']; ?></td>
 		    </tr>
