@@ -24,6 +24,7 @@
 	    tbody tr:hover { background: #ccc; }
 	    td, th { padding: 4px 2px; font-size: 12px; }
 	    th:nth-child(2), td:nth-child(2) { display: none; }
+	    th:nth-child(5), td:nth-child(5) { text-align: center; }
 	    td:nth-child(6):not(:empty) { cursor: help; }
 	    input[type=button] {margin: 10px 0; }
 	</style>
@@ -111,10 +112,9 @@
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_last']; ?></a></td>
 		        <td <?php if($row['do_not_contact'] == 1) echo "data-dnc=1"; ?> ><a href="mailto:<?php echo $row['email']; ?>"><?php echo $row['email']; ?></a></td>
-		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?></a>
-		        </td>
+		        <td><?php echo $row['grades_taught']; ?> <?php echo $row['primary_subject']; ?> <?php echo $row['role']; ?></a></td>
 		        <td><?php echo $row['location']; ?></td>
-		        <td style="text-align:center" data-data="<?php echo $row['recent_contact']; ?>"
+		        <td data-data="<?php echo $row['recent_contact']; ?>"
 title="(<?php echo $row['bootstrap_name']; ?>via <?php echo $row['comm_type']; ?>)
 
 <?php echo $row['comm_notes']; ?>" 
