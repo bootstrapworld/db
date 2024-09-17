@@ -8,7 +8,8 @@ async function waitForModal(showButton, eltID, submitHandler) {
         form.querySelector('[id$=Cancel]').onclick = (e) => { modalObj.hideModal(); resolve(false); }
         form.onsubmit = async (e) => { 
             e.preventDefault();                             // kill the event so we can do it ourselves
-            const res = await submitHandler(e, r => r);     // make the request, wait for the response, and just hand it back
+            const res = await submitHandler(e, r => r);     // make the request and wait for the response
+            if(!res) return;                                // false = sit and wait, true = cancel, anything else = success!
             modalObj.hideModal();                           // hide the modal
             resolve(res);                                   // resolve the promise, passing back the response
         }
@@ -83,9 +84,9 @@ Modal.prototype.showModal = function(){
 	  .find(elt => (elt.type !== "hidden") && (!elt.disabled) && (elt.tabIndex > -1))
 	  .focus();
 	
-    // cancel hides the modal and returns false
+    // cancel hides the modal and returns true
 	var cancel = this.contents.querySelector("[id$=Cancel]");
-	cancel.onclick = () => { pointer.hideModal(); return false; }
+	cancel.onclick = () => { pointer.hideModal(); return true; }
 }
 
 Modal.prototype.hideModal = function(){

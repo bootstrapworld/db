@@ -101,8 +101,8 @@ function validate(elt, type, value){
 	    if(elt.getAttribute('ignore')  ) return true;
 
 	    // call validate
-	    if(debug > 3) alert("calling validate_" + type + "("+value+")");
-	    result = eval("validate_" + type + "(\'" + value + "\')");
+	    if(debug > 3) alert("calling validate_" + type + "("+escape(value)+")");
+	    result = eval("validate_" + type + "(`" + value + "`)");
 	    valid = result[0] && (!missing);
 	    value = result[1];
 	    if(missing) value = "This field cannot be left blank";
@@ -122,7 +122,7 @@ function validate(elt, type, value){
 
 const numb	= '0123456789.';
 const date	= numb+'/.-';
-const sym   = '#\'\"\,\!\?\$/:-\(\)\[\]\|\.=+-’';
+const sym   = '#\'\"\,\!\?\$/:-\(\)\[\]\|\.\\\n=+-’';
 const numbsym = numb+sym;
 const lwr		= 'abcdefghijklmnopqrstuvwxyz.- ';
 const upr		= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- ';
@@ -217,7 +217,7 @@ Please correct all the boxes marked in red, and then resubmit.`);
 	const eltsToIgnore = [...submitEvent.target.querySelectorAll('*[ignore]')];
 
 	eltsToIgnore.forEach(elt => delete formObject[elt.name]);
-	
+	console.log(JSON.stringify(formObject))
 	return formObject;
 }
 
