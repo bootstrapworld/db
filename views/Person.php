@@ -83,6 +83,8 @@
 	            WHERE C.person_id=".$_REQUEST["person_id"]." ORDER BY date DESC, communication_id DESC";
 	  $comms = $mysqli->query($sql);
 
+	  $sql =    "SELECT * FROM Implementations AS I WHERE I.person_id = ".$_REQUEST["person_id"]." ORDER BY start DESC";
+	  $classes = $mysqli->query($sql);
 
 
 	  $mysqli->close();
@@ -184,7 +186,7 @@
 	               		<input  id="person_city" name="city" 
 				                placeholder="Home City" validator="alpha" 
 				                value="<?php echo $data["person_city"] ?>" 
-				                type="text" size="40" maxlength="50" required="yes"/>
+				                type="text" size="40" maxlength="50" />
 			            <label for="city">City</label>
 	                </span>
 
@@ -252,7 +254,7 @@
 	                <p/>
 
 	               	<span class="formInput">
-			            <?php echo generateDropDown("race", "race", $raceOpts, $data["race"], true); ?>
+			            <?php echo generateDropDown("race", "race", $raceOpts, $data["race"], false); ?>
 		                <label for="race">Race</label>
 	                </span>
 
@@ -494,8 +496,51 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
 			} else {
 			echo "<p/>No events were found that are associated with this person";
 			}
-		?>
-<?php } ?>
+     } ?>
+
+		<h2>Classes (<?php echo mysqli_num_rows($classes); ?>)</h2>
+		        
+		<input type="button" onmouseup="addOrEditEnrollment(this);" value="+ Add an Entry"
+		    data-person_id="<?php echo $data['person_id']; ?>"
+		    data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
+		/>
+		
+	<?php
+		if(mysqli_num_rows($classes)) {
+    ?>
+        <table>
+		    <thead>
+		    <tr>
+		        <th>Status</th>
+		        <th>Course Name</th>
+		        <th>Subject</th>
+		        <th>Curriculum</th>
+		        <th>Impl. Model</th>
+		        <th>Est. Start</th>
+		        <th>Students</th>
+		    </tr>
+		    </thead>
+		    <tbody>
+		<?php 
+		    while($row = mysqli_fetch_assoc($classes)) { 
+		  ?>
+		    <tr>
+		        <td><?php echo $row['status']; ?></td>
+		        <td><a href="Implementation.php?implementation_id=<?php echo $row['implementation_id']; ?>"><?php echo $row['course_name']; ?></a></td>
+		        <td><?php echo $row['subject']; ?></td>
+		        <td><?php echo $row['curriculum']; ?></td>
+		        <td><?php echo $row['model']; ?></td>
+		        <td><?php echo $row['start']; ?></td>
+		        <td><?php echo $row['num_students']; ?></td>
+		    </tr>
+		<?php } ?>
+		    </tbody>
+		</table>
+		<?php
+			} else {
+			echo "<p/>No classes were found that are associated with this person";
+			}
+         ?>
 
 			<!-- Communication modal -->
 			<?php include 'fragments/communication-fragment.php'; ?>

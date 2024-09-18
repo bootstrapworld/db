@@ -99,9 +99,9 @@
 		    const pct_boys      = 1 - (pct_girls + pct_non_binary);
             const gender = google.visualization.arrayToDataTable([
                 ['Gender', '#Students', {type:'string', role:'tooltip'}],
-                ['Boys', pct_boys, String(Math.round(num_students * pct_boys)) + " male students"],
-                ['Girls', pct_girls, String(Math.round(num_students * pct_girls)) + " female students"],
-                ['Non Binary', pct_non_binary, String(Math.round(num_students * pct_non_binary)) + " non-binary students"],
+                ['Boys', pct_boys, String(Math.round(num_students * pct_boys)) + " male"],
+                ['Girls', pct_girls, String(Math.round(num_students * pct_girls)) + " female"],
+                ['Non Binary', pct_non_binary, String(Math.round(num_students * pct_non_binary)) + " non-binary"],
             ]); 
             let options = { title: 'Gender', legend: 'none', };
             let chart = new google.visualization.PieChart(document.getElementById('genderChart'));
@@ -111,11 +111,11 @@
 		    const pct_white     = 1 - (pct_black + pct_latino + pct_asian + pct_islander);
             const ethnicity = google.visualization.arrayToDataTable([
                 ['Ethnicty', '#Students', {type:'string', role:'tooltip'}],
-                ['White', pct_white, String(Math.round(num_students * pct_white)) + " white students"],
-                ['Black', pct_black, String(Math.round(num_students * pct_black)) + " black students"],
-                ['Latino', pct_latino, String(Math.round(num_students * pct_latino)) + " latino students"],
-                ['Asian', pct_asian, String(Math.round(num_students * pct_asian)) + " asian students"],
-                ['Pacific Islander', pct_islander, String(Math.round(num_students * pct_islander)) + " islander students"],
+                ['White', pct_white, String(Math.round(num_students * pct_white)) + " white"],
+                ['Black', pct_black, String(Math.round(num_students * pct_black)) + " black"],
+                ['Latino', pct_latino, String(Math.round(num_students * pct_latino)) + " latino"],
+                ['Asian', pct_asian, String(Math.round(num_students * pct_asian)) + " asian"],
+                ['Pacific Islander', pct_islander, String(Math.round(num_students * pct_islander)) + " islander"],
             ]); 
             options = { title: 'Ethnicity', legend: 'none' };
             chart = new google.visualization.PieChart(document.getElementById('ethnicityChart'));
@@ -179,7 +179,6 @@
 		    </thead>
 		    <tbody>
 		<?php 
-		print_r($data);
 		    while($row = mysqli_fetch_assoc($classes)) { 
 		  ?>
 		    <tr>

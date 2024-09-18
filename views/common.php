@@ -31,7 +31,8 @@ $raceOpts = ["American Indian or Alaska Native",
 						"Native Hawai`ian or Pacific Islander",
 						"White or European",
 						"More than one race",
-						"Prefer not to say"];
+						"Prefer not to say",
+						"UNKNOWN"];
 
 $instrumentTypeOpts = ['Teacher Pre-test','Teacher Post-test','Student Pre-test','Student Post-test'];
 

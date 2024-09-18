@@ -21,6 +21,7 @@
 	    #num_students, #pct_iep, #pct_girls, #pct_non_binary, #pct_black, #pct_latino, #pct_asian, #pct_islander {
 	        width: 75px;
 	    }
+	    .chart { width: 200px; height: 200px; float: right; }
 	</style>
 
 <?php
@@ -161,10 +162,9 @@
 	</span>
 	
 	<span class="formInput">
-		<input ignore="yes" disabled="true"
-			placeholder="Sally Struthers" validator="alphanumbsym"
-			value="<?php echo $data['name_first']." ".$data['name_last']; ?>" 
-			type="text" size="30" maxlength="70" required="yes"/>
+		<a href="Person.php?person_id="<?php echo $data['person_id']; ?>" style="border-bottom:solid 1px black; width: 300px; display: inline-block;">
+		    <?php echo $data['name_first']." ".$data['name_last']; ?>
+		</a>
 		<label for="name">Teacher Name</label>
 	</span>
 	<br/>
@@ -261,8 +261,8 @@
 <fieldset>
     <legend>Demographics</legend>
     
-    <div id="genderChart" style="width: 250px; height: 250px; float: right;"></div>
-    <div id="ethnicityChart" style="width: 250px; height: 250px; float: right;"></div>
+    <div id="genderChart" class="chart"></div>
+    <div id="ethnicityChart" class="chart"></div>
 	<span class="formInput">
 		<input  id="num_students" name="num_students"
 			placeholder="0" validator="number"
@@ -278,6 +278,7 @@
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% IEP</label>
 	</span>
+	<br/>
 	
 	<span class="formInput">
 		<input  id="pct_girls" name="pct_girls"
@@ -296,6 +297,7 @@
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Non Binary</label>
 	</span>
+	<br/>
 	
 	<span class="formInput">
 		<input  id="pct_black" name="pct_black"

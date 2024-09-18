@@ -87,7 +87,7 @@ ORDER BY start DESC";
 		    while($row = mysqli_fetch_assoc($events)) { 
 		       $start = date_create($row['start']);
 		       $end   = date_create($row['end']);
-		       $isPast = round($now->getTimestamp() / $secondsInADay) > round($start->getTimestamp() / $secondsInADay);
+		       $isPast = round($now->getTimestamp() / $secondsInADay) > (round($start->getTimestamp() / $secondsInADay) + 1);
 		       $location = $row['location'];
 
 		  ?>
