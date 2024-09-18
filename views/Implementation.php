@@ -31,7 +31,6 @@
 	            SUM(num_students) AS num_students,
 	            CAST(JSON_EXTRACT(demographics_json, '$.pct_iep')       AS DECIMAL(2,2))  AS pct_iep,
 	            CAST(JSON_EXTRACT(demographics_json, '$.pct_girls')     AS DECIMAL(2,2))  AS pct_girls,
-	            -- num_students * (1 - (pct_girls + pct_non_binary))       AS DECIMAL(2,2))  AS pct_boys,
 	            CAST(JSON_EXTRACT(demographics_json, '$.pct_non_binary') AS DECIMAL(2,2)) AS pct_non_binary,
 	            CAST(JSON_EXTRACT(demographics_json, '$.pct_black')     AS DECIMAL(2,2))  AS pct_black,
 	            CAST(JSON_EXTRACT(demographics_json, '$.pct_latino')    AS DECIMAL(2,2))  AS pct_latino,
@@ -118,7 +117,7 @@
             const data = google.visualization.arrayToDataTable([
                 ['Ethnicty', '#Students', {type:'string', role:'tooltip'}],
                 ['White', pct_white, String(Math.round(num_students * pct_white)) + " white students"],
-                ['Black', pct_black, String(Math.round(num_students * pct_black)) + " female students"],
+                ['Black', pct_black, String(Math.round(num_students * pct_black)) + " black students"],
                 ['Latino', pct_latino, String(Math.round(num_students * pct_latino)) + " latino students"],
                 ['Asian', pct_asian, String(Math.round(num_students * pct_asian)) + " asian students"],
                 ['Pacific Islander', pct_islander, String(Math.round(num_students * pct_islander)) + " islander students"],
