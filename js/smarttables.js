@@ -264,13 +264,14 @@ SmartTable.prototype.copyEmails = function(idx) {
 
 SmartTable.prototype.exportToCSV = function() {
     const rows = [...this.table.querySelectorAll('tbody tr')];
-    console.log("rows hidden before export:", this.hiddenRows)
     const visibleRows = rows.filter( (r, i)  => !this.hiddenRows[i]);
-    const csvString = visibleRows.map( (r, i) => {
+    const headerString =  [...this.table.querySelectorAll('thead th')].map( elt => '"'+elt.textContent.trim()+'"').join(',');
+    const bodyString = visibleRows.map( (r, i) => {
         const cells = [...r.querySelectorAll('th, td')].filter(c => c.checkVisibility());  // grab all the visible cells
         return cells.map( elt => '"'+elt.textContent.trim()+'"').join(',');
          
     }).join('\n');
+    const csvString = headerString + '\n' + bodyString;
     console.log(csvString);
     // Download it
     var filename = 'export_' + document.querySelector('h1').textContent + '_' + new Date().toLocaleDateString() + '.csv';
