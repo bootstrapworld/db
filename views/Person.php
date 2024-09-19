@@ -288,10 +288,7 @@
 			            <label for="reason">Do Not Contact</label>
 	                </span>
 	            	<span class="formInput">
-	                	<input  id="reason" name="reason" 
-				                placeholder="Why should this person not be contacted?" validator="alphanumbsym" 
-				                value="<?php echo $data["reason"] ?>"  
-				                type="text" size="70" maxlength="100-" />
+			            <?php echo generateDropDown("reason", "reason", $dncReasonOpts, $data["reason"], false); ?>
 			            <label for="reason">Reason</label>
 	                </span>
 	                

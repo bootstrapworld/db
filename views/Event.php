@@ -90,6 +90,7 @@
                         P.person_id, 
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
             		    do_not_contact,
+            		    role,
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         JSON_VALUE(attendance, '$.total') AS days_attended,
                         attendance AS attendance,

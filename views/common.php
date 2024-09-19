@@ -57,6 +57,7 @@ $roleOpts = ["Teacher",
 						"Other"];
 
 $enrollmentTypeOpts = ["Participant", "Facilitator", "Admin", "Make-up"];
+$dncReasonOpts = ["Requested to no longer receive emails","Email address no longer a valid address","Moved to another position","Email address is blocked"];
 
 $commTypeOpts = ["Phone", "Zoom", "Coaching", "Email", "Discourse"];
 
@@ -152,7 +153,7 @@ $stateOpts = [
 function generateDropDown($id, $name, $options, $actualValue, $required) {
 	$select_html = '<select id="'.$id.'" name="'.$name.'"';
 	$select_html .= $required? 'required="yes">' : ">";
-	$select_html .='<option value="" hidden>Select one</option>';
+	$select_html .='<option value="">Select one</option>';
 	$optionMaker = function($value) use ($actualValue) {
 		// convert non k/v-pairs into k/k pairs,
 		if (!is_array($value)) { $value = [$value, $value]; }

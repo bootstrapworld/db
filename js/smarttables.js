@@ -215,12 +215,12 @@ SmartTable.prototype.filterBy = function(filters) {
             const td = rows[i].cells[idx];
             var v = getCellContents(td);    	                        // 	  if it's a DOM node, pull out the contents
             v = v.replace(/^\s+|\s+$/g,"").toLowerCase();				// 	  trim whitespace, make case-insensitive
-            if(!fn(v)) this.hiddenRows[i] = true;                       //    use the filter function, and hide the row if it fails
+            this.hiddenRows[i] = !fn(v);                                //    use the filter function, and hide the row if it fails
         });
     });
     // set row visibility accordingly
     rows.forEach((r, i) => r.style.display = this.hiddenRows[i]? "none" : null);
-	tbody.style.display=null;										    // NOW display the filtered body
+	tbody.style.display = null;										    // NOW display the filtered body
     console.timeEnd('filtered in');
  	return;
 }
@@ -263,20 +263,21 @@ SmartTable.prototype.copyEmails = function(idx) {
 };
 
 SmartTable.prototype.exportToCSV = function() {
-    const rows = [...this.table.querySelectorAll('tr')];
-    const csv_string = rows.map( (r, i) => {
-        if(this.hiddenRows[i]) { return ''; }                       // skip hidden rows
-        const cells = [...r.querySelectorAll('th, td')];            // grab all the cells
+    const rows = [...this.table.querySelectorAll('tbody tr')];
+    console.log("rows hidden before export:", this.hiddenRows)
+    const visibleRows = rows.filter( (r, i)  => !this.hiddenRows[i]);
+    const csvString = visibleRows.map( (r, i) => {
+        const cells = [...r.querySelectorAll('th, td')].filter(c => c.checkVisibility());  // grab all the visible cells
         return cells.map( elt => '"'+elt.textContent.trim()+'"').join(',');
          
     }).join('\n');
-    console.log(csv_string);
+    console.log(csvString);
     // Download it
     var filename = 'export_' + document.querySelector('h1').textContent + '_' + new Date().toLocaleDateString() + '.csv';
     var link = document.createElement('a');
     link.style.display = 'none';
     link.setAttribute('target', '_blank');
-    link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string));
+    link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString));
     link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
