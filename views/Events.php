@@ -88,6 +88,7 @@ ORDER BY start DESC";
 		       $start = date_create($row['start']);
 		       $end   = date_create($row['end']);
 		       $isPast = round($now->getTimestamp() / $secondsInADay) > (round($start->getTimestamp() / $secondsInADay) + 1);
+		       $isCoaching = $row['type'] == 'Coaching';
 		       $location = $row['location'];
 
 		  ?>
@@ -108,7 +109,7 @@ ORDER BY start DESC";
 		            <?php echo date_format($start,"M jS"); if($row['start'] !== $row['end']) { echo " - ".date_format($end,"M jS"); } ?></td>
 		        <td style="text-align: center;"><?php echo $row['facilitators']; ?></td>
 		        <td style="text-align: center;"><?php echo $row['participants']; ?></td>
-		        <td style="text-align: center;"><?php if($isPast && !is_null($row['marked_present'])) { echo round(($row['marked_present'] * 100) / $row['max_present'])."%"; } else { echo "N/A"; } ?></td>
+		        <td style="text-align: center;"><?php if($isPast && !$isCoaching && !is_null($row['marked_present'])) { echo round(($row['marked_present'] * 100) / $row['max_present'])."%"; } else { echo "N/A"; } ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>

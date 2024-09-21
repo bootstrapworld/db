@@ -39,7 +39,10 @@
 
 	$mysqli = openDB_Connection();
 	
-	$sql = "SELECT *, SUM(num_students) AS num_students
+	$sql = "SELECT *, 
+	            SUM(num_students) AS num_students,
+	            YEAR(start) - IF(MONTH(start) < 7, 1, 0) AS AY
+
 	        FROM 
                 Implementations AS I,
 	            People AS P
@@ -173,7 +176,7 @@
 		        <th>Subject</th>
 		        <th>Curriculum</th>
 		        <th>Impl. Model</th>
-		        <th>Est. Start</th>
+		        <th>School Year</th>
 		        <th>Students</th>
 		    </tr>
 		    </thead>
@@ -198,7 +201,7 @@
 		                data-person_name="<?php echo $row['person_fname']." ".$row['person_lname']; ?>"
 		                data-subject="<?php echo $row['subject']; ?>"
 		                data-curriculum="<?php echo $row['curriculum']; ?>"
-		                data-start="<?php echo date_format(date_create($row['start']),"Y-m-d"); ?>"
+		                data-start="<?php echo $row['AY']; ?>"
 		                data-num_students="<?php echo $row['num_students']; ?>"
 		                data-demographics_json="<?php echo $row['demographics_json']; ?>"
 		                data-exams="<?php echo $row['exams']; ?>"
@@ -213,7 +216,7 @@
 		        <td><?php echo $row['subject']; ?></td>
 		        <td><?php echo $row['curriculum']; ?></td>
 		        <td><?php echo $row['model']; ?></td>
-		        <td><?php echo $row['start']; ?></td>
+		        <td><?php echo $row['AY']."-".substr($row['AY']+1, -2); ?></td>
 		        <td><?php echo $row['num_students']; ?></td>
 		    </tr>
 		<?php } ?>

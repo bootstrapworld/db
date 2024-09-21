@@ -34,7 +34,7 @@
 	</script>
 	
 	   <?php
-
+        include 'common.php';
 		$mysqli = new mysqli("localhost", "u804343808_admin", "92AWe*MP", "u804343808_testingdb");
 			
 		// Check connection
@@ -42,13 +42,17 @@
 			echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
 			exit();
 		}
-	    $sql = "SELECT * FROM Logs";
+	    $sql = "SELECT *, 
+	                JSON_EXTRACT(data, '$.meta[1]') AS category, 
+                    JSON_EXTRACT(data, '$.error') AS error
+                FROM `Logs`  
+                WHERE JSON_EXTRACT(data, '$.meta[1]') = 'error'";
 	    $logs = $mysqli->query($sql);
     	$mysqli->close();
 	?>
 </head>
 <body>
-	<?php echo $header_nav?>
+	<?php echo $header_nav; ?>
 	<div id="content">
 		<h1>Add a Log</h1>
 			<!-- Log form -->
@@ -74,7 +78,7 @@
 			<?php
 			    if(mysqli_num_rows($logs)) {
 					while($row = mysqli_fetch_assoc($logs)) {
-						echo '<tr><td>'.$row['timestamp'].'</td><td>'.$row['data'].'</td></tr>';
+						echo '<tr><td>'.$row['timestamp'].'</td><td style="max-width: 500px; text-overflow: ellipsis; overflow: hidden;">'.$row['data'].'</td></tr>';
 					}
 				} else {
 					echo "No logs in table (yet!)";

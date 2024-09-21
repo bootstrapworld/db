@@ -13,13 +13,18 @@ function openDB_Connection() {
 		return $mysqli;
 }
 
-$header_nav = '<nav id="header">
+$header_nav = '
+    <style>
+        .beta { background: lightgray; }
+    </style>
+    <nav id="header">
         <a href="People.php">People</a>
         <a href="Organizations.php">Organizations</a>
         <a href="Events.php">Events</a>
         <a href="Communications.php">Communications</a>
-        <a href="Implementations.php">Classes</a>
-        <a href="Instruments.php">Instruments</a>
+        <a class="beta" href="Implementations.php">Classes</a>
+        <a class="beta" href="Instruments.php">Instruments</a>
+        <a class="beta" href="Logs.php">Logs</a>
     </nav>';
 
 // Taken from https://idealdeisurvey.stanford.edu/frequently-asked-questions/survey-definitions

@@ -84,8 +84,8 @@
 	  $comms = $mysqli->query($sql);
 
 	  $sql =    "SELECT * FROM Implementations AS I WHERE I.person_id = ".$_REQUEST["person_id"]." ORDER BY start DESC";
+	  
 	  $classes = $mysqli->query($sql);
-
 
 	  $mysqli->close();
 		}
@@ -493,7 +493,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
 			} else {
 			echo "<p/>No events were found that are associated with this person";
 			}
-     } ?>
+        ?>
 
 		<h2>Classes (<?php echo mysqli_num_rows($classes); ?>)</h2>
 		        
@@ -537,6 +537,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
 			} else {
 			echo "<p/>No classes were found that are associated with this person";
 			}
+}
          ?>
 
 			<!-- Communication modal -->
