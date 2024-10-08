@@ -22,6 +22,7 @@
 	        width: 75px;
 	    }
 	    .chart { width: 200px; height: 200px; float: right; }
+	    #parent_course_name { border: none; border-bottom: solid 1px black; pointer-events: none; }
 	</style>
 
 <?php
@@ -38,13 +39,14 @@
 	            CAST(JSON_EXTRACT(demographics_json, '$.pct_asian')     AS DECIMAL(2,2))  AS pct_asian,
 	            CAST(JSON_EXTRACT(demographics_json, '$.pct_islander')  AS DECIMAL(2,2))  AS pct_islander
 	        FROM 
-                Implementations AS I,
-	            People AS P
+                Implementations AS I
+	        LEFT JOIN People AS P
+	        ON I.person_id = P.person_id
 	        LEFT JOIN Organizations AS O
 	        ON O.org_id = P.employer_id
-            WHERE 
-	            I.person_id = P.person_id
-	        AND I.implementation_id=".$_REQUEST['implementation_id'];
+	        LEFT JOIN (SELECT implementation_id AS parent_impl_id, course_name AS parent_course_name FROM Implementations) AS ParentI
+	        ON ParentI.parent_impl_id = I.parent_impl_id
+            WHERE I.implementation_id=".$_REQUEST['implementation_id'];
 	$result = $mysqli->query($sql);
 	$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 	$mysqli->close();
@@ -69,7 +71,7 @@
 				// if the request is successful, execute the callback
 				request.onreadystatechange = function() {
 					if (request.readyState == 4 && request.status == 200) {
-						deleteEventRp(request.responseText);
+						deleteImplementationRp(request.responseText);
 					}
 				}; 
 				const data = JSON.stringify({implementation_id:id});
@@ -77,21 +79,37 @@
 				request.send();
 			}
 		}
-		function deleteEventRp( rsp ){
-			const urlValue = baseURL + `/views/Classes.php`;
+		function deleteImplementationRp( rsp ){
+			const urlValue = baseURL + `/views/Implementations.php`;
 			window.location = urlValue;
 		}
 		
+		function duplicateImplementationRq(e) {
+		    const id = document.getElementById('implementation_id').value;
+			if(confirm("Are you sure you want to duplicate Implementation ID# " + id + "?")){
+				var request = new XMLHttpRequest();
+				// if the request is successful, execute the callback
+				request.onreadystatechange = function() {
+					if (request.readyState == 4 && request.status == 200) {
+						window.location = "Implementation.php?implementation_id="+request.responseText;
+					}
+				}; 
+				const data = JSON.stringify({implementation_id:id});
+				request.open('POST', "../actions/ImplementationActions.php?method=duplicateImplementation&data="+data);
+				request.send();
+			}
+		}
+
 		function drawCharts() {
 		    drawGenderChart();
 		    drawEthnicityChart() 
 		}
 		
 		function drawGenderChart() {
-		    const num_students  = Number(document.getElementById('num_students').value);
-		    const pct_girls     = Number(document.getElementById('pct_girls').value);
-		    const pct_non_binary= Number(document.getElementById('pct_non_binary').value);
-		    const pct_boys      = 1 - (pct_girls + pct_non_binary);
+		    const num_students  = Number(document.getElementById('num_students').value) / 100;
+		    const pct_girls     = Number(document.getElementById('pct_girls').value) / 100;
+		    const pct_non_binary= Number(document.getElementById('pct_non_binary').value) / 100;
+		    const pct_boys      = 1 - (pct_girls + pct_non_binary) / 100;
             const data = google.visualization.arrayToDataTable([
                 ['Gender', '#Students', {type:'string', role:'tooltip'}],
                 ['Boys', pct_boys, String(Math.round(num_students * pct_boys)) + " male students"],
@@ -109,12 +127,12 @@
         }
         
 		function drawEthnicityChart() {
-		    const num_students  = Number(document.getElementById('num_students').value);
-		    const pct_black     = Number(document.getElementById('pct_black').value);
-		    const pct_latino    = Number(document.getElementById('pct_latino').value);
-		    const pct_asian     = Number(document.getElementById('pct_asian').value);
-		    const pct_islander  = Number(document.getElementById('pct_islander').value);
-		    const pct_white     = (1 - (pct_black + pct_latino + pct_asian + pct_islander));
+		    const num_students  = Number(document.getElementById('num_students').value) / 100;
+		    const pct_black     = Number(document.getElementById('pct_black').value) / 100;
+		    const pct_latino    = Number(document.getElementById('pct_latino').value) / 100;
+		    const pct_asian     = Number(document.getElementById('pct_asian').value) / 100;
+		    const pct_islander  = Number(document.getElementById('pct_islander').value) / 100;
+		    const pct_white     = (1 - (pct_black + pct_latino + pct_asian + pct_islander)) / 100;
             const data = google.visualization.arrayToDataTable([
                 ['Ethnicty', '#Students', {type:'string', role:'tooltip'}],
                 ['White', pct_white, String(Math.round(num_students * pct_white)) + " white students"],
@@ -142,13 +160,30 @@
     <div id="content">
 		<span style="display:flex; align-items:center;">
 		    <h1><?php echo $title ?></h1> 
+		    <button title="Duplicate" onclick="duplicateImplementationRq()" style="margin-top:10px; margin-left: 10px;"><img src="../images/copyIcon-black.png" style="width: 16px; height: 16px;"></button>
 		</span>
 
 
-<form novalidate action="../actions/ImplementationActions.php">
+<form id="updateImplementationForm" novalidate action="../actions/ImplementationActions.php" class="<?php echo empty($data)? "unlocked" : "locked"; ?>">
+			<?php 
+					if($_GET["implementation_id"] && !$data) {
+							echo "NOTE: no records matched <tt>implementation_id=".$_REQUEST["implementation_id"]."</tt>. Submitting this form will create a new DB entry with a new <tt>implementation_id</tt>.";
+					}
+			?>
+			
+			<span class="buttons">
+    			<input type="button" title="Edit" value="✏️" onmouseup="unlockForm(this)">
+    			<?php if(isset($data)) { ?>
+    			    <input type="button" title="Delete" value="🗑️️" onclick="deleteImplementationRq()">
+    			 <?php } ?>
+    			<input type="submit" title="Save" value="💾">
+	    		<?php if(isset($data)) { ?>
+	    		    <input type="button" title="Cancel" value="↩️" onclick="window.location.reload()">
+			    <?php } ?>
+			</span>
+
 <fieldset>
 	<legend>Class Implementation</legend>
-	
 	<input type="hidden" id="implementation_id"	name="implementation_id" validator="num"
 		   value="<?php echo $data["implementation_id"] ?>" 
 	/>
@@ -157,15 +192,26 @@
 		<input  id="course_name" name="course_name"
 			placeholder="Introdution to Pyret" validator="alphanumbsym"
 			value="<?php echo $data["course_name"] ?>" 
-			type="text" size="80" maxlength="70" required="yes"/>
+			type="text" size="50" maxlength="70" required="yes"/>
 		<label for="name">Course Name</label>
 	</span>
+
+<?php if($data['parent_impl_id'] != "") { ?>
+	<input type="hidden" id="parent_impl_id" name="parent_impl_id" validator="num" value="<?php echo $data["parent_impl_id"] ?>" />
+	<span class="formInput">
+		<a href="Implementation.php?implementation_id=<?php echo $data['parent_impl_id']; ?>" style="border-bottom:solid 1px black; width: 200px; display: inline-block; overflow: hidden; text-overflow:ellipsis;">
+		    <?php echo $data['parent_course_name']; ?>
+		</a>
+		<label for="name">Based on draft of...</label>
+	</span>
+<?php } ?>
+
 	
 	<span class="formInput">
-		<a href="Person.php?person_id="<?php echo $data['person_id']; ?>" style="border-bottom:solid 1px black; width: 300px; display: inline-block;">
+		<a href="Person.php?person_id="<?php echo $data['person_id']; ?>" style="border-bottom:solid 1px black; width: 200px; display: inline-block;">
 		    <?php echo $data['name_first']." ".$data['name_last']; ?>
 		</a>
-		<label for="name">Teacher Name</label>
+		<label for="name">Taught by</label>
 	</span>
 	<br/>
 
@@ -195,6 +241,7 @@
 		<?php echo generateDropDown("curriculum", "curriculum", $currOpts, $data["curriculum"], true) ?>
 		<label for="name">Curriculum</label>
 	</span>
+	<br/>
 	
 	<span class="formInput">
 		<?php echo generateDropDown("model", "model", $modelOpts, $data["model"], true) ?>
@@ -205,7 +252,6 @@
 		<?php echo generateDropDown("status", "status", $implStatusOpts, $data["status"], true) ?>
 		<label for="name">Implementation Status</label>
 	</span>
-	<br/>
 
 	<span class="formInput">
 		<input  id="module_theme" name="module_theme"
@@ -274,7 +320,7 @@
 	<span class="formInput">
 		<input  id="pct_iep" name="pct_iep"
 			placeholder="0" validator="number"
-			value="<?php echo $data["pct_iep"] ?>" 
+			value="<?php echo $data["pct_iep"] * 100 ?>" 
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% IEP</label>
 	</span>
@@ -283,7 +329,7 @@
 	<span class="formInput">
 		<input  id="pct_girls" name="pct_girls"
 			placeholder="0" validator="number"
-			value="<?php echo $data["pct_girls"] ?>" 
+			value="<?php echo $data["pct_girls"] * 100 ?>" 
 			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Girls</label>
@@ -292,7 +338,7 @@
 	<span class="formInput">
 		<input  id="pct_non_binary" name="pct_non_binary"
 			placeholder="0" validator="number"
-			value="<?php echo $data["pct_non_binary"] ?>" 
+			value="<?php echo $data["pct_non_binary"] * 100 ?>" 
 			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Non Binary</label>
@@ -302,7 +348,7 @@
 	<span class="formInput">
 		<input  id="pct_black" name="pct_black"
 			placeholder="0" validator="number"
-			value="<?php echo $data["pct_black"] ?>" 
+			value="<?php echo $data["pct_black"] * 100 ?>" 
 			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Black</label>
@@ -311,7 +357,7 @@
 	<span class="formInput">
 		<input  id="pct_latino" name="pct_latino"
 			placeholder="0" validator="number"
-			value="<?php echo $data["pct_latino"] ?>" 
+			value="<?php echo $data["pct_latino"] * 100 ?>" 
 			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Latino</label>
@@ -320,7 +366,7 @@
 	<span class="formInput">
 		<input  id="pct_asian" name="pct_asian"
 			placeholder="0" validator="number"
-			value="<?php echo $data["pct_asian"] ?>" 
+			value="<?php echo $data["pct_asian"] * 100 ?>" 
 			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Asian</label>
@@ -329,7 +375,7 @@
 	<span class="formInput">
 		<input  id="pct_islander" name="pct_islander"
 			placeholder="0" validator="number"
-			value="<?php echo $data["pct_islander"] ?>" 
+			value="<?php echo $data["pct_islander"] * 100 ?>" 
 			onchange="drawCharts()"
 			type="number" size="4" maxlength="3"/>
 		<label for="name">% Pacific Islander</label>
@@ -343,5 +389,37 @@
 <script>
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawCharts);
+    
+	function updateImplementationRq(e, callback) {
+        formObject = validateSubmission(e);
+        if(!formObject) return false;
+
+        // combine demographic data into a single JSON object
+        demographics = {};
+        const demographicFields = ['pct_asian', 'pct_black', 'pct_latino', 'pct_non_binary', 'pct_girls', 'pct_iep', 'pct_islander'];
+        demographicFields.forEach(f => demographics[f] = formObject[f] / 100);
+        
+        // remove the demographic fields, and replace with the combined object
+        demographicFields.forEach(f => delete formObject[f]);
+        formObject['demographics_json'] = demographics;
+        
+        // append method and JSON-formatted string to post address
+        const data = JSON.stringify(formObject);
+        const target = e.target;
+        target.action += '?method=update&data='+data; 
+            
+        return new Promise(function(resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function() {
+                resolve(this.responseText);
+            };
+            xhr.onerror = reject;
+            xhr.open(target.method, target.action);
+            xhr.send();
+        }).then(async id => updateImplementationRp(id));
+	}
+    
+    
+    document.getElementById('updateImplementationForm').onsubmit = (e) => updateImplementationRq(e, () => window.location.reload());
 </script>
 </html>

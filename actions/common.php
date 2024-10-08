@@ -62,12 +62,14 @@ function openDB_Connection() {
 }
 
 function genericInsertOrUpdate($table, $data) {
-		$mysqli = openDB_Connection();
+    	$mysqli = openDB_Connection();
 		$columns = array_keys($data);
 		$values = array_values($data);
+		
 		for( $i = 0; $i < count($values); $i++ ){
             $values[$i] = quoteOrNull(mysqli_real_escape_string( $mysqli, $values[$i] ));
         }
+        
 		$updateFields = implode(", ", array_map(
 			function($column,$value) { return $column."=".$value; }, 
 			$columns, $values

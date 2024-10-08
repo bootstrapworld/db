@@ -83,7 +83,7 @@
 				SUM(CASE WHEN status LIKE 'Not implementing yet, but will this school year' then 1 else 0 end) AS this_year,
 				SUM(CASE WHEN status LIKE 'Will not implement this school year, but will next year' then 1 else 0 end) AS next_year,
 				SUM(CASE WHEN status LIKE 'Will not implement' then 1 else 0 end) AS not_implementing,
-				SUM(CASE WHEN status LIKE 'Unknown' then 1 else 0 end) AS unknown
+				SUM(CASE WHEN status LIKE 'Initial Plan' then 1 else 0 end) AS initial_plan
 	        FROM 
                 Implementations AS I
             GROUP BY X";
@@ -139,14 +139,15 @@
             chart = new google.visualization.PieChart(document.getElementById('curriculumChart'));
             chart.draw(curriculum, options);
 
-		    const { implementing, this_year, next_year, not_implementing, unknown } = data;
+		    const { implementing, this_year, next_year, not_implementing, initial_plan } = data;
+		    console.log(data);
             const status = google.visualization.arrayToDataTable([
                 ['Curriculum', '%Classes', {type:'string', role:'tooltip'}],
                 ['Implementing',                                            implementing,       String( implementing ) + " Implementing"],
                 ['Not implementing yet, but will this school year',         this_year,          String( this_year ) + " Will Implement this Year"],
                 ['Will not implement this school year, but will next year', next_year,          String( next_year ) + " Will Implement Next Year"],
                 ['Will not implement',                                      not_implementing,   String( not_implementing ) + " Not Implementing"],
-                ['Unknown',                                                 unknown,            String( unknown ) + " Unknown"],
+                ['Initial Plan',                                            initial_plan,       String( initial_plan ) + " Initial Plan"],
             ]); 
             options = { title: 'Implementation Status', legend: 'none' };
             chart = new google.visualization.PieChart(document.getElementById('statusChart'));

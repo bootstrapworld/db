@@ -163,7 +163,7 @@ function updateRequest(e, callback) {
 	if(!formObject) return false;
 	console.log('validated!', formObject);
 	const data = JSON.stringify(formObject);
-
+	
 	// append method and JSON-formatted string to post address
 	const target = event.target;
 	target.action += '?method=update&data='+data; 

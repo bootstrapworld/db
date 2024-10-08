@@ -125,7 +125,7 @@ function validate(elt, type, value){
 
 const numb	= '0123456789.';
 const date	= numb+'/.-';
-const sym   = '#\'\"\,\!\?\$/:-\(\)\[\]\|\.\\\n=+-’';
+const sym   = '\;#\'\"\,\!\?\$/:-\(\)\[\]\|\.\\\n=+-’';
 const numbsym = numb+sym;
 const lwr		= 'abcdefghijklmnopqrstuvwxyz.- ';
 const upr		= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.- ';
