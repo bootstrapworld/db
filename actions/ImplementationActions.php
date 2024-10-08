@@ -91,7 +91,7 @@
                         demographics_json,
                         exams,
                         standards,
-                        status,
+                        'Unknown' AS status,
                         ".$data['implementation_id']." AS parent_id
                     FROM Implementations WHERE implementation_id=".$data['implementation_id'];
 

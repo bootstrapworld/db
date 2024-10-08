@@ -39,19 +39,30 @@
 
 	$mysqli = openDB_Connection();
 	
+	// set $year to URL parameters, or infer from the current date
+	$now = new DateTime();
+    $year = $now->format('Y');
+    if($now->format('m') < 6) $year = $year - 1;
+	$year = $_GET['year']? $_GET['year'] : $year;
+	
+	// build the query
 	$sql = "SELECT *, 
 	            SUM(num_students) AS num_students,
 	            YEAR(start) - IF(MONTH(start) < 7, 1, 0) AS AY
-
 	        FROM 
-                Implementations AS I,
-	            People AS P
+            	(SELECT * FROM Implementations WHERE implementation_id NOT IN 
+            	    (SELECT parent_impl_id FROM Implementations WHERE parent_impl_id IS NOT NULL)
+				UNION 
+				(SELECT * FROM Implementations WHERE parent_impl_id IS NOT NULL)) AS I
+            LEFT JOIN People AS P
+            ON P.person_id = I.person_id
 	        LEFT JOIN Organizations AS O
 	        ON O.org_id = P.employer_id
             WHERE 
 	            I.person_id = P.person_id
+            AND YEAR(start) - IF(MONTH(start) < 7, 1, 0)=".$year."
             GROUP BY I.person_id";
-            
+          
 	  $classes = $mysqli->query($sql);
 	  
 	  $sql = "SELECT 1 AS X,
@@ -171,13 +182,13 @@
 		    <thead>
 		    <tr>
 		        <th></th>
+		        <th>AY</th>
 		        <th>Status</th>
 		        <th>Course Name</th>
 		        <th>Teacher</th>
 		        <th>Subject</th>
 		        <th>Curriculum</th>
 		        <th>Impl. Model</th>
-		        <th>School Year</th>
 		        <th>Students</th>
 		    </tr>
 		    </thead>
@@ -211,13 +222,13 @@
 		            </a>
 		            <a class="deleteButton" href="#" onmouseup="deleteClass(<?php echo $row['implementation_id']; ?>)"></a>
 		        </td>
+		        <td><?php echo $row['AY']; ?></td>
 		        <td><?php echo $row['status']; ?></td>
 		        <td><a href="Implementation.php?implementation_id=<?php echo $row['implementation_id']; ?>"><?php echo $row['course_name']; ?></a></td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first']." ".$row['name_last']; ?></a></td>
 		        <td><?php echo $row['subject']; ?></td>
 		        <td><?php echo $row['curriculum']; ?></td>
 		        <td><?php echo $row['model']; ?></td>
-		        <td><?php echo $row['AY']."-".substr($row['AY']+1, -2); ?></td>
 		        <td><?php echo $row['num_students']; ?></td>
 		    </tr>
 		<?php } ?>

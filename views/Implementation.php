@@ -51,6 +51,11 @@
 	$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 	$mysqli->close();
 	
+	// If this is a derived implementation (ie - has a parent), remove "Initial Plan" from the menu
+	if($_GET['implementation_id'] && $data['parent_impl_id']) { 
+	    $implStatusOpts = array_filter($implStatusOpts, static function ($elt) { return $elt !== "Initial Plan"; });
+	} 
+	
 	$title = isset($_GET["implementation_id"])? $data["course_name"] : "New Course";
 ?>
 
@@ -393,6 +398,13 @@
 	function updateImplementationRq(e, callback) {
         formObject = validateSubmission(e);
         if(!formObject) return false;
+        
+        console.log(formObject['parent_impl_id'], (formObject['status'] == encodeURI("Initial Plan")), formObject);
+        
+        if(formObject['parent_impl_id'] && (formObject['status'] == encodeURI("Initial Plan"))) {
+            alert("An implementation and its parent cannot both have 'Initial Plan' as a status");
+            return false;
+        }
 
         // combine demographic data into a single JSON object
         demographics = {};
