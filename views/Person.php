@@ -260,6 +260,7 @@
 
 	               	<span class="formInput">
 	                    <input type="hidden" id="employer_id"	name="employer_id" value="<?php echo $data["employer_id"] ?>"  />
+	                    <a href="Organization.php?org_id=<?php echo $data['employer_id'] ?>"><?php echo $data['employer_name']?></a>
 	                	<input id="employer_name" name="employer_name"
 				                placeholder="Which school or organization do you work for?" validator="dropdown"
 				                datatype="organization"  target="employer_id" addnew="yes"

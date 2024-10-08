@@ -224,6 +224,7 @@
 				/>
 
 				<span class="formInput">
+				    <a href="Organization.php?org_id=<?php echo $data["org_id"] ?>"><?php echo $data["name"] ?></a>
 					<input id="org_name" name="org_name"
 						placeholder="CSforAll" validator="dropdown" addnew="yes"
 						datatype="organization"  target="org_id"

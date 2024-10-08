@@ -76,7 +76,7 @@
 		              SELECT 
 	                    NULL AS implementation_id, 
                         person_id,
-                        CONCAT('(Copy) ', course_name) AS course_name,
+                        course_name,
                         subject,
                         grade_level,
                         computer_access,

@@ -22,6 +22,7 @@
 
 	<p/>
 	<span class="formInput">
+	    <a href="<?php echo $data["website"] ?>"><?php echo $data["website"] ?></a>
 		<input  id="website" name="website" 
 			placeholder="https://www.flynn.schools.state.ri" validator="url" 
 			value="<?php echo $data["website"] ?>" 

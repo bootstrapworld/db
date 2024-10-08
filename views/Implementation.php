@@ -213,7 +213,7 @@
 
 	
 	<span class="formInput">
-		<a href="Person.php?person_id="<?php echo $data['person_id']; ?>" style="border-bottom:solid 1px black; width: 200px; display: inline-block;">
+		<a href="Person.php?person_id=<?php echo $data['person_id']; ?>" style="border-bottom:solid 1px black; width: 200px; display: inline-block;">
 		    <?php echo $data['name_first']." ".$data['name_last']; ?>
 		</a>
 		<label for="name">Taught by</label>

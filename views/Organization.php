@@ -79,6 +79,20 @@
                     GROUP BY E.event_id
                     ORDER BY start DESC";
 			$events = $mysqli->query($sql);
+			
+			
+			$sql = "SELECT *           
+			        FROM Organizations AS O, Implementations AS I, People AS P
+			        LEFT JOIN Enrollments AS R
+                    ON R.person_id = P.person_id
+                    LEFT JOIN Events AS E 
+                    ON E.event_id = R.event_id
+			        WHERE employer_id = O.org_id 
+			            AND (O.org_id=".$_REQUEST["org_id"]." OR parent_id=".$_REQUEST["org_id"].") 
+                        AND I.person_id = P.person_id
+			        GROUP BY P.person_id";
+			$implementations = $mysqli->query($sql);
+
 			$mysqli->close();
 		}
 		
@@ -186,6 +200,33 @@
     		        <td><?php echo $row['location']; ?></td>
     		        <td><a href="Organization.php?org_id=<?php echo $row['org_id']; ?>"><?php echo $row['name']; ?></a></td>
     		        <td><?php echo $row['participants']; ?></td>
+    		    </tr>
+    		<?php } ?>
+    		    </tbody>
+    		</table>
+
+			<h2>Bootstrap Classes (<?php echo mysqli_num_rows($implementations); ?>)</h2>
+    	    <table class="smart">
+    		    <thead>
+    		    <tr>
+    		        <th>Course Name</th>
+    		        <th>Teacher</th>
+    		        <th>Grade</th>
+    		        <th>Curriculum</th>
+    		        <th>Subject</th>
+    		    </tr>
+    		    </thead>
+    		    <tbody>
+    		<?php 
+        		//print_r($data);
+    		    while($row = mysqli_fetch_assoc($implementations)) { 
+    		  ?>
+    		    <tr>
+    		        <td><a href="Implementation.php?implementation_id=<?php echo $row['implementation_id']; ?>"><?php echo $row['course_name']; ?></a></td>
+    		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first']." ".$row['name_last']; ?></a></td>
+    		        <td><?php echo $row['grade_level']; ?></td>
+    		        <td><?php echo $row['curriculum']; ?></td>
+    		        <td><?php echo $row['subject']; ?></td>
     		    </tr>
     		<?php } ?>
     		    </tbody>
