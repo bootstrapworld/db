@@ -31,7 +31,7 @@
 	    th:nth-child(8), td:nth-child(8) { text-align: center; }
 	    th:nth-child(9), td:nth-child(9) { text-align: center; }
 	    input[type=button] {margin: 10px 0; }
-	    .chart { width: 225px; height: 225px; float: right; }
+	    .chart { width: 20%; height: auto; float: left; }
 	</style>
    <?php
 
@@ -45,7 +45,8 @@
     if($now->format('m') < 6) $year = $year - 1;
 	$year = $_GET['year']? $_GET['year'] : $year;
 	
-	// build the query
+	// Get all implementations for each teacher, per-AY
+	// Replace the planned one with the real one, if it exists
 	$sql = "SELECT *, 
 	            SUM(num_students) AS num_students,
 	            YEAR(start) - IF(MONTH(start) < 7, 1, 0) AS AY
@@ -62,9 +63,21 @@
 	            I.person_id = P.person_id
             AND YEAR(start) - IF(MONTH(start) < 7, 1, 0)=".$year."
             GROUP BY I.person_id";
-          
 	  $classes = $mysqli->query($sql);
 	  
+	  // Get the ratio of planned to actual implementations
+	  $sql = "SELECT 1 AS X,
+				SUM(CASE WHEN status LIKE 'Initial Plan' then 1 else 0 end) AS planned,
+				SUM(CASE WHEN status LIKE 'Initial Plan' then 0 else 1 end) AS actual
+	        FROM 
+                Implementations AS I
+            GROUP BY X";
+            
+	  $real_v_planned = $mysqli->query($sql);
+	  $real_v_planned = $real_v_planned->fetch_array(MYSQLI_ASSOC);
+	  print_r($real_v_planned);
+	  
+	  // Get summary statistics for all REAL implementations
 	  $sql = "SELECT 1 AS X,
 	            SUM(num_students) AS num_students,
 	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_iep')       AS DECIMAL(2,2)))  AS pct_iep,
@@ -97,18 +110,35 @@
 				SUM(CASE WHEN status LIKE 'Initial Plan' then 1 else 0 end) AS initial_plan
 	        FROM 
                 Implementations AS I
+            WHERE status NOT LIKE 'Initial Plan'
             GROUP BY X";
             
 	  $summary = $mysqli->query($sql);
 	  $summary = (!$summary || ($summary->num_rows !== 1))? false : $summary->fetch_array(MYSQLI_ASSOC);
+	  
 	  $mysqli->close();
 	?>
 	
 <script>
     	function drawCharts() {
-    	    let data = <?php echo json_encode($summary); ?>;
+    	    // Extract status and demographic data
+    	    const statusData = <?php echo json_encode($real_v_planned); ?>;
+    	    const data       = <?php echo json_encode($summary); ?>;
+    	    
+    	    // Show TeacherSuccess's progress reaching out to teachers
+    	    Object.keys(statusData).forEach( k => statusData[k] = Number(statusData[k]));
+    	    const { planned, actual } = statusData;
+            const progress = google.visualization.arrayToDataTable([
+                ['Contacted', '#Teachers', {type:'string', role:'tooltip'}],
+                ['Actual', actual, String(actual) + " contacted"],
+                ['Initial Plan', planned, String(planned) + " not contacted"]
+            ]); 
+            let options = { title: 'Contacted', legend: 'none', };
+            let chart = new google.visualization.PieChart(document.getElementById('progressChart'));
+            chart.draw(progress, options);
+    	    
+    	    // Show actual Gender data
     	    Object.keys(data).forEach( k => data[k] = Number(data[k]));
-
 		    const { num_students, pct_iep, pct_girls, pct_non_binary } = data;
 		    const pct_boys      = 1 - (pct_girls + pct_non_binary);
             const gender = google.visualization.arrayToDataTable([
@@ -117,10 +147,11 @@
                 ['Girls', pct_girls, String(Math.round(num_students * pct_girls)) + " female"],
                 ['Non Binary', pct_non_binary, String(Math.round(num_students * pct_non_binary)) + " non-binary"],
             ]); 
-            let options = { title: 'Gender', legend: 'none', };
-            let chart = new google.visualization.PieChart(document.getElementById('genderChart'));
+            options = { title: 'Gender', legend: 'none', };
+            chart = new google.visualization.PieChart(document.getElementById('genderChart'));
             chart.draw(gender, options);
             
+            // Show actual Race data
 		    const { pct_black, pct_latino, pct_asian, pct_islander } = data;
 		    const pct_white     = 1 - (pct_black + pct_latino + pct_asian + pct_islander);
             const ethnicity = google.visualization.arrayToDataTable([
@@ -135,6 +166,7 @@
             chart = new google.visualization.PieChart(document.getElementById('ethnicityChart'));
             chart.draw(ethnicity, options);
             
+            // Show actual Curriculum data
 		    const { Algebra, Algebra2, DataScience, Reactive, ExpressionsEquations, Physics, Other } = data;
             const curriculum = google.visualization.arrayToDataTable([
                 ['Curriculum', '%Classes', {type:'string', role:'tooltip'}],
@@ -150,8 +182,8 @@
             chart = new google.visualization.PieChart(document.getElementById('curriculumChart'));
             chart.draw(curriculum, options);
 
+            // Show actual Implementation data
 		    const { implementing, this_year, next_year, not_implementing, initial_plan } = data;
-		    console.log(data);
             const status = google.visualization.arrayToDataTable([
                 ['Curriculum', '%Classes', {type:'string', role:'tooltip'}],
                 ['Implementing',                                            implementing,       String( implementing ) + " Implementing"],
@@ -170,13 +202,16 @@
 	<?php echo $header_nav?>
     
 	<div id="content">
+		<h1>Classes</h1><br/>
+        <input type="button" onclick="addOrEditClass(this)" value="+ Add a Class"/><br/>
+        
+		
+        <div id="progressChart"     class="chart"></div>
+        <div id="statusChart"       class="chart"></div>
         <div id="genderChart"       class="chart"></div>
         <div id="ethnicityChart"    class="chart"></div>
         <div id="curriculumChart"   class="chart"></div>
-        <div id="statusChart"   class="chart"></div>
-		<h1>Classes</h1>
 
-        <input type="button" onclick="addOrEditClass(this)" value="+ Add a Class"/>
 
 	    <table class="smart">
 		    <thead>
