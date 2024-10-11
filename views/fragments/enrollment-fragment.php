@@ -38,7 +38,7 @@
 	</span>
 
 	<span class="formInput">
-		<?php echo generateDropDown("event_type", "type", $enrollmentTypeOpts, $data["type"], true) ?>
+		<?php echo generateDropDown("type", "type", $enrollmentTypeOpts, $data["type"], true) ?>
 		<label for="state">Type</label>
 	</span>
     <br/>
@@ -56,9 +56,10 @@
 <script>
 async function addOrEditEnrollment(elt) {
     const form = document.getElementById('new_enrollment');
+    console.log(elt.dataset)
     const fields = ["enrollment_id", "person_id", "name", "event_id", "title", "type", "created", "notes"];
     fields.forEach(f => form.querySelector('[name="'+f+'"]').value  = elt.dataset[f] || null);
-	form.querySelector('[name="created"]').value = elt.dataset.type || "<?php echo date("Y-m-d") ?>";
+	form.querySelector('[name="created"]').value = elt.dataset.created || "<?php echo date("Y-m-d") ?>";
 	const resp = await waitForModal(elt, 'new_enrollment', updateRequest2);
 	switch(typeof resp) {
 	    case "boolean": return;
