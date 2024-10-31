@@ -92,8 +92,9 @@
             		    do_not_contact,
             		    role,
                         CONCAT(P.name_first, ' ', name_last) AS name,
-                        JSON_VALUE(attendance, '$.total') AS days_attended,
-                        attendance AS attendance,
+                       	CONCAT(T.curriculum, ' (',T.location, ' - ', DATE_FORMAT(T.start, '%b %y'),')') AS recent_workshop,
+                        JSON_VALUE(R.attendance, '$.total') AS days_attended,
+                        R.attendance AS attendance,
                         (CASE grades_taught
                         	WHEN 'High School' THEN 'HS'
                         	WHEN 'Middle School' THEN 'MS'
@@ -109,9 +110,16 @@
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON P.employer_id = O.org_id
+                    LEFT JOIN Enrollments AS TR
+                    ON TR.person_id = P.person_id
+                    LEFT JOIN Events AS T
+		            ON T.event_id = TR.event_id
+        		    AND T.type = 'Training'
                     WHERE R.person_id = P.person_id 
                     AND (R.type = 'Participant' OR R.type = 'Make-up')
-                    AND event_id = ".$_REQUEST["event_id"];
+                    AND R.event_id = ".$_REQUEST['event_id']."
+                    GROUP BY P.person_id
+            		ORDER BY T.start DESC";
 			$participants = $mysqli->query($sql);
 
             $sql = "SELECT 
@@ -422,6 +430,9 @@ if($data) {
 		        <th>Role</th>
 		        <th>Grades</th>
 		        <th>Primary Subject</th>
+            <?php if($data['event_type'] == 'Coaching'){ ?>
+                <td>Recent Workshop</td>
+            <?php } ?>
 		        <th>Notes</th>
 		        <?php 
 		            if($oldFormat) {
@@ -459,6 +470,9 @@ if($data) {
 		        <td><?php echo $row['role'] ?></td>
 		        <td><?php echo $row['grades_taught'] ?></td>
 		        <td><?php echo $row['primary_subject'] ?></td>
+            <?php if($data['event_type'] == 'Coaching'){ ?>
+                <td><?php echo $row['recent_workshop'] ?></td>
+            <?php } ?>
 		        <td style="white-space: break-spaces;"><?php echo $row['notes']; ?></td>
 		        <?php 
 		            if($oldFormat) {
