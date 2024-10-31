@@ -64,7 +64,7 @@
 	  $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 
 	  $sql =   "SELECT *, 
-	                JSON_VALUE(attendance, '$.total') AS days_attended,
+	                COALESCE(JSON_LENGTH(JSON_VALUE(attendance, '$.days_attended')),0) AS days_attended,
                     DATEDIFF(end, start)+1 AS total_days,
                     R.type AS role, E.type AS event_type,
                     R.notes AS notes
