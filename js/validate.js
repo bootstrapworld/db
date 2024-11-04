@@ -79,8 +79,12 @@ function showErr(elt, msg){
 function validate(elt, type, value){
 	let valid = true;
 	
-	// rewrite value: trim outside whitespace, and escape newlines and tabs
-	value = value.trim().replace(/\n/g, "\\\\n").replace(/\r/g, "\\\\r").replace(/\t/g, "\\\\t");
+	// rewrite value
+	value = value.trim()            // trim outside whitespace
+	    .replace(/\n/g, "\\\\n")    // escape newlines
+	    .replace(/\r/g, "\\\\r")    // escape windows newlines
+	    .replace(/\t/g, "\\\\t")    // escape tabs
+	    .replace(/"/g, "&#34;");    // rewrite quotes
 
 	// is the field required? is it blank? Required + Blank =  Missing
 	required = (elt.getAttribute('required') == "yes")? true : false;
