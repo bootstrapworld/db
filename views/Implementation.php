@@ -28,7 +28,7 @@
 <?php
     include 'common.php';
 	$mysqli = openDB_Connection();
-	//{"pct_iep":"0.8", "pct_girls":"0.45", "pct_non_binary":"0.1", "pct_black":"0.2", "pct_latino":"0.1", "pct_asian":"0.1", "pct_islander":"0.03"}
+	//example: {"pct_iep":"0.8", "pct_girls":"0.45", "pct_non_binary":"0.1", "pct_black":"0.2", "pct_latino":"0.1", "pct_asian":"0.1", "pct_islander":"0.03"}
 	$sql = "SELECT *, 
 	            SUM(num_students) AS num_students,
 	            CAST(JSON_EXTRACT(demographics_json, '$.pct_iep')       AS DECIMAL(2,2))  AS pct_iep,
@@ -49,13 +49,17 @@
             WHERE I.implementation_id=".$_REQUEST['implementation_id'];
 	$result = $mysqli->query($sql);
 	$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
-	$mysqli->close();
 	
 	// If this is a derived implementation (ie - has a parent), remove "Initial Plan" from the menu
 	if($_GET['implementation_id'] && $data['parent_impl_id']) { 
 	    $implStatusOpts = array_filter($implStatusOpts, static function ($elt) { return $elt !== "Initial Plan"; });
 	} 
-	
+	if(!$_GET['implementation_id'] && $_GET['person_id']) {
+	    $sql = "SELECT person_id, name_first, name_last FROM People WHERE person_id = ".$_GET['person_id'];
+    	$result = $mysqli->query($sql);
+	    $data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
+	}
+	$mysqli->close();
 	$title = isset($_GET["implementation_id"])? $data["course_name"] : "New Course";
 ?>
 
@@ -160,6 +164,7 @@
 	<title><?php echo $title ?></title>
 </head>
 <body>
+        
 	<?php echo $header_nav?>
     
     <div id="content">
@@ -211,11 +216,13 @@
 	</span>
 <?php } ?>
 
-	
+	<input type="hidden" id="person_id" name="person_id" validator="num" required="yes" value="<?php echo $data["person_id"] ?>" />
 	<span class="formInput">
-		<a href="Person.php?person_id=<?php echo $data['person_id']; ?>" style="border-bottom:solid 1px black; width: 200px; display: inline-block;">
-		    <?php echo $data['name_first']." ".$data['name_last']; ?>
-		</a>
+		<input  id="person_name" name="person_name" ignore="yes"
+			placeholder="Teacher's name" validator="dropdown"
+			datatype="person" target="person_id"
+			value="<?php echo $data['name_first']." ".$data['name_last']; ?>" 
+			type="text" size="30" maxlength="70" />
 		<label for="name">Taught by</label>
 	</span>
 	<br/>
@@ -286,6 +293,7 @@
 	<span class="formInput">
 		<textarea  id="lesson_list" name="lesson_list"
 			placeholder="Simple Data Types, Contracts..."
+			required="yes"
 			cols="80" rows="5"><?php echo $data["lesson_list"] ?></textarea>
 		<label for="name">Selected Lessons</label>
 	</span>

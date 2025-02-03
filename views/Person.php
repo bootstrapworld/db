@@ -498,10 +498,7 @@ document.getElementById('person_zip').placeholder 	= randomFormInfo.zip;
 
 		<h2>Classes (<?php echo mysqli_num_rows($classes); ?>)</h2>
 		        
-		<input type="button" onmouseup="addOrEditEnrollment(this);" value="+ Add an Entry"
-		    data-person_id="<?php echo $data['person_id']; ?>"
-		    data-name="<?php echo $data['name_first']." ".$data['name_last']; ?>"
-		/>
+		<input type="button" onclick="window.location='Implementation.php?person_id=<?php echo $data["person_id"]?>'" value="+ Add an Entry"/>
 		
 	<?php
 		if(mysqli_num_rows($classes)) {

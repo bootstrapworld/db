@@ -9,31 +9,21 @@
     	$mysqli = openDB_Connection();
 		$columns = array_keys($data);
 		$values = array_values($data);
+		
+		for( $i = 0; $i < count($values); $i++ ){
+		    if ($columns[$i] == "demographics_json") $values[$i] = "'".json_encode($data['demographics_json'])."'";
+            else $values[$i] = quoteOrNull(mysqli_real_escape_string( $mysqli, $values[$i] ));
+        }
         
+
 		$updateFields = implode(", ", array_map(
 			function($column,$value) { return $column."=".$value; }, 
 			$columns, $values
 		));
 
-		$sql = "UPDATE Implementations SET
-		            course_name         = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['course_name'])).",
-		            subject             = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['subject'])).",
-		            grade_level         = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['grade_level'])).",
-		            computer_access     = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['computer_access'])).",
-		            start               = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['start'])).",
-		            curriculum          = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['curriculum'])).",
-		            model               = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['model'])).",
-		            module_theme        = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['module_theme'])).",
-		            when_teaching       = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['when_teaching'])).",
-		            dataset_selection   = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['dataset_selection'])).",
-		            lesson_list         = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['lesson_list'])).",
-		            num_students        = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['num_students'])).",
-		            demographics_json   = '".json_encode($data['demographics_json'])."',
-		            exams               = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['exams'])).",
-		            standards           = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['standards'])).", 
-		            status              = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['status'])).", 
-		            parent_impl_id      = ".quoteOrNull(mysqli_real_escape_string( $mysqli, $data['parent_impl_id']))."
-		        WHERE implementation_id=".$data['implementation_id'];
+        $sql = "INSERT INTO Implementations (".implode(', ', $columns).")
+				VALUES (".implode(', ', $values).") 
+				ON DUPLICATE KEY UPDATE $updateFields";
 
 		$result = $mysqli->query($sql);
 		if($result){

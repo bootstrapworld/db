@@ -13,6 +13,8 @@
 	<script type="text/javascript" src="../js/autosuggest.js"></script>	
 	<script type="text/javascript" src="../js/modal.js"></script>
 	<script type="text/javascript" src="../js/smarttables.js"></script>
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	
 	<script>
 	    function addPerson() { window.location = 'Person.php'; }
@@ -27,6 +29,7 @@
 	    th:nth-child(5), td:nth-child(5) { text-align: center; }
 	    td:nth-child(6):not(:empty) { cursor: help; }
 	    input[type=button] {margin: 10px 0; }
+	    .chart { width: 20%; height: auto; float: left; }
 	</style>
    <?php
 
@@ -79,18 +82,91 @@
             ON BP.person_id = C.bootstrap_id
             GROUP BY P.person_id
             ORDER BY C.date DESC, E.start DESC";
-            
 	  $people = $mysqli->query($sql);
+	  
+	  $sql = "SELECT 
+	            COUNT(person_id) AS count, 
+	            (CASE primary_subject
+	                WHEN 'English/ELA' THEN 'ELA'
+	                WHEN 'Algebra 1' THEN 'Algebra1'
+	                WHEN 'Algebra 2' THEN 'Algebra2'
+	                WHEN 'General Math' THEN 'Math'
+	                WHEN 'Earth Science' THEN 'EarthScience'
+	                WHEN 'Computer Science' THEN 'CS'
+	                WHEN 'General Science' THEN 'Science'
+	                WHEN 'Precalculus or Above' THEN 'HighMath'
+	                WHEN 'Data Science' THEN 'DS'
+	                WHEN 'Social Studies' THEN 'SocialStudies'
+	            END) AS primary_subject
+	          FROM `People` WHERE role='Teacher' GROUP BY primary_subject";
+	  $subject_summary = $mysqli->query($sql);
+
+	  $sql = "SELECT COUNT(person_id) AS count, state FROM `People` WHERE role='Teacher' GROUP BY state";
+	  $state_summary = $mysqli->query($sql);
+	  
+	  
 	  $mysqli->close();
 	?>
+<script>
+    	function drawCharts() {
+    	    // Extract status and demographic data
+    	    const subjectData = <?php echo json_encode($subject_summary); ?>;
+    	    const stateData   = <?php echo json_encode($state_summary); ?>;
+    	    console.log(subjectData, stateData)
+/*    	    
+    	    // Show TeacherSuccess's progress reaching out to teachers
+    	    Object.keys(subjectData).forEach( k => subjectData[k] = Number(subjectData[k]));
+    	    const { ELA, SocialStudies,History,Civics,Business,Physics,Chemistry,Biology,EarthScience,CS,Science,Algebra1,Algebra2,Geometry,Statistics,Math,HighMath,Other,DS } = subjectData;
+            const progress = google.visualization.arrayToDataTable([
+                ['Subject', '#Teachers', {type:'string', role:'tooltip'}],
+                ['ELA',             ELA,            String(ELA) + " teachers"],
+                ['Social Studies',  SocialStudies,  String(SocialStudies) + " teachers"],
+                ['History',         History,        String(History) + " teachers"],
+                ['Civics',          Civics,         String(Civics) + " teachers"],
+                ['Business',        Business,       String(Business) + " teachers"],
+                ['Physics',         Physics,        String(Physics) + " teachers"],
+                ['Chemistry',       Chemistry,      String(Chemistry) + " teachers"],
+                ['Earth Science',   EarthScience,   String(EarthScience) + " teachers"],
+                ['Computer Science',CS,             String(ELA) + " teachers"],
+                ['Science',         Science,        String(Science) + " teachers"],
+                ['Algebra1',        Algebra1,       String(Algebra1) + " teachers"],
+                ['Algebra2',        Algebra2,       String(Algebra2) + " teachers"],
+                ['Statistics',      Statistics,     String(Statistics) + " teachers"],
+                ['Math',            Math,           String(Math) + " teachers"],
+                ['Precalculus or Above', HighMath,  String(HighMath) + " teachers"],
+                ['Other',           Other,          String(Other) + " teachers"],
+                ['Data Science',    DS,             String(DS) + " teachers"]
+                
+            ]); 
+            let options = { title: 'Contacted', legend: 'none', };
+            let chart = new google.visualization.PieChart(document.getElementById('subjectChart'));
+            chart.draw(progress, options);
+    	    
+    	    // Show actual Gender data
+    	    Object.keys(stateData).forEach( k => stateData[k] = Number(stateData[k]));
+    	    Object.keys(stateData).map(state => [state, ])
+            const gender = google.visualization.arrayToDataTable([
+                ['Gender', '#Students', {type:'string', role:'tooltip'}],
+                ['Boys', pct_boys, String(Math.round(num_students * pct_boys)) + " male"],
+                ['Girls', pct_girls, String(Math.round(num_students * pct_girls)) + " female"],
+                ['Non Binary', pct_non_binary, String(Math.round(num_students * pct_non_binary)) + " non-binary"],
+            ]); 
+            options = { title: 'Gender', legend: 'none', };
+            chart = new google.visualization.PieChart(document.getElementById('genderChart'));
+            chart.draw(gender, options);
+*/            
+        }
+</script>
 </head>
 <body>
 	<?php echo $header_nav?>
     
 	<div id="content">
-		<h1>People</h1>
-
-        <input type="button" onclick="addPerson()" value="+ Add a Person"/>
+		<h1>People</h1><br/>
+        <input type="button" onclick="addPerson()" value="+ Add a Person"/><br/>
+        
+        <div id="subjectChart"      class="chart"></div>
+        <div id="stateChart"        class="chart"></div>
 
 	    <table class="smart">
 		    <thead>
@@ -127,4 +203,8 @@ title="(<?php echo $row['bootstrap_name']; ?>via <?php echo $row['comm_type']; ?
 		</table>
 	</div>
 </body>
+<script>
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
+</script>
 </html>

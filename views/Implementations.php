@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	
 	<script>
-	    function addPerson() { window.location = 'Person.php'; }
+	    function addImplementation() { window.location = 'Implementation.php'; }
 	</script>
 	
 	<style>
@@ -75,8 +75,7 @@
             
 	  $real_v_planned = $mysqli->query($sql);
 	  $real_v_planned = $real_v_planned->fetch_array(MYSQLI_ASSOC);
-	  print_r($real_v_planned);
-	  
+
 	  // Get summary statistics for all REAL implementations
 	  $sql = "SELECT 1 AS X,
 	            SUM(num_students) AS num_students,
@@ -203,7 +202,7 @@
     
 	<div id="content">
 		<h1>Classes</h1><br/>
-        <input type="button" onclick="addOrEditClass(this)" value="+ Add a Class"/><br/>
+        <input type="button" onclick="addImplementation()" value="+ Add a Class"/><br/>
         
 		
         <div id="progressChart"     class="chart"></div>
@@ -233,28 +232,7 @@
 		  ?>
 		    <tr>
 		        <td class="controls">
-		            <a class="editButton" href="#" onmouseup="addOrEditClass(this);" 
-		                data-implementation_id="<?php echo $row['implementation_id']; ?>"
-		                data-status="<?php echo $row['status']; ?>"
-		                data-course_name="<?php echo $row['course_name']; ?>"
-		                data-class_type="<?php echo $row['class_type']; ?>"
-		                data-grade_level="<?php echo $row['grade_level']; ?>"
-		                data-computer_access="<?php echo $row['computer_access']; ?>"
-		                data-model="<?php echo $row['model']; ?>"
-		                data-module_theme="<?php echo $row['module_theme']; ?>"
-		                data-when_teaching="<?php echo $row['when_teaching']; ?>"
-		                data-dataset_selection="<?php echo $row['dataset_selection']; ?>"
-		                data-lesson_list="<?php echo $row['lesson_list']; ?>"
-		                data-person_name="<?php echo $row['person_fname']." ".$row['person_lname']; ?>"
-		                data-subject="<?php echo $row['subject']; ?>"
-		                data-curriculum="<?php echo $row['curriculum']; ?>"
-		                data-start="<?php echo $row['AY']; ?>"
-		                data-num_students="<?php echo $row['num_students']; ?>"
-		                data-demographics_json="<?php echo $row['demographics_json']; ?>"
-		                data-exams="<?php echo $row['exams']; ?>"
-		                data-standards="<?php echo $row['standards']; ?>"
-		                >
-		            </a>
+		            <a class="editButton" href="Implementation.php?implementation_id=<?php echo $row['implementation_id']; ?>"></a>
 		            <a class="deleteButton" href="#" onmouseup="deleteClass(<?php echo $row['implementation_id']; ?>)"></a>
 		        </td>
 		        <td><?php echo $row['AY']; ?></td>
