@@ -228,17 +228,17 @@
 	<br/>
 
 	<span class="formInput">
-		<?php echo generateDropDown("subject", "subject", $subjectOpts, $data["subject"], true) ?>
+		<?php echo generateDropDown("subject", "subject", $subjectOpts, $data["subject"], false) ?>
 		<label for="name">Subject</label>
 	</span>
 
 	<span class="formInput">
-		<?php echo generateDropDown("grade_level", "grade_level", $gradeOpts, $data["grade_level"], true) ?>
+		<?php echo generateDropDown("grade_level", "grade_level", $gradeOpts, $data["grade_level"], false) ?>
 		<label for="name">Grade Level</label>
 	</span>
 
 	<span class="formInput">
-		<?php echo generateDropDown("computer_access", "computer_access", $computerAccessOpts, $data["computer_access"], true) ?>
+		<?php echo generateDropDown("computer_access", "computer_access", $computerAccessOpts, $data["computer_access"], false) ?>
 		<label for="name">Computer Access</label>
 	</span>
 
@@ -256,7 +256,7 @@
 	<br/>
 	
 	<span class="formInput">
-		<?php echo generateDropDown("model", "model", $modelOpts, $data["model"], true) ?>
+		<?php echo generateDropDown("model", "model", $modelOpts, $data["model"], false) ?>
 		<label for="name">Implementation Model</label>
 	</span>
 	
