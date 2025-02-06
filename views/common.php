@@ -99,6 +99,8 @@ $currOpts = ["Algebra",
 $modelOpts = ["Dedicated Course","Dedicated Unit Within Existing Course","Lessons Sprinkled Throughout Course"];
 
 $implStatusOpts = ["Initial Plan", "Implementing","Not implementing yet, but will this school year","Will not implement this school year, but will next year","Will not implement"];
+$implStatusOpts2 = ['Will not implement','Implementing this year','Will implement next year','Unknown',null];
+
 
 $eventTypeOpts = ["Presentation","Coaching","Training","Meetup","Panel","AYW"];
 

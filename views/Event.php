@@ -106,7 +106,8 @@
                         R.type AS type,
                         COALESCE(R.notes,'') AS notes,
                         R.enrollment_id,
-                        R.type AS type
+                        R.type AS type,
+                        TR.implemented
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
                     ON P.employer_id = O.org_id
@@ -470,6 +471,10 @@ if($data) {
                             echo '<th style="text-align: center;">'.date_format(date_create($date),"M j").'</th>';
                         }
 		            }
+		            
+		            //if($data['event_type'] !== "AYW") {
+		                echo "<th>Implementation Status</th>";
+		            //}
 		        ?>
 		    </tr>
 		    </thead>
@@ -515,6 +520,11 @@ if($data) {
                             echo '<span style="visibility:hidden; display: inline-block; width:0; margin: 0;">'.($present? "P" : "A").'</span></td>';
                         }    
 		            }
+
+		            //if($data['event_type'] !== "AYW") {
+		                echo "<td>".generateDropDown('implemented', 'implemented', $implStatusOpts2, $row['implemented'], false)."</td>";
+		            //}
+
 		        ?>
 		    </tr>
 		<?php } ?>
@@ -580,10 +590,12 @@ if($data) {
 	        let last_id;
 	        [...formData.entries()].forEach( ([k, v]) => {
 	            if(k == "enrollment_id") { last_id = v; attendanceData[v] = []; }
+	            else if(k == "implemented") attendanceData[last_id].push(v);
 	            else attendanceData[last_id].push(k);
 	        });
 
 	        const data = JSON.stringify(attendanceData);
+	        //console.log(data); 
 
 	        // append method and JSON-formatted string to post address
 	        const target = event.currentTarget;
