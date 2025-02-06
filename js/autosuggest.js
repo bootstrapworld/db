@@ -19,7 +19,7 @@ async function modalAddition(showButton, modalEltId, dropdownFieldId, callback) 
 }
 
 /* takes a FieldID and a Parameter Object */
-AutoSuggest = function (fldID, param){
+AutoSuggest = function (fldID, param) {
 	// no DOM - give up!
 	if (!document.getElementById) return false;
 	// get field via DOM
@@ -82,7 +82,7 @@ AutoSuggest.prototype.onKeyUp = function(ev){
 }
 
 /* If input field has changed, get suggestions from DB */
-AutoSuggest.prototype.getSuggestions = function (val){
+AutoSuggest.prototype.getSuggestions = function (val) {
 	// if input stays the same, is below our min length, do nothing
 	if (val == this.sInput) return false;
 	if (val.length < 2){

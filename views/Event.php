@@ -138,6 +138,16 @@
                     AND R.type = 'Facilitator'
                     AND event_id = ".$_REQUEST["event_id"];
 			$facilitators = $mysqli->query($sql);
+			
+			$sql = "SELECT E.event_id, E.title, E.start, marked_present FROM Events AS E
+                    LEFT JOIN 
+	                    (SELECT event_id, IF(JSON_EXTRACT(attendance,'$.total'), SUM(JSON_EXTRACT(attendance,'$.total')), SUM(JSON_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(attendance,'$.days_attended'))))) AS marked_present  
+                        FROM Enrollments WHERE type = 'Participant' AND attendance IS NOT NULL AND attendance != '{\"days_attended\": \"[]\"}' GROUP BY event_id) AS attendance
+                    ON attendance.event_id = E.event_id
+                    WHERE parent_event_id=".$_REQUEST["event_id"]."
+                    ORDER BY START";
+			$followup_events = $mysqli->query($sql);
+			
             $sql = "SELECT 
                         P.person_id,
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
@@ -155,7 +165,13 @@
                     AND event_id = ".$_REQUEST["event_id"];
 			$admins = $mysqli->query($sql);
 
-			$sql = "SELECT *, DATEDIFF(end, start)+1 AS total_days, E.type AS event_type FROM Events As E LEFT JOIN Organizations AS O ON E.org_id = O.org_id WHERE event_id=".$_REQUEST["event_id"];
+			$sql = "SELECT *, DATEDIFF(end, start)+1 AS total_days, E.type AS event_type 
+			        FROM Events As E 
+			        LEFT JOIN Organizations AS O 
+			        ON E.org_id = O.org_id 
+			        LEFT JOIN (SELECT event_id AS parent_event_id, title AS parent_event_name FROM Events) AS PE
+			        ON E.parent_event_id = PE.parent_event_id
+			        WHERE E.event_id=".$_REQUEST["event_id"];
 			$result = $mysqli->query($sql);
 			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 		} else if(isset($_GET["org_id"])) {
@@ -240,7 +256,6 @@
 						type="text" size="70" maxlength="70" ignore="yes" />
 					<label for="employer_name">Partner Organization</label>
 				</span>
-				<p/>
 
 				<span class="formInput">
 					<input  id="start" name="start" 
@@ -259,6 +274,8 @@
 					<label for="end">End Date</label>
 				</span>
 
+				<p/>
+
 				<span class="formInput">
 					<input  id="price" name="price" 
 						placeholder="Price ($USD)" validator="num" 
@@ -271,15 +288,26 @@
 					<?php echo generateDropDown("curriculum", "curriculum", $currOpts, $data["curriculum"], true); ?>
 					<label for="curriculum">Curriculum</label>
 				</span>
-				<p/>
 
 				<span class="formInput">
 					<input  id="webpage_url" name="webpage_url" 
 						placeholder="www.BootstrapWorld.org/workshops/..." validator="url" 
 						value="<?php echo $data["webpage_url"] ?>" 
-						type="text" size="70" maxlength="100"/>
+						type="text" size="30" maxlength="70"/>
 					<label for="webpage_url">Web page for the event</label>
 				</span>
+				<p/>
+	           	<span class="formInput" style="width:450px;">
+	                <input type="hidden" id="parent_event_id"	name="parent_event_id" value="<?php echo $data["parent_event_id"] ?>"  />
+	                <a href="Event.php?event_id=<?php echo $data['parent_event_id'] ?>"><?php echo $data['parent_event_name']?></a>
+	            	<input id="parent_event_name" name="parent_event_name"
+			                placeholder="Parent Event Name" validator="dropdown"
+			                datatype="event"  target="parent_event_id"
+			                value="<?php echo $data["parent_event_name"] ?>" 
+			                type="search" size="100" maxlength="100" ignore="yes" />
+			        <label for="parent_event_name">Parent Event</label>
+	            </span>
+
 				<p/>
 				
                 <p/>	
@@ -493,8 +521,41 @@ if($data) {
 		    </tbody>
 		</table>
 		</p>
-		<input type="Submit" id="update_attendance" value="💾 Save Attendance" style="position: absolute; right: 0; bottom: -35px; margin: 0;" />
+		<input type="Submit" id="update_attendance" value="💾 Save Attendance" style="float: right;" />
 	</form>
+	
+<?php if (mysqli_num_rows($followup_events) > 0) { ?>
+    <p style="clear: both;" />
+	<b>Follow-Up Events (<?php echo mysqli_num_rows($followup_events); ?>)</b><p/>
+	<table>
+	    <thead>
+	        <tr>
+	            <th>Name</th>
+	            <th>Attendance</th>
+	            <th>Start Date</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	    <?php
+	        while($row = mysqli_fetch_assoc($followup_events)) {
+
+		    $now = new DateTime("now", new DateTimeZone("America/New_York"));
+		    $secondsInADay = 60*60*24;
+	        $start = date_create($row['start']);
+	    	$isPast = round($now->getTimestamp() / $secondsInADay) > (round($start->getTimestamp() / $secondsInADay) + 1);
+	    ?>
+	        <tr>
+		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['title']; ?></a></td>
+		        <td><?php echo $isPast? $row['marked_present']." / ".count($participants) :  "N/A"; ?></td>
+		        <td><?php echo $row['start']; ?></td>
+	        </tr>
+	    <?php } ?>
+	    </tbody>
+    </table>
+    <p/>
+<?php } ?>
+
+
 	<script>
     	window.addEventListener('beforeunload', (event) => {
     	    // Cancel the event
