@@ -16,6 +16,7 @@
 	<style>
 	    td, th { padding: 5px; }
 	    table { border: 1px solid black; }
+	    form.locked .formInput a:has(+a), form.locked .formInput a+a { width: unset; display: inline; }
 	</style>
 	
 	<!--- AJAX calls --->
@@ -145,7 +146,7 @@
 	                    (SELECT event_id, IF(JSON_EXTRACT(attendance,'$.total'), SUM(JSON_EXTRACT(attendance,'$.total')), SUM(JSON_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(attendance,'$.days_attended'))))) AS marked_present  
                         FROM Enrollments WHERE type = 'Participant' AND attendance IS NOT NULL AND attendance != '{\"days_attended\": \"[]\"}' GROUP BY event_id) AS attendance
                     ON attendance.event_id = E.event_id
-                    WHERE parent_event_id=".$_REQUEST["event_id"]."
+                    WHERE JSON_CONTAINS(parent_event_id, ".$_REQUEST["event_id"].")
                     ORDER BY START";
 			$followup_events = $mysqli->query($sql);
 			
@@ -166,13 +167,14 @@
                     AND event_id = ".$_REQUEST["event_id"];
 			$admins = $mysqli->query($sql);
 
-			$sql = "SELECT *, DATEDIFF(end, start)+1 AS total_days, E.type AS event_type 
+			$sql = "SELECT *, DATEDIFF(end, start)+1 AS total_days, E.type AS event_type, JSON_ARRAYAGG(PE.parent_id) AS parent_ids, JSON_ARRAYAGG(parent_title) AS parent_titles
 			        FROM Events As E 
 			        LEFT JOIN Organizations AS O 
 			        ON E.org_id = O.org_id 
-			        LEFT JOIN (SELECT event_id AS parent_event_id, title AS parent_event_name FROM Events) AS PE
-			        ON E.parent_event_id = PE.parent_event_id
-			        WHERE E.event_id=".$_REQUEST["event_id"];
+			        LEFT JOIN (SELECT title AS parent_title, event_id AS parent_id FROM Events) AS PE
+			        ON JSON_CONTAINS(E.parent_event_id, PE.parent_id)
+			        WHERE E.event_id=".$_REQUEST["event_id"]."
+			        GROUP BY E.event_id";
 			$result = $mysqli->query($sql);
 			$data = (!$result || ($result->num_rows !== 1))? false : $result->fetch_array(MYSQLI_ASSOC);
 		} else if(isset($_GET["org_id"])) {
@@ -183,6 +185,7 @@
 		$mysqli->close();
 		$title = isset($_GET["event_id"])? $data["title"] : "New Event";
 	?>
+	
 	<title><?php echo $title ?></title>
 </head>
 <body>
@@ -298,13 +301,20 @@
 					<label for="webpage_url">Web page for the event</label>
 				</span>
 				<p/>
-	           	<span class="formInput" style="width:450px;">
-	                <input type="hidden" id="parent_event_id"	name="parent_event_id" value="<?php echo $data["parent_event_id"] ?>"  />
-	                <a href="Event.php?event_id=<?php echo $data['parent_event_id'] ?>"><?php echo $data['parent_event_name']?></a>
+	           	<span class="formInput" style="width:auto;">
+	                <input type="hidden" id="parent_event_id"	name="parent_event_id" value="<?php echo $data["parent_ids"] ?>"  />
+	                <?php
+	                    $ids    = json_decode($data['parent_ids']);
+	                    $titles = json_decode($data['parent_titles']);
+	                    $link_a = array_map(function ($id, $title) {
+                            return '<a href="Event.php?event_id='.$id.'">'.$title.'</a>';
+                        }, $ids, $titles);
+                        echo implode(is_array($titles)? "<a>, </a>" : "", $link_a);
+	                ?>
 	            	<input id="parent_event_name" name="parent_event_name"
 			                placeholder="Parent Event Name" validator="dropdown"
 			                datatype="event"  target="parent_event_id"
-			                value="<?php echo $data["parent_event_name"] ?>" 
+			                value="<?php echo implode(", ", $titles); ?>" 
 			                type="search" size="100" maxlength="100" ignore="yes" />
 			        <label for="parent_event_name">Parent Event</label>
 	            </span>
