@@ -88,14 +88,12 @@
 		if(isset($_GET["event_id"])) {
 
             $sql = "SELECT 
-                        P.person_id, 
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
             		    do_not_contact,
             		    role,
                         CONCAT(P.name_first, ' ', name_last) AS name,
-                       	CONCAT(T.curriculum, ' (',T.location, ' - ', DATE_FORMAT(T.start, '%b %y'),')') AS recent_workshop,
-                        JSON_VALUE(R.attendance, '$.total') AS days_attended,
-                        R.attendance AS attendance,
+                        JSON_VALUE(En.attendance, '$.total') AS days_attended,
+                        En.attendance AS attendance,
                         (CASE grades_taught
                         	WHEN 'High School' THEN 'HS'
                         	WHEN 'Middle School' THEN 'MS'
@@ -104,24 +102,22 @@
                         	WHEN 'Elementary & Middle School' THEN 'E&MS'
                          	ELSE 'Unknown'
                         END) AS grades_taught,
-                        R.type AS type,
-                        COALESCE(R.notes,'') AS notes,
-                        R.enrollment_id,
-                        R.type AS type,
+                        En.type AS type,
+                        COALESCE(En.notes,'') AS notes,
+                        En.enrollment_id,
+    					IF(Ev.type='Coaching', recent_training_id, COALESCE(Ev.parent_event_id, Ev.event_id)) AS training_id,
                         TR.implemented
-                    FROM `Enrollments` AS R, `People` AS P
-                    LEFT JOIN `Organizations` AS O
-                    ON P.employer_id = O.org_id
-                    LEFT JOIN Enrollments AS TR
+                    FROM Events AS Ev, Enrollments AS En, People AS P
+                    LEFT JOIN (
+                        SELECT person_id, Ev.event_id AS recent_training_id, En.implemented FROM Enrollments AS En, Events AS Ev 
+                        WHERE Ev.event_id = En.event_id AND Ev.type='Training' GROUP BY person_id ORDER BY start 
+                    ) AS TR
                     ON TR.person_id = P.person_id
-                    LEFT JOIN Events AS T
-		            ON T.event_id = TR.event_id
-        		    AND T.type = 'Training'
-                    WHERE R.person_id = P.person_id 
-                    AND (R.type = 'Participant' OR R.type = 'Make-up')
-                    AND R.event_id = ".$_REQUEST['event_id']."
-                    GROUP BY P.person_id
-            		ORDER BY T.start DESC";
+                    WHERE 
+                        Ev.event_id = ".$_REQUEST['event_id']."
+                        AND En.event_id = Ev.event_id
+                        AND P.person_id = En.person_id
+                        AND En.type='Participant'";
 			$participants = $mysqli->query($sql);
 
             $sql = "SELECT 
@@ -541,7 +537,7 @@ if($data) {
 		    </tbody>
 		</table>
 		</p>
-		<input type="Submit" id="update_attendance" value="💾 Save Attendance" style="float: right;" />
+		<input type="Submit" id="update_attendance" value="💾 Save" style="float: right;" />
 	</form>
 	
 <?php if (mysqli_num_rows($followup_events) > 0) { ?>

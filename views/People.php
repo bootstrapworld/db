@@ -67,7 +67,8 @@
                 C.type AS comm_type,
                 C.date AS recent_contact, 
                 C.notes AS comm_notes,
-                BP.bootstrap_name
+                BP.bootstrap_name,
+                R.implemented
 			FROM People AS P
 			LEFT JOIN Organizations AS O
 			ON P.employer_id=O.org_id
@@ -178,6 +179,7 @@
 		        <th>Location</th>
 		        <th>Recent Contact</th>
 		        <th>Recent Workshop</th>
+		        <th>Status</th>
 		    </tr>
 		    </thead>
 		    <tbody>
@@ -196,7 +198,12 @@ title="(<?php echo $row['bootstrap_name']; ?>via <?php echo $row['comm_type']; ?
 <?php echo $row['comm_notes']; ?>" 
                     
 		        ><?php if($row['recent_contact']) echo date_format(date_create($row['recent_contact']), "M jS, Y");?></td>
-		        <td><a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop_role']; ?> - <?php echo $row['recent_workshop']; ?></a></td>
+		        <td>
+		            <?php if($row['recent_workshop_role'] == "Participant") { ?>
+		                <a href="Event.php?event_id=<?php echo $row['event_id']; ?>"><?php echo $row['recent_workshop']; ?></a>
+		            <?php } ?>
+		        </td>
+		        <td><?php echo $row['implemented']; ?></td>
 		    </tr>
 		<?php } ?>
 		    </tbody>

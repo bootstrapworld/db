@@ -27,8 +27,11 @@
 	    td, th { padding: 4px 2px; font-size: 11px; }
 	    th:nth-child(2), td:nth-child(2) { text-align: center; }
 	    th:nth-child(3), td:nth-child(3) { max-width: 100px; text-overflow: ellipsis; overflow: hidden; }
+	    th:nth-child(4), td:nth-child(4) { text-align: center; }
+	    th:nth-child(5), td:nth-child(5) { text-align: center; }
+	    th:nth-child(6), td:nth-child(6) { text-align: center; }
 	    th:nth-child(7), td:nth-child(7) { text-align: center; }
-	    th:nth-child(8), td:nth-child(8) { text-align: center; }
+	    th:nth-child(8), td:nth-child(8) { text-align: center; max-width: 200px; text-overflow: ellipsis; overflow: hidden; }
 	    th:nth-child(9), td:nth-child(9) { text-align: center; }
 	    input[type=button] {margin: 10px 0; }
 	    .chart { width: 20%; height: auto; float: left; }
@@ -47,7 +50,9 @@
 	
 	// Get all implementations for each teacher, per-AY
 	// Replace the planned one with the real one, if it exists
-	$sql = "SELECT *, 
+	$sql = "SELECT 
+	            I.implementation_id, I.course_name, I.subject, I.grade_level, I.curriculum, I.model, 
+	            P.person_id, P.name, P.race, P.implemented,
 	            SUM(num_students) AS num_students,
 	            YEAR(start) - IF(MONTH(start) < 7, 1, 0) AS AY
 	        FROM 
@@ -55,10 +60,13 @@
             	    (SELECT parent_impl_id FROM Implementations WHERE parent_impl_id IS NOT NULL)
 				UNION 
 				(SELECT * FROM Implementations WHERE parent_impl_id IS NOT NULL)) AS I
-            LEFT JOIN People AS P
+            LEFT JOIN (
+                SELECT P.person_id, CONCAT(name_first, ' ', name_last) AS name,race, E.implemented 
+                FROM People AS P, Enrollments AS E
+                WHERE P.person_id = E.person_id
+                GROUP BY P.person_id
+            ) AS P
             ON P.person_id = I.person_id
-	        LEFT JOIN Organizations AS O
-	        ON O.org_id = P.employer_id
             WHERE 
 	            I.person_id = P.person_id
             AND YEAR(start) - IF(MONTH(start) < 7, 1, 0)=".$year."
@@ -217,12 +225,12 @@
 		    <tr>
 		        <th></th>
 		        <th>AY</th>
-		        <th>Status</th>
-		        <th>Course Name</th>
 		        <th>Teacher</th>
-		        <th>Subject</th>
 		        <th>Curriculum</th>
+		        <th>Status</th>
+		        <th>Subject</th>
 		        <th>Impl. Model</th>
+		        <th>Course Name</th>
 		        <th>Students</th>
 		    </tr>
 		    </thead>
@@ -236,12 +244,12 @@
 		            <a class="deleteButton" href="#" onmouseup="deleteClass(<?php echo $row['implementation_id']; ?>)"></a>
 		        </td>
 		        <td><?php echo $row['AY']; ?></td>
-		        <td><?php echo $row['status']; ?></td>
-		        <td><a href="Implementation.php?implementation_id=<?php echo $row['implementation_id']; ?>"><?php echo $row['course_name']; ?></a></td>
-		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name_first']." ".$row['name_last']; ?></a></td>
-		        <td><?php echo $row['subject']; ?></td>
+		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
 		        <td><?php echo $row['curriculum']; ?></td>
+		        <td><?php echo $row['implemented']; ?></td>
+		        <td><?php echo $row['subject']; ?></td>
 		        <td><?php echo $row['model']; ?></td>
+		        <td><a href="Implementation.php?implementation_id=<?php echo $row['implementation_id']; ?>"><?php echo $row['course_name']; ?></a></td>
 		        <td><?php echo $row['num_students']; ?></td>
 		    </tr>
 		<?php } ?>
