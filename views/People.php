@@ -86,76 +86,133 @@
 	  $people = $mysqli->query($sql);
 	  
 	  $sql = "SELECT 
-	            COUNT(person_id) AS count, 
-	            (CASE primary_subject
-	                WHEN 'English/ELA' THEN 'ELA'
-	                WHEN 'Algebra 1' THEN 'Algebra1'
-	                WHEN 'Algebra 2' THEN 'Algebra2'
-	                WHEN 'General Math' THEN 'Math'
-	                WHEN 'Earth Science' THEN 'EarthScience'
-	                WHEN 'Computer Science' THEN 'CS'
-	                WHEN 'General Science' THEN 'Science'
-	                WHEN 'Precalculus or Above' THEN 'HighMath'
-	                WHEN 'Data Science' THEN 'DS'
-	                WHEN 'Social Studies' THEN 'SocialStudies'
-	            END) AS primary_subject
-	          FROM `People` WHERE role='Teacher' GROUP BY primary_subject";
+	            person_id, Ev.type,
+                SUM(CASE WHEN En.implemented='Implementing this year' 	THEN 1 ELSE 0 END) AS this_year,
+                SUM(CASE WHEN En.implemented='Will implement next year' THEN 1 ELSE 0 END) AS next_year,
+                SUM(CASE WHEN En.implemented='Will not implement' 		THEN 1 ELSE 0 END) AS not_implementing,
+                SUM(CASE WHEN En.implemented='Unknown' 					THEN 1 ELSE 0 END) AS unknown,
+                1 AS X
+            FROM Events AS Ev
+            LEFT JOIN (
+                SELECT event_id, P.person_id, En.implemented 
+                FROM People AS P, Enrollments AS En
+                WHERE En.person_id = P.person_id
+                AND En.type = 'Participant'
+                AND P.role = 'Teacher'
+                ORDER BY person_id, CASE
+	                WHEN En.implemented = 'Implementing this year' 	 THEN 1
+	                WHEN En.implemented = 'Will implement next year' THEN 2
+	                WHEN En.implemented = 'Will not implement' 		 THEN 3
+	                WHEN En.implemented = 'Unknown' 				 THEN 4
+		            ELSE 5
+                END ASC
+            ) AS En
+            ON Ev.event_id = En.event_id
+            WHERE Ev.type = 'Training'
+            GROUP BY X";
+      $status_summary = $mysqli->query($sql);
+      $status_summary = $status_summary->fetch_array(MYSQLI_ASSOC);
+	  
+	  $sql = "SELECT 1 AS X,
+                SUM(CASE WHEN primary_subject = 'other' 	        THEN 1 ELSE 0 END) AS other,
+                SUM(CASE WHEN primary_subject = 'English/ELA' 	    THEN 1 ELSE 0 END) AS ELA,
+                SUM(CASE WHEN primary_subject = 'Earth Science' 	THEN 1 ELSE 0 END) AS earth_science,
+                SUM(CASE WHEN primary_subject = 'Computer Science' 	THEN 1 ELSE 0 END) AS computer_science,
+                SUM(CASE WHEN primary_subject = 'Data Science' 	    THEN 1 ELSE 0 END) AS data_science,
+                SUM(CASE WHEN primary_subject = 'Social Studies' 	THEN 1 ELSE 0 END) AS social_studies,
+                SUM(CASE WHEN primary_subject = 'History' 	        THEN 1 ELSE 0 END) AS history,
+                SUM(CASE WHEN primary_subject = 'General Science' 	THEN 1 ELSE 0 END) AS general_science,
+                SUM(CASE WHEN primary_subject = 'Physics' 	        THEN 1 ELSE 0 END) AS physics,
+                SUM(CASE WHEN primary_subject = 'Chemistry' 	    THEN 1 ELSE 0 END) AS chemistry,
+                SUM(CASE WHEN primary_subject = 'Business'   	    THEN 1 ELSE 0 END) AS business,
+                SUM(CASE WHEN primary_subject = 'Geometry' 	        THEN 1 ELSE 0 END) AS geometry,
+                SUM(CASE WHEN primary_subject = 'Statistics'        THEN 1 ELSE 0 END) AS statistics,
+                SUM(CASE WHEN primary_subject = 'Algebra 1' 	    THEN 1 ELSE 0 END) AS algebra1,
+                SUM(CASE WHEN primary_subject = 'Algebra 2' 	    THEN 1 ELSE 0 END) AS algebra2,
+                SUM(CASE WHEN primary_subject = 'General Math' 	    THEN 1 ELSE 0 END) AS general_math,
+                SUM(CASE WHEN primary_subject = 'Precalculus or Above' 	THEN 1 ELSE 0 END) AS higher_math
+	          FROM `People` WHERE role='Teacher' GROUP BY X";
 	  $subject_summary = $mysqli->query($sql);
-
-	  $sql = "SELECT COUNT(person_id) AS count, state FROM `People` WHERE role='Teacher' GROUP BY state";
-	  $state_summary = $mysqli->query($sql);
-	  
-	  
+      $subject_summary = $subject_summary->fetch_array(MYSQLI_ASSOC);
+      
+      $sql = "SELECT 1 AS X, 
+    	        SUM(CASE WHEN grades_taught = 'Middle School'         	THEN 1 ELSE 0 END) AS middle_school,
+                SUM(CASE WHEN grades_taught = 'High School'         	THEN 1 ELSE 0 END) AS high_school,
+        	    SUM(CASE WHEN grades_taught = 'Middle & High School'    THEN 1 ELSE 0 END) AS middle_and_high_school,
+        	    SUM(CASE WHEN grades_taught = 'Elementary'         	    THEN 1 ELSE 0 END) AS elementary_school,
+        	    SUM(CASE WHEN grades_taught = 'K-12'         			THEN 1 ELSE 0 END) AS k_12,
+        	    SUM(CASE WHEN grades_taught = 'Elementary & Middle School' THEN 1 ELSE 0 END) AS elem_and_middle_school
+              FROM People
+              WHERE role = 'Teacher'
+              GROUP BY X";
+	  $grade_summary = $mysqli->query($sql);
+      $grade_summary = $grade_summary->fetch_array(MYSQLI_ASSOC);
+      
 	  $mysqli->close();
 	?>
 <script>
     	function drawCharts() {
     	    // Extract status and demographic data
     	    const subjectData = <?php echo json_encode($subject_summary); ?>;
-    	    const stateData   = <?php echo json_encode($state_summary); ?>;
-    	    console.log(subjectData, stateData)
-/*    	    
+    	    const gradeData   = <?php echo json_encode($grade_summary);   ?>;
+    	    const statusData  = <?php echo json_encode($status_summary);  ?>;
+    	    
     	    // Show TeacherSuccess's progress reaching out to teachers
     	    Object.keys(subjectData).forEach( k => subjectData[k] = Number(subjectData[k]));
-    	    const { ELA, SocialStudies,History,Civics,Business,Physics,Chemistry,Biology,EarthScience,CS,Science,Algebra1,Algebra2,Geometry,Statistics,Math,HighMath,Other,DS } = subjectData;
+    	    const { other, ELA, earth_science, computer_science, data_science, social_studies, history, general_science, physics, chemistry, business, geometry, algebra1, algebra2, general_math, higher_math, statistics } = subjectData;
             const progress = google.visualization.arrayToDataTable([
                 ['Subject', '#Teachers', {type:'string', role:'tooltip'}],
-                ['ELA',             ELA,            String(ELA) + " teachers"],
-                ['Social Studies',  SocialStudies,  String(SocialStudies) + " teachers"],
-                ['History',         History,        String(History) + " teachers"],
-                ['Civics',          Civics,         String(Civics) + " teachers"],
-                ['Business',        Business,       String(Business) + " teachers"],
-                ['Physics',         Physics,        String(Physics) + " teachers"],
-                ['Chemistry',       Chemistry,      String(Chemistry) + " teachers"],
-                ['Earth Science',   EarthScience,   String(EarthScience) + " teachers"],
-                ['Computer Science',CS,             String(ELA) + " teachers"],
-                ['Science',         Science,        String(Science) + " teachers"],
-                ['Algebra1',        Algebra1,       String(Algebra1) + " teachers"],
-                ['Algebra2',        Algebra2,       String(Algebra2) + " teachers"],
-                ['Statistics',      Statistics,     String(Statistics) + " teachers"],
-                ['Math',            Math,           String(Math) + " teachers"],
-                ['Precalculus or Above', HighMath,  String(HighMath) + " teachers"],
-                ['Other',           Other,          String(Other) + " teachers"],
-                ['Data Science',    DS,             String(DS) + " teachers"]
-                
+                ['Other',           other,              String(other)           + " Other"],
+                ['ELA',             ELA,                String(ELA)             + " ELA"],
+                ['Earth Science',   earth_science,      String(earth_science)   + ' Earth Science'],
+                ['Computer Science',computer_science,   String(computer_science) + ' Computer Science'],
+                ['Data Science',    data_science,       String(data_science)    + ' Data Science'],
+                ['Physics',         physics,            String(physics)         + ' Physics'],
+                ['Chemistry',       chemistry,          String(chemistry)       + ' Chemistry'],
+                ['Science',         general_science,    String(general_science) + 'S cience'],
+                ['Social Studies',  social_studies,     String(social_studies)  + ' Social Studies'],
+                ['History',         history,            String(history)         + ' History'],
+                ['Business',        business,           String(business)        + ' Business'],
+                ['Algebra1',        algebra1,           String(algebra1)        + ' Algebra1'],
+                ['Algebra2',        algebra2,           String(algebra2)        + ' Algebra2'],
+                ['Geometry',        geometry,           String(geometry)        + ' Geometry'],
+                ['General Math',    general_math,       String(geometry)        + ' General Math'],
+                ['Precalculus or Above',higher_math,    String(geometry)        + ' Precalculus or above'],
+                ['Statistics',      statistics,         String(statistics)      + ' Statistics'],
             ]); 
-            let options = { title: 'Contacted', legend: 'none', };
+            let options = { title: 'By Subject', legend: 'none', };
             let chart = new google.visualization.PieChart(document.getElementById('subjectChart'));
             chart.draw(progress, options);
     	    
-    	    // Show actual Gender data
-    	    Object.keys(stateData).forEach( k => stateData[k] = Number(stateData[k]));
-    	    Object.keys(stateData).map(state => [state, ])
-            const gender = google.visualization.arrayToDataTable([
-                ['Gender', '#Students', {type:'string', role:'tooltip'}],
-                ['Boys', pct_boys, String(Math.round(num_students * pct_boys)) + " male"],
-                ['Girls', pct_girls, String(Math.round(num_students * pct_girls)) + " female"],
-                ['Non Binary', pct_non_binary, String(Math.round(num_students * pct_non_binary)) + " non-binary"],
+    	    // Show grade level chart
+    	    Object.keys(gradeData).forEach( k => gradeData[k] = Number(gradeData[k]));
+    	    const { middle_school, high_school, elementary_school, middle_and_high_school, elem_and_middle_school, k_12 } = gradeData;
+            const gradeLevel = google.visualization.arrayToDataTable([
+                ['Grade Level', '#Teachers', {type:'string', role:'tooltip'}],
+                ['High School',         high_school,        String(Math.round(high_school)) + '  High School'],
+                ['Middle School',       middle_school,      String(Math.round(high_school)) + '  Middle School'],
+                ['Elementary School',   elementary_school,  String(Math.round(high_school)) + '  Elementary School'],
+                ['Middle and High School', middle_and_high_school, String(Math.round(high_school)) + '  Middle and High  School'],
+                ['Elementary and Middle School', elem_and_middle_school, String(Math.round(high_school)) + '  Elementary and Middle School'],
+                ['K-12',                k_12,               String(Math.round(k_12)) + '  K-12'],
             ]); 
-            options = { title: 'Gender', legend: 'none', };
-            chart = new google.visualization.PieChart(document.getElementById('genderChart'));
-            chart.draw(gender, options);
-*/            
+            options = { title: 'By Grade Level', legend: 'none', };
+            chart = new google.visualization.PieChart(document.getElementById('gradeLevelChart'));
+            chart.draw(gradeLevel, options);
+    	    
+    	    // Show implementation status chart
+    	    Object.keys(statusData).forEach( k => statusData[k] = Number(statusData[k]));
+    	    const { this_year, next_year, not_implementing, unknown } = statusData;
+            const status = google.visualization.arrayToDataTable([
+                ['Status', '#Participants', {type:'string', role:'tooltip'}],
+                ['Implementing this year', this_year, String(Math.round(this_year)) + '  are implementing THIS year'],
+                ['Implementing next year', next_year, String(Math.round(next_year)) + ' will implement NEXT year'],
+                ['Will not implement', not_implementing, String(Math.round(not_implementing)) + ' Will NOT implement'],
+                ['Unknown', unknown, String(Math.round(unknown)) + ' are Unknown'],
+            ]); 
+            options = { title: 'By Status', legend: 'none', };
+            chart = new google.visualization.PieChart(document.getElementById('statusChart'));
+            chart.draw(status, options);
         }
 </script>
 </head>
@@ -166,8 +223,9 @@
 		<h1>People</h1><br/>
         <input type="button" onclick="addPerson()" value="+ Add a Person"/><br/>
         
+        <div id="statusChart"       class="chart"></div>
         <div id="subjectChart"      class="chart"></div>
-        <div id="stateChart"        class="chart"></div>
+        <div id="gradeLevelChart"   class="chart"></div>
 
 	    <table class="smart">
 		    <thead>

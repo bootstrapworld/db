@@ -12,82 +12,24 @@
 	<script type="text/javascript" src="../js/modal.js"></script>
 	<script type="text/javascript" src="../js/smarttables.js"></script>
 	<script type="text/javascript" src="../js/scripts.js"></script>	
+	
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 	<style>
 	    td, th { padding: 5px; }
 	    table { border: 1px solid black; }
 	    form.locked .formInput a:has(+a), form.locked .formInput a+a { width: unset; display: inline; }
+	    .chart { float: right; }
 	</style>
 	
-	<!--- AJAX calls --->
-	<script type="text/javascript">
-		function updateEventRp( eventId ){
-			if ( eventId ){
-		        if(eventId > 0)  window.location = baseURL + `/views/Event.php?event_id=${eventId}`;
-			    else if(eventId == 0) window.location.reload();
-			    else throw "Impossible result came back from EventAction.php:"+eventId;
-			}
-		}
-
-		function deleteEventRq(){
-			const id = document.getElementById('event_id').value;
-			if(confirm("Are you sure you want to remove Event ID# " + id + " permanently?")){
-				var request = new XMLHttpRequest();
-				// if the request is successful, execute the callback
-				request.onreadystatechange = function() {
-					if (request.readyState == 4 && request.status == 200) {
-						deleteEventRp(request.responseText);
-					}
-				}; 
-				const data = JSON.stringify({event_id:id});
-				request.open('POST', "../actions/EventActions.php?method=delete&data="+data);
-				request.send();
-			}
-		}
-		function deleteEventRp( rsp ){
-			const urlValue = baseURL + `/views/Events.php`;
-			window.location = urlValue;
-		}
-		
-		
-		<!--- local code --->
-		function markDirty() {
-		    document.getElementById('update_attendance').style.boxShadow = "red 5px 5px 20px";
-		    window._DBglobal_isDirty = true;    
-		}
-		window._DBglobal_isDirty = false;
-		
-		function duplicateEventRq(e) {
-		    const id = document.getElementById('event_id').value;
-			if(confirm("Are you sure you want to duplicate Event ID# " + id + ", and all the associated enrollments?")){
-				var request = new XMLHttpRequest();
-				// if the request is successful, execute the callback
-				request.onreadystatechange = function() {
-					if (request.readyState == 4 && request.status == 200) {
-						window.location = "Event.php?event_id="+request.responseText;
-					}
-				}; 
-				const data = JSON.stringify({event_id:id});
-				request.open('POST', "../actions/EventActions.php?method=duplicateEvent&data="+data);
-				request.send();
-			}
-		}
-		
-		function updateEndDate() {
-		    const startDateElt = document.getElementById('start');
-		    const endDateElt   = document.getElementById('end');
-		    if(!endDateElt.value) endDateElt.value = startDateElt.value;
-		}
-		
-	</script>
 		<?php
-
 		include 'common.php';
 
 		$mysqli = openDB_Connection();
 		if(isset($_GET["event_id"])) {
 
             $sql = "SELECT 
+                        P.person_id,
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
             		    do_not_contact,
             		    role,
@@ -162,8 +104,36 @@
                     AND R.type = 'Admin'
                     AND event_id = ".$_REQUEST["event_id"];
 			$admins = $mysqli->query($sql);
+			
+			$sql = "SELECT 
+	            person_id, Ev.type,
+                SUM(CASE WHEN En.implemented='Implementing this year' 	THEN 1 ELSE 0 END) AS this_year,
+                SUM(CASE WHEN En.implemented='Will implement next year' THEN 1 ELSE 0 END) AS next_year,
+                SUM(CASE WHEN En.implemented='Will not implement' 		THEN 1 ELSE 0 END) AS not_implementing,
+                SUM(CASE WHEN En.implemented='Unknown' 					THEN 1 ELSE 0 END) AS unknown,
+                1 AS X
+            FROM Events AS Ev
+            LEFT JOIN (
+                SELECT event_id, P.person_id, En.implemented 
+                FROM People AS P, Enrollments AS En
+                WHERE En.person_id = P.person_id
+                AND En.type = 'Participant'
+                AND P.role = 'Teacher'
+                ORDER BY person_id, CASE
+	                WHEN En.implemented = 'Implementing this year' 	 THEN 1
+	                WHEN En.implemented = 'Will implement next year' THEN 2
+	                WHEN En.implemented = 'Will not implement' 		 THEN 3
+	                WHEN En.implemented = 'Unknown' 				 THEN 4
+		            ELSE 5
+                END ASC
+            ) AS En
+            ON Ev.event_id = En.event_id
+            WHERE Ev.event_id = ".$_REQUEST["event_id"]."
+            GROUP BY X";
+        $status_summary = $mysqli->query($sql);
+        $status_summary = $status_summary->fetch_array(MYSQLI_ASSOC);
 
-			$sql = "SELECT *, DATEDIFF(end, start)+1 AS total_days, E.type AS event_type, JSON_ARRAYAGG(PE.parent_id) AS parent_ids, JSON_ARRAYAGG(parent_title) AS parent_titles
+		$sql = "SELECT *, DATEDIFF(end, start)+1 AS total_days, E.type AS event_type, JSON_ARRAYAGG(PE.parent_id) AS parent_ids, JSON_ARRAYAGG(parent_title) AS parent_titles
 			        FROM Events As E 
 			        LEFT JOIN Organizations AS O 
 			        ON E.org_id = O.org_id 
@@ -181,7 +151,85 @@
 		$mysqli->close();
 		$title = isset($_GET["event_id"])? $data["title"] : "New Event";
 	?>
-	
+		<script type="text/javascript">
+	    
+	    function drawCharts() {
+	        const statusData  = <?php echo json_encode($status_summary);  ?>;
+            // Show implementation status chart
+    	    Object.keys(statusData).forEach( k => statusData[k] = Number(statusData[k]));
+    	    const { this_year, next_year, not_implementing, unknown } = statusData;
+            const status = google.visualization.arrayToDataTable([
+                ['Status', '#Participants', {type:'string', role:'tooltip'}],
+                ['Implementing this year', this_year, String(Math.round(this_year)) + '  are implementing THIS year'],
+                ['Implementing next year', next_year, String(Math.round(next_year)) + ' will implement NEXT year'],
+                ['Will not implement', not_implementing, String(Math.round(not_implementing)) + ' Will NOT implement'],
+                ['Unknown', unknown, String(Math.round(unknown)) + ' are Unknown'],
+            ]); 
+            options = { title: 'By Status', legend: 'none', };
+            chart = new google.visualization.PieChart(document.getElementById('statusChart'));
+            chart.draw(status, options);
+	    }
+
+    	<!--- AJAX calls --->
+		function updateEventRp( eventId ){
+			if ( eventId ){
+		        if(eventId > 0)  window.location = baseURL + `/views/Event.php?event_id=${eventId}`;
+			    else if(eventId == 0) window.location.reload();
+			    else throw "Impossible result came back from EventAction.php:"+eventId;
+			}
+		}
+
+		function deleteEventRq(){
+			const id = document.getElementById('event_id').value;
+			if(confirm("Are you sure you want to remove Event ID# " + id + " permanently?")){
+				var request = new XMLHttpRequest();
+				// if the request is successful, execute the callback
+				request.onreadystatechange = function() {
+					if (request.readyState == 4 && request.status == 200) {
+						deleteEventRp(request.responseText);
+					}
+				}; 
+				const data = JSON.stringify({event_id:id});
+				request.open('POST', "../actions/EventActions.php?method=delete&data="+data);
+				request.send();
+			}
+		}
+		function deleteEventRp( rsp ){
+			const urlValue = baseURL + `/views/Events.php`;
+			window.location = urlValue;
+		}
+		
+		
+		<!--- local code --->
+		function markDirty() {
+		    document.getElementById('update_attendance').style.boxShadow = "red 5px 5px 20px";
+		    window._DBglobal_isDirty = true;    
+		}
+		window._DBglobal_isDirty = false;
+		
+		function duplicateEventRq(e) {
+		    const id = document.getElementById('event_id').value;
+			if(confirm("Are you sure you want to duplicate Event ID# " + id + ", and all the associated enrollments?")){
+				var request = new XMLHttpRequest();
+				// if the request is successful, execute the callback
+				request.onreadystatechange = function() {
+					if (request.readyState == 4 && request.status == 200) {
+						window.location = "Event.php?event_id="+request.responseText;
+					}
+				}; 
+				const data = JSON.stringify({event_id:id});
+				request.open('POST', "../actions/EventActions.php?method=duplicateEvent&data="+data);
+				request.send();
+			}
+		}
+		
+		function updateEndDate() {
+		    const startDateElt = document.getElementById('start');
+		    const endDateElt   = document.getElementById('end');
+		    if(!endDateElt.value) endDateElt.value = startDateElt.value;
+		}
+	</script>
+
 	<title><?php echo $title ?></title>
 </head>
 <body>
@@ -213,6 +261,7 @@
 			<fieldset>
 				<legend>Event Information</legend>
 				<span class="instructions">You must enter at least a title, type, start & end time, and price.</span><p/>
+				<div id="statusChart" class="chart"></div>
 				
 				<input type="hidden" id="event_id"	name="event_id"
 						 value="<?php echo $data["event_id"] ?>" 
@@ -651,6 +700,10 @@ if($data) {
 */
 document.getElementById('location').placeholder = randomFormInfo.address + " " + randomFormInfo.city + ", " + randomFormInfo.state
 	</script>
+<script>
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
+</script>
 
 </body>
 </html>
