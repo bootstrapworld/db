@@ -74,7 +74,7 @@ ORDER BY start DESC";
 		        <th>Title</th>
 		        <th style="display:none;">Partner Org</th>
 		        <th style="text-align: center;">When</th>
-		        <th>Facilitators</th>
+		        <th style="text-align: center;">Facilitators</th>
 		        <th>Participants</th>
 		        <th>Attendance</th>
 		    </tr>

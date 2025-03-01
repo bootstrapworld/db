@@ -91,8 +91,8 @@ SmartTable = function(table){
 
 // Check to see if the cell has a data attribute, then fallback to textContent, then the empty string
 function getCellContents(td) {
-  return (td.dataset && td.dataset['data']) || td.textContent || '';  
-};
+  return (td.dataset && td.dataset['data']) || td.textContent.replace(/ /g,'') || '';  
+}
 
 SmartTable.prototype.rebuildTable = function (e) {
     const filter1Col  = this.controls.querySelector('.filter1Col');
@@ -227,7 +227,6 @@ SmartTable.prototype.filterBy = function(filters) {
 
 /* Use RegExps to guess datatypes */
 function getDatatype(rows, idx){
-    
     if(rows.length == 0) return "text";
     // USE A FOR LOOP SO WE CAN BREAK EARLY!
 	for(i=0; i < rows.length; i++){							// loop through the column
