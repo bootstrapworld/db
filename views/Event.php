@@ -33,6 +33,7 @@
             		    COALESCE(email_preferred, email_professional, email_google) AS email,
             		    do_not_contact,
             		    role,
+            		    En.created AS date,
                         CONCAT(P.name_first, ' ', name_last) AS name,
                         JSON_VALUE(En.attendance, '$.total') AS days_attended,
                         En.attendance AS attendance,
@@ -44,6 +45,7 @@
                         	WHEN 'Elementary & Middle School' THEN 'E&MS'
                          	ELSE 'Unknown'
                         END) AS grades_taught,
+                        primary_subject,
                         En.type AS type,
                         COALESCE(En.notes,'') AS notes,
                         En.enrollment_id,
@@ -70,6 +72,7 @@
                         O.org_id, O.name AS employer_name,
                         COALESCE(R.notes,'') AS notes,
                         R.enrollment_id,
+            		    R.created AS date,
                         R.type AS type
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O
@@ -96,6 +99,7 @@
                         O.org_id, O.name AS employer_name,
                         COALESCE(R.notes,'') AS notes,
                         R.enrollment_id,
+            		    R.created AS date,
                         R.type AS type
                     FROM `Enrollments` AS R, `People` AS P
                     LEFT JOIN `Organizations` AS O

@@ -67,7 +67,8 @@
 	                COALESCE(JSON_LENGTH(JSON_VALUE(attendance, '$.days_attended')),0) AS days_attended,
                     DATEDIFF(end, start)+1 AS total_days,
                     R.type AS role, E.type AS event_type,
-                    R.notes AS notes
+                    R.notes AS notes,
+                    R.created AS date
                 FROM Enrollments AS R, Events AS E
                 LEFT JOIN Organizations AS O
                 ON O.org_id = E.org_id
@@ -76,7 +77,7 @@
                 ORDER BY start DESC";
 	  $events = $mysqli->query($sql);
 
-	  $sql =   "SELECT C.communication_id, C.person_id, C.type, C.notes, C.date, BP.bootstrap_name
+	  $sql =   "SELECT C.communication_id, C.person_id, C.type, C.notes, C.date, BP.bootstrap_name, C.bootstrap_id
 	            FROM Communications AS C 
 	            LEFT JOIN (SELECT person_id, COALESCE(CONCAT(name_first, ' ', name_last,' '),'') AS bootstrap_name FROM People) AS BP
 	            ON BP.person_id = C.bootstrap_id
