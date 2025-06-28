@@ -26,13 +26,13 @@
 	    tbody tr:hover { background: #ccc; }
 	    td, th { padding: 4px 2px; font-size: 11px; }
 	    th:nth-child(2), td:nth-child(2) { text-align: center; }
-	    th:nth-child(3), td:nth-child(3) { max-width: 100px; text-overflow: ellipsis; overflow: hidden; }
-	    th:nth-child(4), td:nth-child(4) { text-align: center; }
-	    th:nth-child(5), td:nth-child(5) { text-align: center; }
+	    th:nth-child(4), td:nth-child(4) { max-width: 100px; text-overflow: ellipsis; overflow: hidden; }
+	    th:nth-child(5), td:nth-child(5) { max-width: 150px; text-overflow: ellipsis; overflow: hidden; }
 	    th:nth-child(6), td:nth-child(6) { text-align: center; }
 	    th:nth-child(7), td:nth-child(7) { text-align: center; }
-	    th:nth-child(8), td:nth-child(8) { text-align: center; max-width: 200px; text-overflow: ellipsis; overflow: hidden; }
-	    th:nth-child(9), td:nth-child(9) { text-align: center; }
+	    th:nth-child(8), td:nth-child(8) { text-align: center; }
+	    th:nth-child(9), td:nth-child(9) { text-align: center; max-width: 200px; text-overflow: ellipsis; overflow: hidden; }
+	    th:nth-child(10), td:nth-child(10) { text-align: center; max-width: 200px; text-overflow: ellipsis; overflow: hidden; }
 	    input[type=button] {margin: 10px 0; }
 	    .chart { width: 20%; height: auto; float: left; }
 	</style>
@@ -45,14 +45,14 @@
 	// set $year to URL parameters, or infer from the current date
 	$now = new DateTime();
     $year = $now->format('Y');
-    if($now->format('m') < 6) $year = $year - 1;
+    if($now->format('m') < 7) $year = $year - 1;
 	$year = $_GET['year']? $_GET['year'] : $year;
 	
 	// Get all implementations for each teacher, per-AY
 	// Replace the planned one with the real one, if it exists
 	$sql = "SELECT 
 	            I.implementation_id, I.course_name, I.subject, I.grade_level, I.curriculum, I.model, 
-	            P.person_id, P.name, P.race, P.implemented,
+	            P.person_id, P.name, P.race, P.implemented, P.state, P.employer_id, Organizations.name AS org_name,
 	            SUM(num_students) AS num_students,
 	            YEAR(start) - IF(MONTH(start) < 7, 1, 0) AS AY
 	        FROM 
@@ -61,12 +61,14 @@
 				UNION 
 				(SELECT * FROM Implementations WHERE parent_impl_id IS NOT NULL)) AS I
             LEFT JOIN (
-                SELECT P.person_id, CONCAT(name_first, ' ', name_last) AS name,race, E.implemented 
+                SELECT P.person_id, CONCAT(name_first, ' ', name_last) AS name,race, E.implemented, P.state, P.employer_id
                 FROM People AS P, Enrollments AS E
                 WHERE P.person_id = E.person_id
                 GROUP BY P.person_id
             ) AS P
             ON P.person_id = I.person_id
+            LEFT JOIN Organizations
+            ON Organizations.org_id = P.employer_id
             WHERE 
 	            I.person_id = P.person_id
             AND YEAR(start) - IF(MONTH(start) < 7, 1, 0)=".$year."
@@ -87,13 +89,13 @@
 	  // Get summary statistics for all REAL implementations
 	  $sql = "SELECT 1 AS X,
 	            SUM(num_students) AS num_students,
-	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_iep')       AS DECIMAL(2,2)))  AS pct_iep,
-	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_girls')     AS DECIMAL(2,2)))  AS pct_girls,
-	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_non_binary') AS DECIMAL(2,2))) AS pct_non_binary,
-	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_black')     AS DECIMAL(2,2)))  AS pct_black,
-	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_latino')    AS DECIMAL(2,2)))  AS pct_latino,
-	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_asian')     AS DECIMAL(2,2)))  AS pct_asian,
-	            AVG(CAST(JSON_EXTRACT(demographics_json, '$.pct_islander')  AS DECIMAL(2,2)))  AS pct_islander,
+	            CAST(AVG(JSON_EXTRACT(demographics_json, '$.pct_iep'))       AS DECIMAL(2,2)) AS pct_iep,
+	            CAST(AVG(JSON_EXTRACT(demographics_json, '$.pct_girls'))     AS DECIMAL(2,2)) AS pct_girls,
+	            CAST(AVG(JSON_EXTRACT(demographics_json, '$.pct_non_binary')) AS DECIMAL(2,2)) AS pct_non_binary,
+	            CAST(AVG(JSON_EXTRACT(demographics_json, '$.pct_black'))     AS DECIMAL(2,2)) AS pct_black,
+	            CAST(AVG(JSON_EXTRACT(demographics_json, '$.pct_latino'))    AS DECIMAL(2,2)) AS pct_latino,
+	            CAST(AVG(JSON_EXTRACT(demographics_json, '$.pct_asian'))     AS DECIMAL(2,2)) AS pct_asian,
+	            CAST(AVG(JSON_EXTRACT(demographics_json, '$.pct_islander'))  AS DECIMAL(2,2)) AS pct_islander,
 				SUM(CASE WHEN model LIKE 'Lessons Sprinkled Throughout Course' then 1 else 0 end) AS sprinkled,
 				SUM(CASE WHEN model LIKE 'Dedicated Course' then 1 else 0 end) AS course,
 				SUM(CASE WHEN model LIKE 'Dedicated Unit Within Existing Course' then 1 else 0 end) AS unit,
@@ -225,12 +227,15 @@
 		    <tr>
 		        <th></th>
 		        <th>AY</th>
+		        <th>State</th>
 		        <th>Teacher</th>
+		        <th>School Name</th>
 		        <th>Curriculum</th>
 		        <th>Status</th>
 		        <th>Subject</th>
 		        <th>Impl. Model</th>
 		        <th>Course Name</th>
+		        <th>Grade Level</th>
 		        <th>Students</th>
 		    </tr>
 		    </thead>
@@ -244,12 +249,15 @@
 		            <a class="deleteButton" href="#" onmouseup="deleteClass(<?php echo $row['implementation_id']; ?>)"></a>
 		        </td>
 		        <td><?php echo $row['AY']; ?></td>
+		        <td><?php echo $row['state']; ?></td>
 		        <td><a href="Person.php?person_id=<?php echo $row['person_id']; ?>"><?php echo $row['name']; ?></a></td>
+		        <td><a href="Organiztion.php?org_id=<?php echo $row['employer_id']; ?>"><?php echo $row['org_name']; ?></a></td>
 		        <td><?php echo $row['curriculum']; ?></td>
 		        <td><?php echo $row['implemented']; ?></td>
 		        <td><?php echo $row['subject']; ?></td>
 		        <td><?php echo $row['model']; ?></td>
 		        <td><a href="Implementation.php?implementation_id=<?php echo $row['implementation_id']; ?>"><?php echo $row['course_name']; ?></a></td>
+		        <td><?php echo $row['grade_level']; ?></td>
 		        <td><?php echo $row['num_students']; ?></td>
 		    </tr>
 		<?php } ?>

@@ -81,7 +81,6 @@ ORDER BY start DESC";
 		    </thead>
 		    <tbody>
 		<?php 
-    		//print_r($data);
 		    $now = new DateTime("now", new DateTimeZone("America/New_York"));
 		    $secondsInADay = 60*60*24;
 		    while($row = mysqli_fetch_assoc($events)) { 
@@ -99,7 +98,7 @@ ORDER BY start DESC";
 		            <a href="Event.php?event_id=<?php echo $row['event_id']; ?>">
 		            <?php 
 		                echo $row['curriculum']; 
-		                echo " (".(str_starts_with($location,'http')? 'virtual' : $location).")" ; 
+		                echo " (".(startsWith($location,'http')? 'virtual' : $location).")" ; 
 		                if($row['name']) { echo " - ".$row['name']; }
 		            ?>
 		            </a>

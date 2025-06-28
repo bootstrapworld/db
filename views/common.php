@@ -174,4 +174,9 @@ function generateDropDown($id, $name, $options, $actualValue, $required) {
 	return $select_html;
 }	
 
+function startsWith ($string, $startString) { 
+    $len = strlen($startString); 
+    return (substr($string, 0, $len) === $startString); 
+} 
+
 ?>
